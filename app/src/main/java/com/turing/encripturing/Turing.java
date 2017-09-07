@@ -1,9 +1,13 @@
 package com.turing.encripturing;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -14,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class Turing extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentSonido.OnFragmentInteractionListener, FragmentImagenes.OnFragmentInteractionListener {
@@ -27,6 +32,8 @@ public class Turing extends AppCompatActivity
         setContentView(R.layout.activity_turing);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        requestExternalStoragePermission();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -120,5 +127,38 @@ public class Turing extends AppCompatActivity
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    /**
+     * solicitar permisos de lectura de archivos
+     *
+     */
+    private void requestExternalStoragePermission(){
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)){
+            new AlertDialog.Builder(this)
+                    .setTitle("Permisos de lectura")
+                    .setMessage("Se necesitan los permisos para leer la memoria")
+                    .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(Turing.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
+                        }
+                    }).show();
+
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permission[], int[] grantResults){
+        switch (requestCode){
+            case 1:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                }else {
+                    Toast.makeText(Turing.this, "Permisos denegados", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            return;
+        }
     }
 }
