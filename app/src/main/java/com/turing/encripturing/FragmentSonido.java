@@ -1,5 +1,6 @@
 package com.turing.encripturing;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -9,20 +10,30 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
+
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
 public class FragmentSonido extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -35,6 +46,20 @@ public class FragmentSonido extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private Context context;
+
+    private Uri pathSound;
+
+    private MediaPlayer mediaPlayer;
+
+    private final int SELECT_PICTURE = 200;
+
+    //Boton agregar sonido
+    private FloatingActionButton btn_add;
+
+    private EditText editTitulo;
+    private Button play, encriptar;
 
     //Variables globales para el reproductor
     private MediaPlayerService player;
@@ -72,7 +97,17 @@ public class FragmentSonido extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_fragment_sonido, container, false);
+        View view = inflater.inflate(R.layout.fragment_fragment_sonido, container, false);
+
+        btn_add = (FloatingActionButton) view.findViewById(R.id.sonido_button_add);
+
+        editTitulo = (EditText) view.findViewById(R.id.sonido_edit_titulo);
+        play = (Button) view.findViewById(R.id.sonido_button_play);
+        encriptar = (Button) view.findViewById(R.id.sonido_button_encriptar);
+
+        agregarListeners();
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -85,6 +120,7 @@ public class FragmentSonido extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        this.context = context;
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -152,7 +188,7 @@ public class FragmentSonido extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        serviceBound = savedInstanceState.getBoolean("ServiceState");
+        //serviceBound = savedInstanceState.getBoolean("ServiceState");
     }
 
     @Override
@@ -190,4 +226,98 @@ public class FragmentSonido extends Fragment {
         }
         cursor.close();
     }
+
+    /**
+     * Funcion para agregar listeners a los botones del fragment
+     */
+    private void agregarListeners()
+    {
+        btn_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showOptions();
+            }
+        });
+
+        play.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mediaPlayer.isPlaying())
+                {
+                    mediaPlayer.stop();
+                    play.setText("Reproducir");
+                }
+                else
+                {
+                    mediaPlayer.start();
+                    play.setText("Detener");
+                }
+
+            }
+        });
+    }
+
+    /**
+     * Despliegue del Alert dialog para seleccionar si grabar sonido o seleccionarlo del almacenamiento
+     */
+    public void showOptions()
+    {
+        final CharSequence[] option = {"Grabar Sonido", "Elegir del Explorador", "Cancelar"};
+        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+        builder.setTitle("Elige una opción");
+        builder.setItems(option, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(option[which] == "Grabar Sonido"){
+                    //openCamera();
+                }else if(option[which] == "Elegir del Explorador"){
+                    Intent intent = new Intent();
+                    intent.setType("audio/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    getActivity().startActivityForResult(Intent.createChooser(intent,"Select Audio "), SELECT_PICTURE);
+                }else {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        builder.show();
+    }
+
+    /**
+     * Funcion para extraer los datos de la cancion, su path e instanciarla para reproducirla
+     * @param path - Uri que proviene
+     */
+    public void obtenerSonido(Uri path)
+    {
+        Log.i("Sonido", path.toString());
+
+        pathSound = path;
+
+        mediaPlayer = MediaPlayer.create(context, pathSound);
+
+        String fileName;
+        if (path.getScheme().equals("file")) {
+            fileName = path.getLastPathSegment();
+            editTitulo.setText(fileName);
+        } else {
+            Cursor cursor = null;
+            try {
+                cursor = getActivity().getContentResolver().query(path, new String[]{
+                        MediaStore.Images.ImageColumns.DISPLAY_NAME
+                }, null, null, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+                    editTitulo.setText(fileName);
+                }
+            } finally {
+
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+    }
+
 }
