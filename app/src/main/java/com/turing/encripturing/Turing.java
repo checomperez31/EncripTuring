@@ -40,6 +40,7 @@ public class Turing extends AppCompatActivity
     private View vistaPrincipal;
     private final int MY_PERMISSIONS = 100;
     private final int SELECT_PICTURE = 200;
+    private final int SELECT_VIDEO = 201;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -210,11 +211,10 @@ public class Turing extends AppCompatActivity
                     Uri path = data.getData();
                     fragmentSonido.obtenerSonido(path);
                     break;
-                /*case SELECT_PICTURE:
-                    Uri path = data.getData();
-                    ivImagen.setImageURI(path);
-                    imgSelected = true;
-                    break;*/
+                case SELECT_VIDEO:
+                    Uri pathV = data.getData();
+                    fragmentImagenes.obtenerVideo(pathV);
+                    break;
 
             }
         }

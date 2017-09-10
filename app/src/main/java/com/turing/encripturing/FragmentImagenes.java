@@ -1,15 +1,23 @@
 package com.turing.encripturing;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
@@ -28,6 +36,10 @@ public class FragmentImagenes extends Fragment {
     private VideoView reproductor;
     private MediaController mc;
     private RelativeLayout.LayoutParams paramsNotFullScreen;
+    private FloatingActionButton btn_SeleccionarVideo;
+    private Context context;
+    private final int SELECT_VIDEO = 201;
+    private Uri pathVideo;
     private int position = 0;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -71,7 +83,11 @@ public class FragmentImagenes extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_fragment_imagenes, container, false);
+        View view = inflater.inflate(R.layout.fragment_fragment_imagenes, container, false);
+
+        btn_SeleccionarVideo = (FloatingActionButton) view.findViewById(R.id.btn_SeleccionarVideo);
+        agregarVideo();
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -84,6 +100,7 @@ public class FragmentImagenes extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        this.context = context;
         if (context instanceof OnFragmentInteractionListener) {
             mListener = (OnFragmentInteractionListener) context;
         } else {
@@ -121,7 +138,6 @@ public class FragmentImagenes extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
         reproductor = getView().findViewById(R.id.reproductorVideo);
-        reproductor.setVideoPath("storage/emulated/0/Music/Peggo/Eternal Sunshine of the Spotless Mind - 8 Bit Cinema.mp4");
         //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
         reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
@@ -173,7 +189,7 @@ public class FragmentImagenes extends Fragment {
     /**
      * Posible método para poder correr el video en fullscreen, sigue en pruebas para lograrlo dentro de un fragment
      * por lo que está comentado
-     * @param newConfig
+     * @param /**newConfig
      */
     /*
     @Override
@@ -195,4 +211,109 @@ public class FragmentImagenes extends Fragment {
         }
     }*/
 
+    public void agregarVideo(){
+        btn_SeleccionarVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showOptions();
+            }
+        });
+    }
+
+    public void showOptions()
+    {
+        final CharSequence[] option = {"Grabar video", "Elegir del Explorador", "Cancelar"};
+        final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
+        builder.setTitle("Elige una opción");
+        builder.setItems(option, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(option[which] == "Grabar video"){
+                    //openCamera();
+                }else if(option[which] == "Elegir del Explorador"){
+                    Intent intent = new Intent();
+                    intent.setType("video/*");
+                    intent.setAction(Intent.ACTION_GET_CONTENT);
+                    Log.i("RUTA", "Llega hasta aqui");
+                    getActivity().startActivityForResult(Intent.createChooser(intent,"Select Video "), SELECT_VIDEO);
+                }else {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        builder.show();
+    }
+
+    /**
+     * Funcion para extraer los datos del video, su path e instanciarlo para reproducirlo
+     * @param path - Uri que proviene
+     */
+    public void obtenerVideo(Uri path)
+    {
+        Log.i("RUTA", path.toString());
+
+        pathVideo = path;
+
+        String fileName;
+        if (path.getScheme().equals("file")) {
+            reproductor = getView().findViewById(R.id.reproductorVideo);
+            reproductor.setVideoURI(pathVideo);
+            //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
+            reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                        //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
+                        @Override
+                        public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
+                            mc = new MediaController(getActivity());
+                            //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
+                            //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
+                            reproductor.setMediaController(mc);
+                            mc.setAnchorView(reproductor);
+                        }
+                    });
+                }
+            });
+            reproductor.start();
+            reproductor.requestFocus();
+        } else {
+            Cursor cursor = null;
+            try {
+                cursor = getActivity().getContentResolver().query(path, new String[]{
+                        MediaStore.Images.ImageColumns.DISPLAY_NAME
+                }, null, null, null);
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    reproductor = getView().findViewById(R.id.reproductorVideo);
+                    reproductor.setVideoURI(pathVideo);
+                    //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
+                    reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer mediaPlayer) {
+                            mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                                //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
+                                @Override
+                                public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
+                                    mc = new MediaController(getActivity());
+                                    //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
+                                    //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
+                                    reproductor.setMediaController(mc);
+                                    mc.setAnchorView(reproductor);
+                                }
+                            });
+                        }
+                    });
+                    reproductor.start();
+                    reproductor.requestFocus();
+                }
+            } finally {
+
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+    }
 }
