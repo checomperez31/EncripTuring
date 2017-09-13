@@ -31,6 +31,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.RECORD_AUDIO;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class Turing extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentSonido.OnFragmentInteractionListener, FragmentImagenes.OnFragmentInteractionListener {
@@ -157,20 +159,20 @@ public class Turing extends AppCompatActivity
         if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return true;
 
-        if((checkSelfPermission(READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))
+        if((checkSelfPermission(READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) && (checkSelfPermission(RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) && (checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))
             return true;
 
-        if((shouldShowRequestPermissionRationale(READ_EXTERNAL_STORAGE))){
+        if((shouldShowRequestPermissionRationale(READ_EXTERNAL_STORAGE)) && (shouldShowRequestPermissionRationale(RECORD_AUDIO)) && (shouldShowRequestPermissionRationale(WRITE_EXTERNAL_STORAGE))){
             Snackbar.make(vistaPrincipal , "Los permisos son necesarios para poder usar la aplicación",
                     Snackbar.LENGTH_INDEFINITE).setAction(android.R.string.ok, new View.OnClickListener() {
                 @TargetApi(Build.VERSION_CODES.M)
                 @Override
                 public void onClick(View v) {
-                    requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, MY_PERMISSIONS);
+                    requestPermissions(new String[]{READ_EXTERNAL_STORAGE, RECORD_AUDIO, WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS);
                 }
             }).show();
         }else{
-            requestPermissions(new String[]{READ_EXTERNAL_STORAGE}, MY_PERMISSIONS);
+            requestPermissions(new String[]{READ_EXTERNAL_STORAGE, RECORD_AUDIO, WRITE_EXTERNAL_STORAGE}, MY_PERMISSIONS);
         }
 
         return false;

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
+
+    <RelativeLayout
+        android:id="@+id/layout_dialog_record"
+        android:layout_centerInParent="true"
+        android:layout_width="1500dp"
+        android:layout_height="150dp"
+        >
+
+        <TextView
+            android:id="@+id/text_dialog_record"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:text="Presiona para grabar"
+            android:textColor="@android:color/black"
+            android:layout_centerHorizontal="true"/>
+
+        <ImageView
+            android:id="@+id/mic_dialog_record"
+            android:layout_below="@id/text_dialog_record"
+            android:layout_centerHorizontal="true"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/mic_record"/>
+    </RelativeLayout>
+
+</RelativeLayout>

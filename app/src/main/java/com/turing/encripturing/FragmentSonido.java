@@ -30,6 +30,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -65,6 +66,8 @@ public class FragmentSonido extends Fragment {
     private MediaPlayerService player;
     boolean serviceBound = false;
     ArrayList<Audio> audioList;
+
+    private DialogRecord dialogRecord;
 
     public FragmentSonido() {
         // Required empty public constructor
@@ -105,6 +108,8 @@ public class FragmentSonido extends Fragment {
         play = (Button) view.findViewById(R.id.sonido_button_play);
         encriptar = (Button) view.findViewById(R.id.sonido_button_encriptar);
 
+        dialogRecord = new DialogRecord(context);
+        mediaPlayer = new MediaPlayer();
         agregarListeners();
 
         return view;
@@ -255,6 +260,28 @@ public class FragmentSonido extends Fragment {
 
             }
         });
+
+        dialogRecord.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                String fichero = DialogRecord.fichero;
+                editTitulo.setText("Audio Grabado");
+                mediaPlayer = new MediaPlayer();
+                try {
+                    mediaPlayer.setDataSource(fichero);
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    Log.e("FSON", "Fallo en reproducción");
+                }
+            }
+        });
+
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                play.setText("Reproducir");
+                mediaPlayer.stop();
+            }
+        });
     }
 
     /**
@@ -269,7 +296,9 @@ public class FragmentSonido extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(option[which] == "Grabar Sonido"){
-                    //openCamera();
+                    dialog.dismiss();
+
+                    dialogRecord.show();
                 }else if(option[which] == "Elegir del Explorador"){
                     Intent intent = new Intent();
                     intent.setType("audio/*");
