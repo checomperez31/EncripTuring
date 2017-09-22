@@ -3,84 +3,196 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.turing.encripturing.FragmentSonido">
-
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <LinearLayout
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="220dp">
-
-                <ImageView
-                    android:id="@+id/sonido_img_sonido"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:scaleType="centerCrop"
-                    android:background="#dbdbdb"
-                    android:src="@drawable/imagen_sonido"/>
-
-                <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/sonido_button_add"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginRight="20dp"
-                    android:src="@drawable/add_item"
-                    android:tint="@color/White"/>
-
-            </RelativeLayout>
+            android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
 
-                <android.support.design.widget.TextInputLayout
-                    android:id="@+id/sonido_til_titulo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/sonido_edit_titulo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:lines="1"
-                        android:hint="Nombre de la Cancion"
-                        android:text="Canaca Remix"
-                        android:enabled="false"/>
-                </android.support.design.widget.TextInputLayout>
-
                 <RelativeLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
-                    <Button
+                    android:id="@+id/sonido_grafica_noenc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="250dp"
+                    android:layout_marginTop="10dp">
+
+                    <com.turing.encripturing.WaveformView
+                        android:id="@+id/waveform"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:background="@color/background_wave"/>
+
+                    <com.turing.encripturing.MarkerView
+                        android:id="@+id/startmarker"
+                        android:nextFocusDown="@+id/endmarker"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentLeft="true"
-                        android:id="@+id/sonido_button_play"
-                        android:text="Reproducir"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:textColor="@color/colorPrimaryDark"/>
-                    <Button
+                        android:src="@drawable/marker_left"
+                        android:contentDescription="@string/start_marker" />
+
+                    <com.turing.encripturing.MarkerView
+                        android:id="@+id/endmarker"
+                        android:nextFocusUp="@+id/startmarker"
+                        android:nextFocusDown="@+id/info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:id="@+id/sonido_button_encriptar"
-                        android:text="Encriptar"
-                        style="@style/Widget.AppCompat.Button.Borderless"
-                        android:textColor="#013ADF"/>
+                        android:src="@drawable/marker_right"
+                        android:contentDescription="@string/end_marker" />
 
                 </RelativeLayout>
 
+                <TextView
+                    android:id="@+id/info"
+                    android:nextFocusUp="@+id/endmarker"
+                    android:nextFocusDown="@+id/play"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/AudioFileInfoOverlayText"
+                    android:gravity="center" />
+
+                <LinearLayout
+                    style="@style/ToolbarBackground"
+                    android:layout_width="fill_parent"
+                    android:layout_height="62dip"
+                    android:gravity="center" >
+
+                    <EditText
+                        android:id="@+id/sonido_starttext"
+                        android:textSize="16sp"
+                        android:inputType="number|numberDecimal"
+                        android:layout_marginLeft="10dip"
+                        android:layout_marginRight="30dip"
+                        android:layout_width="50dip"
+                        android:layout_height="31dip"
+                        android:gravity="center" />
+
+                    <ImageButton
+                        android:id="@+id/rew"
+                        android:layout_width="64dip"
+                        android:layout_height="52dip"
+                        android:layout_marginTop="6dip"
+                        android:layout_marginBottom="6dip"
+                        style="@android:style/MediaButton"
+                        android:contentDescription="Rewind"
+                        android:src="@android:drawable/ic_media_previous"
+                        android:tint="@color/colorPrimary"/>
+
+                    <ImageButton
+                        android:id="@+id/play"
+                        style="@android:style/MediaButton"
+                        android:layout_width="71dip"
+                        android:layout_height="52dip"
+                        android:layout_marginBottom="6dip"
+                        android:layout_marginTop="6dip"
+                        android:contentDescription="Play"
+                        android:src="@android:drawable/ic_media_play"
+                        android:tint="@color/colorPrimary"
+                        />
+
+                    <ImageButton
+                        android:id="@+id/ffwd"
+                        android:layout_width="64dip"
+                        android:layout_height="52dip"
+                        android:layout_marginRight="5dip"
+                        android:layout_marginTop="6dip"
+                        android:layout_marginBottom="6dip"
+                        style="@android:style/MediaButton"
+                        android:contentDescription="FastForward"
+                        android:src="@android:drawable/ic_media_next"
+                        android:tint="@color/colorPrimary"
+                        />
+                    <EditText
+                        android:id="@+id/endtext"
+                        android:textSize="16sp"
+                        android:inputType="number|numberDecimal"
+                        android:layout_width="50dip"
+                        android:layout_height="31dip"
+                        android:layout_marginLeft="10dip"
+                        android:gravity="center" />
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/sonido_til_titulo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/sonido_edit_titulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lines="1"
+                            android:hint="Nombre de la Cancion"
+                            android:text=""/>
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:id="@+id/sonido_til_tam"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <EditText
+                            android:id="@+id/sonido_edit_tam"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:lines="1"
+                            android:hint="Tamaño"
+                            android:text=""/>
+                    </android.support.design.widget.TextInputLayout>
+
+                    <RelativeLayout
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/sonido_play_ne"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@mipmap/ic_play"/>
+
+                        <ImageView
+                            android:id="@+id/sonido_stop_ne"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:src="@mipmap/ic_stop"
+                            android:layout_toRightOf="@+id/sonido_play_ne"/>
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/sonido_button_encriptar"
+                            android:text="Encriptar"
+                            style="@style/Widget.AppCompat.Button.Borderless"
+                            android:textColor="#013ADF"/>
+
+                    </RelativeLayout>
+
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/sonido_button_add"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/add_item"
+            android:tint="@color/White"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginRight="20dp"/>
 
+    </RelativeLayout>
 </FrameLayout>
