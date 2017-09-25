@@ -43,6 +43,7 @@ public class Turing extends AppCompatActivity
     private final int MY_PERMISSIONS = 100;
     private final int SELECT_PICTURE = 200;
     private final int SELECT_VIDEO = 201;
+    private final int GRABAR_VIDEO = 202;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,7 +218,10 @@ public class Turing extends AppCompatActivity
                     Uri pathV = data.getData();
                     fragmentImagenes.obtenerVideo(pathV);
                     break;
-
+                case GRABAR_VIDEO:
+                    Uri pathVG = data.getData();
+                    fragmentImagenes.obtenerVideo(pathVG);
+                    break;
             }
         }
     }

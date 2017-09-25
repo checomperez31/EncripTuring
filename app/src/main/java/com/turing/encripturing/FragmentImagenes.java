@@ -9,10 +9,12 @@ import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.os.EnvironmentCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,10 @@ import android.widget.Button;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 
 /**
@@ -37,9 +43,12 @@ public class FragmentImagenes extends Fragment {
     private MediaController mc;
     private RelativeLayout.LayoutParams paramsNotFullScreen;
     private FloatingActionButton btn_SeleccionarVideo;
+    private FloatingActionButton btn_GuardarVideo;
     private Context context;
     private final int SELECT_VIDEO = 201;
+    private final int GRABAR_VIDEO = 202;
     private Uri pathVideo;
+    private RelativeLayout layoutVideo;
     private int position = 0;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -86,7 +95,9 @@ public class FragmentImagenes extends Fragment {
         View view = inflater.inflate(R.layout.fragment_fragment_imagenes, container, false);
 
         btn_SeleccionarVideo = (FloatingActionButton) view.findViewById(R.id.btn_SeleccionarVideo);
+        btn_GuardarVideo = (FloatingActionButton) view.findViewById(R.id.btn_GuardarVideo);
         agregarVideo();
+        guardarVideo();
         return view;
     }
 
@@ -220,6 +231,31 @@ public class FragmentImagenes extends Fragment {
         });
     }
 
+    public void guardarVideo(){
+        btn_GuardarVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*File file = getStorageDir("videoTuring");
+                try {
+                    FileOutputStream fos = context.openFileOutput("VID_TUR", Context.MODE_PRIVATE);
+
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }*/
+
+            }
+        });
+    }
+
+    public File getStorageDir(String albumName){
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),albumName);
+        if(!file.mkdirs()){
+            Log.e("ERRGUARDAR", "Directory not created");
+        }
+        Log.i("SAVERUTA", file.toString());
+        return file;
+    }
+
     public void showOptions()
     {
         final CharSequence[] option = {"Grabar video", "Elegir del Explorador", "Cancelar"};
@@ -229,7 +265,10 @@ public class FragmentImagenes extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(option[which] == "Grabar video"){
-                    //openCamera();
+                    Intent intent = new Intent();
+                    intent.setAction(MediaStore.ACTION_VIDEO_CAPTURE);
+                    Log.i("VIDEO", "Llega hasta aqui");
+                    getActivity().startActivityForResult(intent, GRABAR_VIDEO);
                 }else if(option[which] == "Elegir del Explorador"){
                     Intent intent = new Intent();
                     intent.setType("video/*");
@@ -257,6 +296,8 @@ public class FragmentImagenes extends Fragment {
 
         String fileName;
         if (path.getScheme().equals("file")) {
+            layoutVideo = getView().findViewById(R.id.layoutVideo);
+            layoutVideo.setVisibility(RelativeLayout.VISIBLE);
             reproductor = getView().findViewById(R.id.reproductorVideo);
             reproductor.setVideoURI(pathVideo);
             //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
@@ -286,6 +327,8 @@ public class FragmentImagenes extends Fragment {
                 }, null, null, null);
 
                 if (cursor != null && cursor.moveToFirst()) {
+                    layoutVideo = getView().findViewById(R.id.layoutVideo);
+                    layoutVideo.setVisibility(RelativeLayout.VISIBLE);
                     reproductor = getView().findViewById(R.id.reproductorVideo);
                     reproductor.setVideoURI(pathVideo);
                     //Listener para aplicar el media controller al tamaño del video una vez que esté cargado

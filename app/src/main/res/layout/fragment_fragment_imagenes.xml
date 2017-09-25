@@ -19,9 +19,24 @@
         android:src="@drawable/add_item"
         android:tint="@color/White"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_GuardarVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="21dp"
+        android:layout_marginLeft="21dp"
+        android:layout_marginStart="21dp"
+        android:src="@drawable/save_item"
+        android:tint="@color/White"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <RelativeLayout
+        android:id="@+id/layoutVideo"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="invisible">
         <VideoView
             android:id="@+id/reproductorVideo"
             android:layout_width="fill_parent"
