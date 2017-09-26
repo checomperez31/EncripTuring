@@ -29,6 +29,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.RECORD_AUDIO;
@@ -37,6 +38,8 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class Turing extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, FragmentSonido.OnFragmentInteractionListener, FragmentImagenes.OnFragmentInteractionListener {
 
+    private VideoView reproductor;
+    private int posicionVideo;
     private FragmentSonido fragmentSonido;
     private FragmentImagenes fragmentImagenes;
     private View vistaPrincipal;
@@ -225,4 +228,19 @@ public class Turing extends AppCompatActivity
             }
         }
     }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        reproductor = fragmentImagenes.getReproductor();
+        posicionVideo = reproductor.getCurrentPosition();
+        reproductor.pause();
+    }
+
+    @Override
+    protected  void onRestart(){
+        super.onRestart();
+        reproductor.seekTo(posicionVideo);
+    }
+
 }

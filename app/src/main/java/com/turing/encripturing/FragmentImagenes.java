@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.os.EnvironmentCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -358,5 +359,9 @@ public class FragmentImagenes extends Fragment {
                 }
             }
         }
+    }
+
+    public VideoView getReproductor(){
+        return reproductor;
     }
 }
