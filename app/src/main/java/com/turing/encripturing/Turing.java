@@ -232,15 +232,15 @@ public class Turing extends AppCompatActivity
     @Override
     protected void onStop(){
         super.onStop();
-        reproductor = fragmentImagenes.getReproductor();
-        posicionVideo = reproductor.getCurrentPosition();
-        reproductor.pause();
+        //reproductor = fragmentImagenes.getReproductor();
+        //posicionVideo = reproductor.getCurrentPosition();
+        //reproductor.pause();
     }
 
     @Override
     protected  void onRestart(){
         super.onRestart();
-        reproductor.seekTo(posicionVideo);
+        //reproductor.seekTo(posicionVideo);
     }
 
 }

@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,13 +26,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class FragmentSonido extends Fragment implements com.turing.encripturing.MarkerView.MarkerListener, WaveformView.WaveformListener{
@@ -52,16 +49,13 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
 
     private Uri pathSound;
 
-    private MediaPlayer mediaPlayer;
-
-    private final int SELECT_PICTURE = 200;
+    private final int SELECT_AUDIO = 200;
 
     //Boton agregar sonido
     private FloatingActionButton btn_add;
 
     private EditText editTitulo, editSize;
     private Button encriptar;
-    private ImageView play, stop;
 
     //Variables globales para el reproductor
     private MediaPlayerService player;
@@ -168,12 +162,9 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
 
         editTitulo = (EditText) view.findViewById(R.id.sonido_edit_titulo);
         editSize = (EditText) view.findViewById(R.id.sonido_edit_tam);
-        play = (ImageView) view.findViewById(R.id.sonido_play_ne);
-        stop = (ImageView) view.findViewById(R.id.sonido_stop_ne);
         encriptar = (Button) view.findViewById(R.id.sonido_button_encriptar);
 
         dialogRecord = new DialogRecord(context);
-        mediaPlayer = new MediaPlayer();
 
         //Wave form
         mPlayer = null;
@@ -199,6 +190,12 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         mEndText = (EditText) view.findViewById(R.id.endtext);
         mEndText.addTextChangedListener(mTextWatcher);
 
+        mPlayButton = (ImageButton)view.findViewById(R.id.play);
+        mPlayButton.setOnClickListener(mPlayListener);
+        mRewindButton = (ImageButton)view.findViewById(R.id.rew);
+        mRewindButton.setOnClickListener(mRewindListener);
+        mFfwdButton = (ImageButton)view.findViewById(R.id.ffwd);
+        mFfwdButton.setOnClickListener(mFfwdListener);
 
         mWaveformView = view.findViewById(R.id.waveform);
         mWaveformView.setListener(this);
@@ -207,12 +204,14 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         mInfo.setText(mCaption);
 
         mStartMarker = (MarkerView)view.findViewById(R.id.startmarker);
+        mStartMarker.setListener(this);
         mStartMarker.setAlpha(1f);
         mStartMarker.setFocusable(true);
         mStartMarker.setFocusableInTouchMode(true);
         mStartVisible = true;
 
         mEndMarker = (MarkerView)view.findViewById(R.id.endmarker);
+        mEndMarker.setListener(this);
         mEndMarker.setAlpha(1f);
         mEndMarker.setFocusable(true);
         mEndMarker.setFocusableInTouchMode(true);
@@ -385,6 +384,7 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
             }
         }
 
+        Log.i("END", mEndPos + " " + mMaxPos);
         mWaveformView.setParameters(mStartPos, mEndPos, mOffset);
         mWaveformView.invalidate();
 
@@ -859,54 +859,11 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
             }
         });
 
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mediaPlayer.isPlaying())
-                {
-                    mediaPlayer.pause();
-                    play.setImageResource(R.mipmap.ic_play);
-                }
-                else
-                {
-                    mediaPlayer.start();
-                    play.setImageResource(R.mipmap.ic_pause);
-                }
-
-            }
-        });
-
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(mediaPlayer.isPlaying())
-                {
-                    mediaPlayer.stop();
-                    mediaPlayer = MediaPlayer.create(context, pathSound);
-                    play.setImageResource(R.mipmap.ic_play);
-                }
-            }
-        });
-
         dialogRecord.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                String fichero = DialogRecord.fichero;
-                editTitulo.setText("Audio Grabado");
-                mediaPlayer = new MediaPlayer();
-                try {
-                    mediaPlayer.setDataSource(fichero);
-                    mediaPlayer.prepare();
-                } catch (IOException e) {
-                    Log.e("FSON", "Fallo en reproducción");
-                }
-            }
-        });
+            public void onDismiss(DialogInterface dialogInterface)
+            {
 
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            public void onCompletion(MediaPlayer mp) {
-                play.setImageResource(R.mipmap.ic_play);
-                mediaPlayer.stop();
             }
         });
 
@@ -932,7 +889,7 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                     Intent intent = new Intent();
                     intent.setType("audio/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    getActivity().startActivityForResult(Intent.createChooser(intent,"Select Audio "), SELECT_PICTURE);
+                    getActivity().startActivityForResult(Intent.createChooser(intent,"Select Audio "), SELECT_AUDIO);
                 }else {
                     dialog.dismiss();
                 }
@@ -951,8 +908,6 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         Log.i("Sonido", path.toString());
 
         pathSound = path;
-
-        mediaPlayer = MediaPlayer.create(context, pathSound);
 
         String fileName;
         if (path.getScheme().equals("file")) {
@@ -1139,5 +1094,39 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                 .setCancelable(false)
                 .show();
     }
+
+    private View.OnClickListener mPlayListener = new View.OnClickListener() {
+        public void onClick(View sender) {
+            onPlay(mStartPos);
+        }
+    };
+
+    private View.OnClickListener mRewindListener = new View.OnClickListener() {
+        public void onClick(View sender) {
+            if (mIsPlaying) {
+                int newPos = mPlayer.getCurrentPosition() - 5000;
+                if (newPos < mPlayStartMsec)
+                    newPos = mPlayStartMsec;
+                mPlayer.seekTo(newPos);
+            } else {
+                mStartMarker.requestFocus();
+                markerFocus(mStartMarker);
+            }
+        }
+    };
+
+    private View.OnClickListener mFfwdListener = new View.OnClickListener() {
+        public void onClick(View sender) {
+            if (mIsPlaying) {
+                int newPos = 5000 + mPlayer.getCurrentPosition();
+                if (newPos > mPlayEndMsec)
+                    newPos = mPlayEndMsec;
+                mPlayer.seekTo(newPos);
+            } else {
+                mEndMarker.requestFocus();
+                markerFocus(mEndMarker);
+            }
+        }
+    };
 
 }
