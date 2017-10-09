@@ -122,11 +122,11 @@ public class Turing extends AppCompatActivity
 
         if (id == R.id.nav_sonido)
         {
-            transaction.replace(R.id.FragmentContent, fragmentSonido);
+            transaction.replace(R.id.FragmentContent, fragmentSonido, "FRAGMENT_SONIDO");
         }
         else if (id == R.id.nav_imagenes)
         {
-            transaction.replace(R.id.FragmentContent, fragmentImagenes);
+            transaction.replace(R.id.FragmentContent, fragmentImagenes, "FRAGMENT_IMAGENES");
         }
         else if (id == R.id.nav_video)
         {
@@ -230,17 +230,22 @@ public class Turing extends AppCompatActivity
     }
 
     @Override
-    protected void onStop(){
-        super.onStop();
-        //reproductor = fragmentImagenes.getReproductor();
-        //posicionVideo = reproductor.getCurrentPosition();
-        //reproductor.pause();
+    protected void onPause(){
+        super.onPause();
+        if(fragmentImagenes != null && fragmentImagenes.isVisible()){
+            reproductor = fragmentImagenes.getReproductor();
+            posicionVideo = reproductor.getCurrentPosition();
+            Log.i("POSICIÓN", "Se pausó "+ posicionVideo);
+            reproductor.pause();
+        }
     }
 
     @Override
     protected  void onRestart(){
         super.onRestart();
-        //reproductor.seekTo(posicionVideo);
+        if(fragmentImagenes != null && fragmentImagenes.isVisible()){
+            Log.i("POSICIÓN", "Se reinició " + posicionVideo);
+            reproductor.seekTo(posicionVideo);
+        }
     }
-
 }
