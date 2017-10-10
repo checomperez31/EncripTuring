@@ -44,7 +44,6 @@ public class FragmentImagenes extends Fragment {
     private MediaController mc;
     private RelativeLayout.LayoutParams paramsNotFullScreen;
     private FloatingActionButton btn_SeleccionarVideo;
-    private FloatingActionButton btn_GuardarVideo;
     private Context context;
     private final int SELECT_VIDEO = 201;
     private final int GRABAR_VIDEO = 202;
@@ -95,10 +94,8 @@ public class FragmentImagenes extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_fragment_imagenes, container, false);
 
-        btn_SeleccionarVideo = (FloatingActionButton) view.findViewById(R.id.btn_SeleccionarVideo);
-        btn_GuardarVideo = (FloatingActionButton) view.findViewById(R.id.btn_GuardarVideo);
+        btn_SeleccionarVideo = view.findViewById(R.id.btn_SeleccionarVideo);
         agregarVideo();
-        guardarVideo();
         return view;
     }
 
@@ -230,31 +227,6 @@ public class FragmentImagenes extends Fragment {
                 showOptions();
             }
         });
-    }
-
-    public void guardarVideo(){
-        btn_GuardarVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*File file = getStorageDir("videoTuring");
-                try {
-                    FileOutputStream fos = context.openFileOutput("VID_TUR", Context.MODE_PRIVATE);
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }*/
-
-            }
-        });
-    }
-
-    public File getStorageDir(String albumName){
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),albumName);
-        if(!file.mkdirs()){
-            Log.e("ERRGUARDAR", "Directory not created");
-        }
-        Log.i("SAVERUTA", file.toString());
-        return file;
     }
 
     public void showOptions()
