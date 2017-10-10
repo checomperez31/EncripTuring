@@ -48,6 +48,8 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
     private Context context;
 
     private Uri pathSound;
+    private String pathSoundRecorded;
+    private boolean isRecorded = false;
 
     private final int SELECT_AUDIO = 200;
 
@@ -863,7 +865,10 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
             @Override
             public void onDismiss(DialogInterface dialogInterface)
             {
-
+                pathSoundRecorded = dialogRecord.directorio;
+                isRecorded = true;
+                obtenerSonido(Uri.parse(new File(dialogRecord.directorio).getPath()));
+                isRecorded = false;
             }
         });
 
@@ -910,35 +915,37 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         pathSound = path;
 
         String fileName;
-        if (path.getScheme().equals("file")) {
-            fileName = path.getLastPathSegment();
-            editTitulo.setText(fileName);
-        } else {
-            Cursor cursor = null;
-            try {
-                cursor = getActivity().getContentResolver().query(path, new String[]{
-                        MediaStore.Files.FileColumns.DATA,
-                        MediaStore.Files.FileColumns.SIZE,
-                        MediaStore.Files.FileColumns.DISPLAY_NAME
-                }, null, null, null);
 
-                if (cursor != null && cursor.moveToFirst()) {
-                    fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
-                    mFilename = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
-                    editTitulo.setText(fileName);
-                    float size = Integer.parseInt(cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)));
-                    size = size/ (1024* 1024);
-                    editSize.setText(size + " MB");
-                }
-            } finally {
+        Cursor cursor = null;
+        try {
+            cursor = getActivity().getContentResolver().query(path, new String[]{
+                    MediaStore.Files.FileColumns.DATA,
+                    MediaStore.Files.FileColumns.SIZE,
+                    MediaStore.Files.FileColumns.DISPLAY_NAME
+            }, null, null, null);
 
-                if (cursor != null) {
-                    cursor.close();
-                }
+            if (cursor != null && cursor.moveToFirst()) {
+                fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
+                mFilename = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+                editTitulo.setText(fileName);
+                float size = Integer.parseInt(cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)));
+                size = size/ (1024* 1024);
+                editSize.setText(size + " MB");
+            }
+        } finally {
+
+            if (cursor != null) {
+                cursor.close();
             }
         }
-
-        mFile = new File(mFilename);
+        if(!isRecorded)
+        {
+            mFile = new File(mFilename);
+        }
+        else
+        {
+            mFile = new File(pathSoundRecorded);
+        }
 
         mLoadingLastUpdateTime = getCurrentTime();
         mLoadingKeepGoing = true;

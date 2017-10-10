@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -29,7 +30,9 @@ public class DialogRecord extends Dialog
     private ImageView microfono;
     private boolean grabando = false;
     private MediaRecorder mediaRecorder;
-    public static String fichero = Environment.getExternalStorageDirectory().getAbsolutePath()+"/audio.mp3";
+    private static String RECORD_DIRECTORY = "ENC";
+    public static String directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
+    private boolean directorioCreado = false;
 
     public DialogRecord(Context context) {
         super(context);
@@ -68,7 +71,11 @@ public class DialogRecord extends Dialog
             }
         });
 
+        File file = new File(directorio, RECORD_DIRECTORY);
 
+        directorioCreado = file.exists();
+
+        if(!directorioCreado) directorioCreado = file.mkdir();
     }
 
     private void animar()
@@ -118,18 +125,29 @@ public class DialogRecord extends Dialog
 
     public void grabar()
     {
-        mediaRecorder = new MediaRecorder();
-        mediaRecorder.setOutputFile(fichero);
+        if(directorioCreado)
+        {
+            //Creamos el archivo donde se guardara el audio grabado
+            Long timestamp = System.currentTimeMillis();
+            String recordName = timestamp.toString() + ".mp3";
+            directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
+            File file = new File(directorio);
 
-        try {
-            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            mediaRecorder.prepare();
-        } catch (IOException e) {
-            Log.e("DREC", "Fallo en grabación");
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setOutputFile(directorio);
+
+            try {
+                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                mediaRecorder.prepare();
+            } catch (IOException e) {
+                Log.e("DREC", "Fallo en grabación");
+            }
+            mediaRecorder.start();
         }
-        mediaRecorder.start();
+
+
     }
 
     public void detenerGrabacion() {
