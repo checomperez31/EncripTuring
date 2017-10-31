@@ -2,13 +2,17 @@ package com.turing.encripturing;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -69,20 +73,11 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
     //Cosas del waveform
     private long mLoadingLastUpdateTime;
     private boolean mLoadingKeepGoing;
-    private long mRecordingLastUpdateTime;
-    private boolean mRecordingKeepGoing;
-    private double mRecordingTime;
     private boolean mFinishActivity;
-    private TextView mTimerTextView;
-    private AlertDialog mAlertDialog;
     private ProgressDialog mProgressDialog;
     private SoundFile mSoundFile;
     private File mFile;
     private String mFilename;
-    private String mArtist;
-    private String mTitle;
-    private int mNewFileKind;
-    private boolean mWasGetContentIntent;
     private WaveformView mWaveformView;
     private MarkerView mStartMarker;
     private MarkerView mEndMarker;
@@ -124,8 +119,10 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
     private int mMarkerBottomOffset;
 
     private Thread mLoadSoundFileThread;
-    private Thread mRecordAudioThread;
-    private Thread mSaveSoundFileThread;
+
+
+    private IntentFilter intentFilter;
+    private BecomingNoisyReceiver myNoisyAudioStreamReceiver;
 
     public FragmentSonido() {
         // Required empty public constructor
@@ -148,10 +145,6 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        //playAudio("https://upload.wikimedia.org/wikipedia/commons/6/6c/Grieg_Lyric_Pieces_Kobold.ogg");
-        //es necesario tener minimo un archivo de audio, sino crashea
-        //loadAudio();
-        //playAudio(audioList.get(0).getData());
     }
 
     @Override
@@ -159,6 +152,9 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_fragment_sonido, container, false);
+
+        intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        myNoisyAudioStreamReceiver = new BecomingNoisyReceiver();
 
         btn_add = (FloatingActionButton) view.findViewById(R.id.sonido_button_add);
 
@@ -385,8 +381,6 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                 mOffset += offsetDelta;
             }
         }
-
-        Log.i("END", mEndPos + " " + mMaxPos);
         mWaveformView.setParameters(mStartPos, mEndPos, mOffset);
         mWaveformView.invalidate();
 
@@ -675,6 +669,7 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
 
     private synchronized void onPlay(int startPosition) {
         if (mIsPlaying) {
+            context.unregisterReceiver(myNoisyAudioStreamReceiver);
             handlePause();
             return;
         }
@@ -702,7 +697,8 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
             mIsPlaying = true;
 
             mPlayer.seekTo(mPlayStartMsec);
-            mPlayer.start();
+            context.registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
+            mPlayer.start();//Se comienza a reproducir el audio
             updateDisplay();
             enableDisableButtons();
         } catch (Exception e) {
@@ -1135,5 +1131,18 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
             }
         }
     };
+
+
+    private class BecomingNoisyReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                Log.i("Jack", "Sparrow");
+                if(mIsPlaying){
+                    handlePause();
+                }
+            }
+        }
+    }
 
 }
