@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -40,7 +41,13 @@ import java.io.FileOutputStream;
  */
 public class FragmentImagenes extends Fragment {
 
-    private VideoView reproductor;
+    //**************************************************
+    //Instanciamos un nuevo objeto de la clase modificada de VideoView
+    private CustomVideoView reproductor;
+    //**************************************************
+    //instanciamos el objeto que permitirá obtener el frame y luego graficar los valores RGB
+    private MediaMetadataRetriever mmdr;
+    //**************************************************
     private MediaController mc;
     private RelativeLayout.LayoutParams paramsNotFullScreen;
     private FloatingActionButton btn_SeleccionarVideo;
@@ -58,6 +65,7 @@ public class FragmentImagenes extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private int[] px;
 
     private OnFragmentInteractionListener mListener;
 
@@ -261,8 +269,7 @@ public class FragmentImagenes extends Fragment {
      * Funcion para extraer los datos del video, su path e instanciarlo para reproducirlo
      * @param path - Uri que proviene
      */
-    public void obtenerVideo(Uri path)
-    {
+    public void obtenerVideo(Uri path) {
         Log.i("RUTA", path.toString());
 
         pathVideo = path;
@@ -271,8 +278,37 @@ public class FragmentImagenes extends Fragment {
         if (path.getScheme().equals("file")) {
             layoutVideo = getView().findViewById(R.id.layoutVideo);
             layoutVideo.setVisibility(RelativeLayout.VISIBLE);
-            reproductor = getView().findViewById(R.id.reproductorVideo);
+
+            //Modifiqué la asignación del view para que éste pudiera establecerse correctamente
+            reproductor = (CustomVideoView) getView().findViewById(R.id.reproductorVideo);
+
             reproductor.setVideoURI(pathVideo);
+            mmdr.setDataSource(path.toString());
+
+
+            //el listener que detecta cuando el video esta en play o pause
+            reproductor.setPlayPauseListener(new CustomVideoView.PlayPauseListener() {
+                @Override
+                public void onPlay() {
+                    //mensaje que se muestra cuando está reproduciendo
+                    Toast.makeText(getActivity(),"Está reproduciendo",Toast.LENGTH_SHORT).show();
+                }
+                @Override
+                public void onPause() {
+                    //mensaje que se muestra cuando está pausado
+                    Toast.makeText(getActivity(),"Está pausado"
+                            +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
+                    //Extraemos el frame en el instante que se da pause
+                    Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000,
+                            MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                    int[] px = new int[bm.getWidth()*bm.getHeight()];
+                    //https://stackoverflow.com/questions/5669501/how-do-you-get-the-rgb-values-from-a-bitmap-on-an-android-device
+                    //De ese link ando sacando la información, pero no sé si esté bien como lo implementé
+                    bm.getPixels(px,0,bm.getWidth(),0,0,bm.getWidth(),bm.getHeight());
+
+                }
+            });
+
             //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
             reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -288,10 +324,16 @@ public class FragmentImagenes extends Fragment {
                             mc.setAnchorView(reproductor);
                         }
                     });
+
+
                 }
             });
             reproductor.start();
+
             reproductor.requestFocus();
+
+
+
         } else {
             Cursor cursor = null;
             try {
@@ -302,8 +344,37 @@ public class FragmentImagenes extends Fragment {
                 if (cursor != null && cursor.moveToFirst()) {
                     layoutVideo = getView().findViewById(R.id.layoutVideo);
                     layoutVideo.setVisibility(RelativeLayout.VISIBLE);
-                    reproductor = getView().findViewById(R.id.reproductorVideo);
+
+                    //Modifiqué la asignación del view para que éste pudiera establecerse correctamente
+                    reproductor = (CustomVideoView) getView().findViewById(R.id.reproductorVideo);
+
                     reproductor.setVideoURI(pathVideo);
+                    mmdr.setDataSource(path.toString());
+
+
+                    //el listener que detecta cuando el video esta en play o pause
+                    reproductor.setPlayPauseListener(new CustomVideoView.PlayPauseListener() {
+                        @Override
+                        public void onPlay() {
+                            //mensaje que se muestra cuando está reproduciendo
+                            Toast.makeText(getActivity(),"Está reproduciendo",Toast.LENGTH_SHORT).show();
+
+                        }
+                        @Override
+                        public void onPause() {
+                            //mensaje que se muestra cuando está pausado
+                            Toast.makeText(getActivity(),"Está pausado"
+                                    +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
+                            //Extraemos el frame en el instante que se da pause
+                            Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000,
+                                    MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                             px = new int[bm.getWidth()*bm.getHeight()];
+                            //https://stackoverflow.com/questions/5669501/how-do-you-get-the-rgb-values-from-a-bitmap-on-an-android-device
+                            //De ese link ando sacando la información, pero no sé si esté bien como lo implementé
+                            bm.getPixels(px,0,bm.getWidth(),0,0,bm.getWidth(),bm.getHeight());
+                        }
+                    });
+
                     //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
                     reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                         @Override
@@ -321,8 +392,11 @@ public class FragmentImagenes extends Fragment {
                             });
                         }
                     });
+
                     reproductor.start();
                     reproductor.requestFocus();
+
+
                 }
             } finally {
 
