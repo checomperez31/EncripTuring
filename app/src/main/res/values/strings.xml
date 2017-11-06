@@ -6,6 +6,17 @@
 
     <string name="action_settings">Settings</string>
 
+    <!-- Strings Fragmento Sonido -->
+    <string name = "nombre_sonido">Audio Name</string>
+    <string name = "tam_sonido">Audio Size</string>
+    <string name = "btn_encriptar">Encrypt</string>
+
+    <!-- Strings Fragmento Video -->
+
+    <!-- Strings Menu -->
+    <string name = "opc_sonido">Sounds</string>
+    <string name = "opc_imagenes">Images</string>
+    <string name = "opc_video">Videos</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ok"> Ok</string>

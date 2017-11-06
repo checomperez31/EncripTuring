@@ -132,7 +132,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lines="1"
-                            android:hint="Nombre de la Cancion"
+                            android:hint="@string/nombre_sonido"
                             android:text=""/>
                     </android.support.design.widget.TextInputLayout>
 
@@ -146,7 +146,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:lines="1"
-                            android:hint="Tamaño"
+                            android:hint="@string/tam_sonido"
                             android:text=""/>
                     </android.support.design.widget.TextInputLayout>
 
@@ -158,7 +158,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
                             android:id="@+id/sonido_button_encriptar"
-                            android:text="Encriptar"
+                            android:text="@string/btn_encriptar"
                             style="@style/Widget.AppCompat.Button.Borderless"
                             android:textColor="#013ADF"/>
 
