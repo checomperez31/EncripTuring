@@ -12,14 +12,14 @@
             android:layout_height="match_parent">
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <RelativeLayout
                     android:id="@+id/sonido_grafica_noenc"
                     android:layout_width="wrap_content"
-                    android:layout_height="250dp"
-                    android:layout_marginTop="10dp">
+                    android:layout_height="@dimen/grafica_sonido_altura"
+                    android:layout_marginTop="8dp">
 
                     <com.turing.encripturing.WaveformView
                         android:id="@+id/waveform"
@@ -50,71 +50,78 @@
                     android:id="@+id/info"
                     android:nextFocusUp="@+id/endmarker"
                     android:nextFocusDown="@+id/play"
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/AudioFileInfoOverlayText"
                     android:gravity="center" />
 
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="62dip"
-                    android:gravity="center" >
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/herramientas_reproduccion_altura"
+                    >
 
                     <EditText
                         android:id="@+id/sonido_starttext"
-                        android:textSize="15sp"
+                        android:textSize="@dimen/texto_altura"
                         android:inputType="number|numberDecimal"
-                        android:layout_marginLeft="10dip"
-                        android:layout_marginRight="30dip"
-                        android:layout_width="50dip"
-                        android:layout_height="35dip"
-                        android:gravity="center" />
+                        android:layout_width="@dimen/edit_text_reproduccion_ancho"
+                        android:layout_height="@dimen/edit_text_reproduccion_altura"
+                        android:layout_centerVertical="true"
+                        android:layout_toLeftOf="@+id/rew"
+                        android:text="0.0"
+                        android:textAlignment="center"
+                        />
 
                     <ImageButton
                         android:id="@+id/rew"
-                        android:layout_width="64dip"
-                        android:layout_height="52dip"
-                        android:layout_marginTop="6dip"
-                        android:layout_marginBottom="6dip"
                         style="@android:style/MediaButton"
                         android:contentDescription="Rewind"
-                        android:src="@android:drawable/ic_media_previous"
-                        android:tint="@color/colorPrimary"/>
+                        android:src="@drawable/ic_media_backward"
+                        android:tint="@color/colorPrimary"
+                        android:scaleType="centerInside"
+                        android:layout_toLeftOf="@+id/play"
+                        android:layout_centerVertical="true"
+                        android:layout_height="@dimen/boton_reproduccion_altura"
+                        android:layout_width="@dimen/boton_reproduccion_ancho"
+                        />
 
                     <ImageButton
                         android:id="@+id/play"
                         style="@android:style/MediaButton"
-                        android:layout_width="71dip"
-                        android:layout_height="52dip"
-                        android:layout_marginBottom="6dip"
-                        android:layout_marginTop="6dip"
                         android:contentDescription="Play"
-                        android:src="@android:drawable/ic_media_play"
+                        android:src="@drawable/ic_media_play"
                         android:tint="@color/colorPrimary"
+                        android:scaleType="centerInside"
+                        android:layout_centerInParent="true"
+                        android:layout_height="@dimen/boton_reproduccion_altura"
+                        android:layout_width="@dimen/boton_reproduccion_ancho"
                         />
 
                     <ImageButton
                         android:id="@+id/ffwd"
-                        android:layout_width="64dip"
-                        android:layout_height="52dip"
-                        android:layout_marginRight="5dip"
-                        android:layout_marginTop="6dip"
-                        android:layout_marginBottom="6dip"
                         style="@android:style/MediaButton"
                         android:contentDescription="FastForward"
-                        android:src="@android:drawable/ic_media_next"
+                        android:src="@drawable/ic_media_forward"
                         android:tint="@color/colorPrimary"
+                        android:scaleType="centerInside"
+                        android:layout_toRightOf="@+id/play"
+                        android:layout_centerVertical="true"
+                        android:layout_height="@dimen/boton_reproduccion_altura"
+                        android:layout_width="@dimen/boton_reproduccion_ancho"
                         />
                     <EditText
                         android:id="@+id/endtext"
-                        android:textSize="15sp"
+                        android:textSize="@dimen/texto_altura"
                         android:inputType="number|numberDecimal"
-                        android:layout_width="50dip"
-                        android:layout_height="35dip"
-                        android:layout_marginLeft="10dip"
-                        android:gravity="center" />
+                        android:layout_width="@dimen/edit_text_reproduccion_ancho"
+                        android:layout_height="@dimen/edit_text_reproduccion_altura"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/ffwd"
+                        android:text="0.0"
+                        android:textAlignment="center"
+                        />
 
-                </LinearLayout>
+                </RelativeLayout>
 
 
                 <LinearLayout
@@ -133,7 +140,8 @@
                             android:layout_height="wrap_content"
                             android:lines="1"
                             android:hint="@string/nombre_sonido"
-                            android:text=""/>
+                            android:textSize="@dimen/texto_altura"
+                            />
                     </android.support.design.widget.TextInputLayout>
 
                     <android.support.design.widget.TextInputLayout
@@ -147,11 +155,12 @@
                             android:layout_height="wrap_content"
                             android:lines="1"
                             android:hint="@string/tam_sonido"
-                            android:text=""/>
+                            android:textSize="@dimen/texto_altura"
+                            />
                     </android.support.design.widget.TextInputLayout>
 
                     <RelativeLayout
-                        android:layout_width="fill_parent"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content">
                         <Button
                             android:layout_width="wrap_content"
@@ -160,7 +169,9 @@
                             android:id="@+id/sonido_button_encriptar"
                             android:text="@string/btn_encriptar"
                             style="@style/Widget.AppCompat.Button.Borderless"
-                            android:textColor="#013ADF"/>
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="@dimen/texto_altura"
+                            />
 
                     </RelativeLayout>
 

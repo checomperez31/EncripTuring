@@ -10,6 +10,11 @@
     <string name = "nombre_sonido">Audio Name</string>
     <string name = "tam_sonido">Audio Size</string>
     <string name = "btn_encriptar">Encrypt</string>
+    <string name = "dialog_cargando_audio">Loading Audio</string>
+    <string name = "opcion_titulo">Choose an Option</string>
+    <string name = "opcion_grabar_sonido">Record Audio</string>
+    <string name = "opcion_elegir">Choose audio from files</string>
+    <string name = "opcion_cancelar">Cancel</string>
 
     <!-- Strings Fragmento Video -->
 

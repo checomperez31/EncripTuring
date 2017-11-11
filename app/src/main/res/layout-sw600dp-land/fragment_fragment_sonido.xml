@@ -1,0 +1,216 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.turing.encripturing.FragmentSonido">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:weightSum="2"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <RelativeLayout
+                        android:id="@+id/sonido_grafica_noenc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/grafica_sonido_altura"
+                        android:layout_marginTop="8dp">
+
+                        <com.turing.encripturing.WaveformView
+                            android:id="@+id/waveform"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:background="@color/background_wave"/>
+
+                        <com.turing.encripturing.MarkerView
+                            android:id="@+id/startmarker"
+                            android:nextFocusDown="@+id/endmarker"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/marker_left"
+                            android:contentDescription="@string/start_marker" />
+
+                        <com.turing.encripturing.MarkerView
+                            android:id="@+id/endmarker"
+                            android:nextFocusUp="@+id/startmarker"
+                            android:nextFocusDown="@+id/info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/marker_right"
+                            android:contentDescription="@string/end_marker" />
+
+                    </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/info"
+                        android:nextFocusUp="@+id/endmarker"
+                        android:nextFocusDown="@+id/play"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/AudioFileInfoOverlayText"
+                        android:gravity="center" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/herramientas_reproduccion_altura"
+                        >
+
+                        <EditText
+                            android:id="@+id/sonido_starttext"
+                            android:textSize="@dimen/texto_altura"
+                            android:inputType="number|numberDecimal"
+                            android:layout_width="@dimen/edit_text_reproduccion_ancho"
+                            android:layout_height="@dimen/edit_text_reproduccion_altura"
+                            android:layout_centerVertical="true"
+                            android:layout_toLeftOf="@+id/rew"
+                            android:text="0.0"
+                            android:textAlignment="center"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/rew"
+                            style="@android:style/MediaButton"
+                            android:contentDescription="Rewind"
+                            android:src="@drawable/ic_media_backward"
+                            android:tint="@color/colorPrimary"
+                            android:scaleType="centerInside"
+                            android:layout_toLeftOf="@+id/play"
+                            android:layout_centerVertical="true"
+                            android:layout_height="@dimen/boton_reproduccion_altura"
+                            android:layout_width="@dimen/boton_reproduccion_ancho"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/play"
+                            style="@android:style/MediaButton"
+                            android:contentDescription="Play"
+                            android:src="@drawable/ic_media_play"
+                            android:tint="@color/colorPrimary"
+                            android:scaleType="centerInside"
+                            android:layout_centerInParent="true"
+                            android:layout_height="@dimen/boton_reproduccion_altura"
+                            android:layout_width="@dimen/boton_reproduccion_ancho"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/ffwd"
+                            style="@android:style/MediaButton"
+                            android:contentDescription="FastForward"
+                            android:src="@drawable/ic_media_forward"
+                            android:tint="@color/colorPrimary"
+                            android:scaleType="centerInside"
+                            android:layout_toRightOf="@+id/play"
+                            android:layout_centerVertical="true"
+                            android:layout_height="@dimen/boton_reproduccion_altura"
+                            android:layout_width="@dimen/boton_reproduccion_ancho"
+                            />
+                        <EditText
+                            android:id="@+id/endtext"
+                            android:textSize="@dimen/texto_altura"
+                            android:inputType="number|numberDecimal"
+                            android:layout_width="@dimen/edit_text_reproduccion_ancho"
+                            android:layout_height="@dimen/edit_text_reproduccion_altura"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@+id/ffwd"
+                            android:text="0.0"
+                            android:textAlignment="center"
+                            />
+
+                    </RelativeLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/sonido_til_titulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <EditText
+                                android:id="@+id/sonido_edit_titulo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:lines="1"
+                                android:hint="@string/nombre_sonido"
+                                android:textSize="@dimen/texto_altura"
+                                />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/sonido_til_tam"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <EditText
+                                android:id="@+id/sonido_edit_tam"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:lines="1"
+                                android:hint="@string/tam_sonido"
+                                android:textSize="@dimen/texto_altura"
+                                />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <Button
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:id="@+id/sonido_button_encriptar"
+                                android:text="@string/btn_encriptar"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="@dimen/texto_altura"
+                                />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    >
+
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+        </ScrollView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/sonido_button_add"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/add_item"
+            android:tint="@color/White"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginRight="20dp"/>
+
+    </RelativeLayout>
+</FrameLayout>

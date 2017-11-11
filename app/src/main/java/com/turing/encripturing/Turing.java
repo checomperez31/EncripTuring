@@ -47,6 +47,7 @@ public class Turing extends AppCompatActivity
     private final int SELECT_PICTURE = 200;
     private final int SELECT_VIDEO = 201;
     private final int GRABAR_VIDEO = 202;
+    public final String TAG = "MECT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,7 +215,8 @@ public class Turing extends AppCompatActivity
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case SELECT_PICTURE:
-                    Uri path = data.getData();
+                    Uri path = Uri.parse(data.getDataString());
+                    Log.i(TAG, path + "");
                     fragmentSonido.obtenerSonido(path);
                     break;
                 case SELECT_VIDEO:

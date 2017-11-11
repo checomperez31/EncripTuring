@@ -1,0 +1,10 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="grafica_sonido_altura">300dp</dimen>
+    <dimen name="herramientas_reproduccion_altura">60dp</dimen>
+    <dimen name="edit_text_reproduccion_altura">50dp</dimen>
+    <dimen name="edit_text_reproduccion_ancho">54dp</dimen>
+    <dimen name="boton_reproduccion_altura">50dp</dimen>
+    <dimen name="boton_reproduccion_ancho">60dp</dimen>
+    <dimen name="texto_altura">16sp</dimen>
+</resources>

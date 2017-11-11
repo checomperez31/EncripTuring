@@ -17,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -38,20 +39,10 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class FragmentSonido extends Fragment implements com.turing.encripturing.MarkerView.MarkerListener, WaveformView.WaveformListener{
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
     private Context context;
-
-    private Uri pathSound;
     private String pathSoundRecorded;
     private boolean isRecorded = false;
 
@@ -128,12 +119,9 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static FragmentSonido newInstance(String param1, String param2) {
         FragmentSonido fragment = new FragmentSonido();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -141,10 +129,6 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -323,9 +307,9 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
 
     private void enableDisableButtons() {
         if (mIsPlaying) {
-            mPlayButton.setImageResource(android.R.drawable.ic_media_pause);
+            mPlayButton.setImageResource(R.drawable.ic_media_stop);
         } else {
-            mPlayButton.setImageResource(android.R.drawable.ic_media_play);
+            mPlayButton.setImageResource(R.drawable.ic_media_play);
         }
     }
 
@@ -820,26 +804,6 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
      *  Recuperar datos desde el dispositivo en orden ascendiente
      */
     private void loadAudio(){
-        ContentResolver contentResolver = getActivity().getContentResolver();
-
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!= 0";
-        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
-        Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
-
-        if (cursor != null && cursor.getCount() >0){
-            audioList = new ArrayList<>();
-            while (cursor.moveToNext()){
-                String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                String album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-
-                //Guardar en la lista de audio
-                audioList.add(new Audio(data, title, album, artist));
-            }
-        }
-        cursor.close();
     }
 
     /**
@@ -906,19 +870,22 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
      */
     public void obtenerSonido(Uri path)
     {
-        Log.i("Sonido", path.toString());
-
-        pathSound = path;
 
         String fileName;
 
+        final String docId = DocumentsContract.getDocumentId(path);
+        final String[] split = docId.split(":");
+        final String type = split[0];
+
         Cursor cursor = null;
         try {
-            cursor = getActivity().getContentResolver().query(path, new String[]{
-                    MediaStore.Files.FileColumns.DATA,
+            cursor = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{
+                    "_data",
                     MediaStore.Files.FileColumns.SIZE,
                     MediaStore.Files.FileColumns.DISPLAY_NAME
-            }, null, null, null);
+            }, "_id=?", new String[]{
+                    split[1]
+            }, null);
 
             if (cursor != null && cursor.moveToFirst()) {
                 fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
@@ -937,6 +904,7 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         if(!isRecorded)
         {
             mFile = new File(mFilename);
+            Log.i("FSENC", mFilename);
         }
         else
         {
@@ -948,7 +916,7 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         mFinishActivity = false;
         mProgressDialog = new ProgressDialog(getActivity());
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        mProgressDialog.setTitle("Cargando Audio");
+        mProgressDialog.setTitle(R.string.dialog_cargando_audio);
         mProgressDialog.setCancelable(true);
         mProgressDialog.setOnCancelListener(
                 new DialogInterface.OnCancelListener() {
