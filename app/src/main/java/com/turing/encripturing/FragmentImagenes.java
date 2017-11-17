@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -277,134 +278,74 @@ public class FragmentImagenes extends Fragment {
         pathVideo = path;
 
         String fileName;
-        if (path.getScheme().equals("file")) {
-            layoutVideo = getView().findViewById(R.id.layoutVideo);
-            layoutVideo.setVisibility(RelativeLayout.VISIBLE);
+        Cursor cursor = null;
+        try {
+            cursor = getActivity().getContentResolver().query(path, new String[]{
+                    MediaStore.Images.ImageColumns.DISPLAY_NAME
+            }, null, null, null);
 
-            //Modifiqué la asignación del view para que éste pudiera establecerse correctamente
-            reproductor = (CustomVideoView) getView().findViewById(R.id.reproductorVideo);
+            if (cursor != null && cursor.moveToFirst()) {
+                layoutVideo = getView().findViewById(R.id.layoutVideo);
+                layoutVideo.setVisibility(RelativeLayout.VISIBLE);
 
-            reproductor.setVideoURI(pathVideo);
-            mmdr.setDataSource(path.toString());
+                //Modifiqué la asignación del view para que éste pudiera establecerse correctamente
+                reproductor = getView().findViewById(R.id.reproductorVideo);
 
-
-            //el listener que detecta cuando el video esta en play o pause
-            reproductor.setPlayPauseListener(new CustomVideoView.PlayPauseListener() {
-                @Override
-                public void onPlay() {
-                    //mensaje que se muestra cuando está reproduciendo
-                    Toast.makeText(getActivity(),"Está reproduciendo",Toast.LENGTH_SHORT).show();
-                }
-                @Override
-                public void onPause() {
-                    //mensaje que se muestra cuando está pausado
-                    Toast.makeText(getActivity(),"Está pausado"
-                            +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
-                    //Extraemos el frame en el instante que se da pause
-                    Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000,
-                            MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                    int[] px = new int[bm.getWidth()*bm.getHeight()];
-                    //https://stackoverflow.com/questions/5669501/how-do-you-get-the-rgb-values-from-a-bitmap-on-an-android-device
-                    //De ese link ando sacando la información, pero no sé si esté bien como lo implementé
-                    bm.getPixels(px,0,bm.getWidth(),0,0,bm.getWidth(),bm.getHeight());
-
-                }
-            });
-
-            //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
-            reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mediaPlayer) {
-                    mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                        //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
-                        @Override
-                        public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
-                            mc = new MediaController(getActivity());
-                            //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
-                            //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
-                            reproductor.setMediaController(mc);
-                            mc.setAnchorView(reproductor);
-                        }
-                    });
+                reproductor.setVideoURI(pathVideo);
+                Log.i("ERRORPATH", pathVideo.toString());
+                mmdr.setDataSource(pathVideo.toString());
 
 
-                }
-            });
-            reproductor.start();
+                //el listener que detecta cuando el video esta en play o pause
+                reproductor.setPlayPauseListener(new CustomVideoView.PlayPauseListener() {
+                    @Override
+                    public void onPlay() {
+                        //mensaje que se muestra cuando está reproduciendo
+                        Toast.makeText(getActivity(),"Está reproduciendo",Toast.LENGTH_SHORT).show();
 
-            reproductor.requestFocus();
+                    }
+                    @Override
+                    public void onPause() {
+                        //mensaje que se muestra cuando está pausado
+                        Toast.makeText(getActivity(),"Está pausado"
+                                +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
+                        //Extraemos el frame en el instante que se da pause
+                        Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000,
+                                MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                        px = new int[bm.getWidth()*bm.getHeight()];
+                        //https://stackoverflow.com/questions/5669501/how-do-you-get-the-rgb-values-from-a-bitmap-on-an-android-device
+                        //De ese link ando sacando la información, pero no sé si esté bien como lo implementé
+                        bm.getPixels(px,0,bm.getWidth(),0,0,bm.getWidth(),bm.getHeight());
+                    }
+                });
 
+                //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
+                reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mediaPlayer) {
+                        mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                            //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
+                            @Override
+                            public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
+                                mc = new MediaController(getActivity());
+                                //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
+                                //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
+                                reproductor.setMediaController(mc);
+                                mc.setAnchorView(reproductor);
+                            }
+                        });
+                    }
+                });
 
-
-        } else {
-            Cursor cursor = null;
-            try {
-                cursor = getActivity().getContentResolver().query(path, new String[]{
-                        MediaStore.Images.ImageColumns.DISPLAY_NAME
-                }, null, null, null);
-
-                if (cursor != null && cursor.moveToFirst()) {
-                    layoutVideo = getView().findViewById(R.id.layoutVideo);
-                    layoutVideo.setVisibility(RelativeLayout.VISIBLE);
-
-                    //Modifiqué la asignación del view para que éste pudiera establecerse correctamente
-                    reproductor = (CustomVideoView) getView().findViewById(R.id.reproductorVideo);
-
-                    reproductor.setVideoURI(pathVideo);
-                    mmdr.setDataSource(path.toString());
-
-
-                    //el listener que detecta cuando el video esta en play o pause
-                    reproductor.setPlayPauseListener(new CustomVideoView.PlayPauseListener() {
-                        @Override
-                        public void onPlay() {
-                            //mensaje que se muestra cuando está reproduciendo
-                            Toast.makeText(getActivity(),"Está reproduciendo",Toast.LENGTH_SHORT).show();
-
-                        }
-                        @Override
-                        public void onPause() {
-                            //mensaje que se muestra cuando está pausado
-                            Toast.makeText(getActivity(),"Está pausado"
-                                    +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
-                            //Extraemos el frame en el instante que se da pause
-                            Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000,
-                                    MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                             px = new int[bm.getWidth()*bm.getHeight()];
-                            //https://stackoverflow.com/questions/5669501/how-do-you-get-the-rgb-values-from-a-bitmap-on-an-android-device
-                            //De ese link ando sacando la información, pero no sé si esté bien como lo implementé
-                            bm.getPixels(px,0,bm.getWidth(),0,0,bm.getWidth(),bm.getHeight());
-                        }
-                    });
-
-                    //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
-                    reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                        @Override
-                        public void onPrepared(MediaPlayer mediaPlayer) {
-                            mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                                //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
-                                @Override
-                                public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
-                                    mc = new MediaController(getActivity());
-                                    //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
-                                    //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
-                                    reproductor.setMediaController(mc);
-                                    mc.setAnchorView(reproductor);
-                                }
-                            });
-                        }
-                    });
-
-                    reproductor.start();
-                    reproductor.requestFocus();
+                reproductor.start();
+                reproductor.requestFocus();
 
 
-                }
-            } finally {
+            }
+        } finally {
 
-                if (cursor != null) {
-                    cursor.close();
-                }
+            if (cursor != null) {
+                cursor.close();
             }
         }
     }
