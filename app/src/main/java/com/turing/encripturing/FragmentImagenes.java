@@ -12,6 +12,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -49,7 +50,7 @@ public class FragmentImagenes extends Fragment {
     private CustomVideoView reproductor;
     //**************************************************
     //instanciamos el objeto que permitirá obtener el frame y luego graficar los valores RGB
-    private MediaMetadataRetriever mmdr;
+    private MediaMetadataRetriever mmdr = new MediaMetadataRetriever();
     //**************************************************
     private MediaController mc;
     private RelativeLayout.LayoutParams paramsNotFullScreen;
@@ -274,15 +275,20 @@ public class FragmentImagenes extends Fragment {
      */
     public void obtenerVideo(Uri path) {
         Log.i("RUTA", path.toString());
-
-        pathVideo = path;
-
+        final String docId = DocumentsContract.getDocumentId(path);
+        final String[] split = docId.split(":");
+        Log.i("RUTA", split[1]);
         String fileName;
+        String data;
         Cursor cursor = null;
         try {
-            cursor = getActivity().getContentResolver().query(path, new String[]{
-                    MediaStore.Images.ImageColumns.DISPLAY_NAME
-            }, null, null, null);
+            String[] busqueda = {MediaStore.Files.FileColumns._ID, MediaStore.Files.FileColumns.DISPLAY_NAME, MediaStore.Files.FileColumns.DATA};
+            cursor = getActivity().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, busqueda, "_id=?", new String[]{split[1]}, null, null);
+            cursor.moveToFirst();
+            int colum_index = cursor.getColumnIndex(MediaStore.Files.FileColumns._ID);
+            fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
+            data = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+            Log.i("RUTA", "Posición cursor: " + cursor.getString(colum_index) + " " + fileName + " " + data);
 
             if (cursor != null && cursor.moveToFirst()) {
                 layoutVideo = getView().findViewById(R.id.layoutVideo);
@@ -291,9 +297,9 @@ public class FragmentImagenes extends Fragment {
                 //Modifiqué la asignación del view para que éste pudiera establecerse correctamente
                 reproductor = getView().findViewById(R.id.reproductorVideo);
 
-                reproductor.setVideoURI(pathVideo);
-                Log.i("ERRORPATH", pathVideo.toString());
-                mmdr.setDataSource(pathVideo.toString());
+                reproductor.setVideoURI(Uri.parse(data));
+                Log.i("RUTA", data);
+                mmdr.setDataSource(data);
 
 
                 //el listener que detecta cuando el video esta en play o pause
