@@ -24,15 +24,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.android.Utils;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
+import org.opencv.core.MatOfInt;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Collections;
 
 
 /**
@@ -70,6 +85,9 @@ public class FragmentImagenes extends Fragment {
     private String mParam1;
     private String mParam2;
     private int[] px;
+    private ImageView histograma;
+    //Creamos los arrays requeridos y convertimos el bitmap a Mat para que pueda acomodarse la info de la misma a los arrelgos
+    private Mat rgba;
 
     private OnFragmentInteractionListener mListener;
 
@@ -316,12 +334,57 @@ public class FragmentImagenes extends Fragment {
                         Toast.makeText(getActivity(),"Está pausado"
                                 +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
                         //Extraemos el frame en el instante que se da pause
-                        Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000,
-                                MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                        px = new int[bm.getWidth()*bm.getHeight()];
-                        //https://stackoverflow.com/questions/5669501/how-do-you-get-the-rgb-values-from-a-bitmap-on-an-android-device
-                        //De ese link ando sacando la información, pero no sé si esté bien como lo implementé
-                        bm.getPixels(px,0,bm.getWidth(),0,0,bm.getWidth(),bm.getHeight());
+                        Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+
+                        rgba = new Mat();
+                        Utils.bitmapToMat(bm, rgba);
+                        //Obtenemos el tamaño del bitmap
+                        Size rgbaSize = rgba.size();
+
+                        //Definimos la cantidad de barras en el histograma
+                        int histSize = 256;
+                        MatOfInt histogramSize = new MatOfInt(histSize);
+
+                        //Definimos la altura del histograma y  el ancho de la barra
+                        int histogramHeight = (int) rgbaSize.height;
+                        int binWidth = 1; //A menor sea el número menos separación existe entre las barras
+
+                        //Definimos el rango de valores
+                        MatOfFloat histogramRange = new MatOfFloat(0f, 256f);
+
+                        //Creamos 2 listas separadas:
+                        // -Una para los colores
+                        // -Otra para los canales
+                        // (Ambos serán usados como conjuntos de datos por separado)
+                        Scalar[] colorsRgb = new  Scalar[]{new Scalar(200,0,0,255), new Scalar(0,200,0,255), new Scalar(0,0,200,255)};
+                        MatOfInt[] channels = new MatOfInt[]{new MatOfInt(0), new MatOfInt(1), new MatOfInt(2)};
+
+                        //Creamos un arreglo para guardarlo en el histograma y un segundo arreglo, en el cual el gráfico del histograma será dibujado
+                        Mat[] histograms = new Mat[]{new Mat(), new Mat(), new Mat()};
+                        Mat histMatBitmap = new Mat(rgbaSize, rgba.type());
+
+                        //Calculamos el histograma para cada canal
+                        for (int i = 0; i < channels.length; i++){
+                            //Usando el método Imgproc.calchist() se calcula el histograma para cada canal. Proviene de la librería OpenCV
+                            Imgproc.calcHist(Collections.singletonList(rgba), channels[i], new Mat(), histograms[i],  histogramSize, histogramRange);
+                            //Se estandarizan los valores de datos para que cuadren todos a la altura y tamaño
+                            Core.normalize(histograms[i], histograms[i], histogramHeight, 0, Core.NORM_INF);
+                            //Creamos 2 puntos por cada barra del histograma y generamos una linea entre esos 2 puntos usando la librería OpenCV
+                            for(int j = 0; j < histSize; j++){
+                                Point p1 = new Point(binWidth * (j-1), histogramHeight - Math.round(histograms[i].get(j-1,0)[0]));
+                                Point p2 = new Point(binWidth *(j), histogramHeight - Math.round(histograms[i].get(j,0)[0]));
+                                Imgproc.line(histMatBitmap, p1, p2, colorsRgb[i], 2, 8, 0);
+                            }
+                        }
+
+                        //Se crea un bitmap de las dimensiones del fotograma
+                        Bitmap bmFinal = Bitmap.createBitmap(histMatBitmap.cols(), histMatBitmap.rows(), Bitmap.Config.ARGB_8888);
+                        //Se le asignan los datos del histograma al bitmap
+                        Utils.matToBitmap(histMatBitmap,bmFinal);
+                        //Definimos el contenido de nuestro ImageView en el layout con los datos del histograma
+                        histograma = getView().findViewById(R.id.histogramaImgView);
+                        histograma.setImageBitmap(bmFinal);
+                        Log.i("TESTEO", "Sale");
                     }
                 });
 

@@ -13,6 +13,6 @@
     <color name="playback_indicator">#8E44AD</color>
     <color name="grid_line">#CD6155</color>
     <color name="timecode">#ddffffdd</color>
-    <color name="timecode_shadow">#FFFFFF</color>
-    <color name = "background_wave">#85C1E9</color>
+    <color name="timecode_shadow">#ffffff</color>
+    <color name = "background_wave">#85c1e9</color>
 </resources>

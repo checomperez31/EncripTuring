@@ -31,6 +31,11 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import org.opencv.android.BaseLoaderCallback;
+import org.opencv.android.LoaderCallbackInterface;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
+
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -48,6 +53,30 @@ public class Turing extends AppCompatActivity
     private final int SELECT_VIDEO = 201;
     private final int GRABAR_VIDEO = 202;
     public final String TAG = "MECT";
+
+    static {
+        if(OpenCVLoader.initDebug()){
+            Log.i("OpenCV", "Initialize success");
+        }else{
+            Log.i("OpenCV", "Initialize failed");
+        }
+    }
+
+    BaseLoaderCallback mLoaderCallBack = new BaseLoaderCallback(this) {
+        @Override
+        public void onManagerConnected(int status) {
+            switch (status) {
+                case LoaderCallbackInterface.SUCCESS: {
+                    Log.i("OpenCV", "Inialize Async success");
+                }
+                break;
+                default: {
+                    super.onManagerConnected(status);
+                }
+                break;
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +107,9 @@ public class Turing extends AppCompatActivity
         fragmentImagenes = new FragmentImagenes();
 
         getSupportFragmentManager().beginTransaction().add(R.id.FragmentContent, fragmentSonido).commit();
+
+
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallBack);
     }
 
     @Override

@@ -9,22 +9,13 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <RelativeLayout
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/btn_SeleccionarVideo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="21dp"
-                android:layout_marginEnd="21dp"
-                android:layout_marginRight="21dp"
-                android:src="@drawable/add_item"
-                android:tint="@color/White" />
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:weightSum="5">
             <RelativeLayout
                 android:id="@+id/layoutVideo"
                 android:layout_width="match_parent"
@@ -33,12 +24,32 @@
                 <com.turing.encripturing.CustomVideoView
                     android:id="@+id/reproductorVideo"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true" />
+                    android:layout_height="match_parent" />
             </RelativeLayout>
-        </RelativeLayout>
-    </LinearLayout>
-    </ScrollView>
 
+            <ImageView
+                android:id="@+id/histogramaImgView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="85dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/background_wave" />
+        </LinearLayout>
+    </ScrollView>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_SeleccionarVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="21dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginRight="21dp"
+            android:src="@drawable/add_item"
+            android:tint="@color/White" />
+    </RelativeLayout>
 </RelativeLayout>

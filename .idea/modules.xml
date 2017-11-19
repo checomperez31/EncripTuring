@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/EncripTuring.iml" filepath="$PROJECT_DIR$/EncripTuring.iml" />
+      <module fileurl="file://$PROJECT_DIR$/OpenCV3.1/OpenCV3.1.iml" filepath="$PROJECT_DIR$/OpenCV3.1/OpenCV3.1.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
