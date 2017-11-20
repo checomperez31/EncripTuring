@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,9 +31,30 @@
                 android:id="@+id/histogramaImgView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="20dp"
+                android:padding="10dp"
+                android:background="@color/background_wave"
+                android:adjustViewBounds="true"
+                android:visibility="gone"/>
+            <ImageView
+                android:id="@+id/imgViewBN"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:adjustViewBounds="true"
+                android:visibility="gone"/>
+            <ImageView
+                android:id="@+id/histogramaLumImgView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_marginBottom="85dp"
                 android:layout_marginTop="10dp"
-                android:background="@color/background_wave" />
+                android:padding="10dp"
+                android:background="@color/background_wave"
+                android:adjustViewBounds="true"
+                android:visibility="gone"/>
         </LinearLayout>
     </ScrollView>
     <RelativeLayout
@@ -52,4 +73,4 @@
             android:src="@drawable/add_item"
             android:tint="@color/White" />
     </RelativeLayout>
-</RelativeLayout>
+</FrameLayout>
