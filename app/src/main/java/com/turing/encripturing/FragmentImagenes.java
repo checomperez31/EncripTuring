@@ -507,4 +507,17 @@ public class FragmentImagenes extends Fragment {
 
         return bmFinal;
     }
+
+    //Función para generar matriz de números random del 1 al 99 xdxd
+    public int[][] generarLlave(){
+        int[][] llave = new int[3][3];
+        for (int i = 0; i<=llave.length; i++){
+            for (int j = 0; j<=llave[i].length; j++){
+                llave[i][j] = (int)(Math.random()*99)+1;
+            }
+        }
+
+        return llave;
+    }
+    
 }
