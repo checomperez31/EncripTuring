@@ -109,7 +109,7 @@ public class Turing extends AppCompatActivity
         getSupportFragmentManager().beginTransaction().add(R.id.FragmentContent, fragmentSonido).commit();
 
 
-        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION, this, mLoaderCallBack);
+        OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallBack);
     }
 
     @Override

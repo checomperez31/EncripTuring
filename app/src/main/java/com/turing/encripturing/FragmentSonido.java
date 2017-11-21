@@ -840,21 +840,23 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
      */
     public void showOptions()
     {
-        final CharSequence[] option = {"Grabar Sonido", "Elegir del Explorador", "Cancelar"};
+        final CharSequence[] option = {
+                getString(R.string.opcion_grabar_sonido),
+                getString(R.string.opcion_elegir),
+                getString(R.string.opcion_cancelar)};
         final android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(context);
-        builder.setTitle("Elige una opción");
+        builder.setTitle(R.string.opcion_titulo);
         builder.setItems(option, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(option[which] == "Grabar Sonido"){
+                if(option[which] == getString(R.string.opcion_grabar_sonido)){
                     dialog.dismiss();
-
                     dialogRecord.show();
-                }else if(option[which] == "Elegir del Explorador"){
+                }else if(option[which] == getString(R.string.opcion_elegir)){
                     Intent intent = new Intent();
                     intent.setType("audio/*");
                     intent.setAction(Intent.ACTION_GET_CONTENT);
-                    getActivity().startActivityForResult(Intent.createChooser(intent,"Select Audio "), SELECT_AUDIO);
+                    getActivity().startActivityForResult(Intent.createChooser(intent, getString(R.string.opcion_titulo)), SELECT_AUDIO);
                 }else {
                     dialog.dismiss();
                 }
