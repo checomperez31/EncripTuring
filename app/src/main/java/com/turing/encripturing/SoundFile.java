@@ -270,7 +270,6 @@ public class SoundFile {
                     codec.queueInputBuffer(inputBufferIndex, 0, sample_size, presentation_time, 0);
                     extractor.advance();
                     tot_size_read += sample_size;
-                    Log.i("SFL", tot_size_read + " " + decodedSamples);
                     if (mProgressListener != null) {
                         if (!mProgressListener.reportProgress((float)(tot_size_read) / mFileSize)) {
                             // We are asked to stop reading the file. Returning immediately. The

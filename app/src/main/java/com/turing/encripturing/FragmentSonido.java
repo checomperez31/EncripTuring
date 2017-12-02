@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
 public class FragmentSonido extends Fragment implements com.turing.encripturing.MarkerView.MarkerListener, WaveformView.WaveformListener{
@@ -829,6 +830,44 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                 isRecorded = true;
                 obtenerSonido(Uri.parse(new File(dialogRecord.directorio).getPath()));
                 isRecorded = false;
+            }
+        });
+
+        encriptar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        short[][] llave = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+                        short[] arreglo = new short[3];
+                        short[] arregloEnc = new short[3];
+                        Log.i("ISOUND", "Samples " + mSoundFile.getNumSamples());
+                        Log.i("ISOUND", "Frames " + mSoundFile.getNumFrames());
+                        Log.i("ISOUND", "SampleRate " + mSoundFile.getSampleRate() + "\nSamplesPerFrame " + mSoundFile.getSamplesPerFrame());
+                        ShortBuffer bufferdshit = mSoundFile.getSamples();
+                        short numero = (short) 2;
+                        Log.i("ISOUND", " 2 en short" + numero);
+                        for(int i = 0; i < mSoundFile.getNumSamples(); i+=3)
+                        {
+                            arreglo[0] = bufferdshit.get(i);
+                            arreglo[1] = bufferdshit.get(i + 1);
+                            arreglo[2] = bufferdshit.get(i + 2);
+                            //Log.i("NENC", "[" + arreglo[0] + ", " + arreglo[1] + ", " + arreglo[2] + "]");
+                            for(int j = 0; j < 3; j ++)
+                            {
+                                arregloEnc[j] = 0;
+                                for(int k = 0; k < 3; k++)
+                                {
+                                    arregloEnc[j] += llave[j][k] * arreglo[k];
+                                }
+                            }
+                            //Log.i("ENC", "[" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
+                        }
+                        Log.i("ISOUND", " multiplicacion terminada");
+                    }
+                }).start();
+
             }
         });
 

@@ -19,6 +19,7 @@ package com.turing.encripturing;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
+import android.util.Log;
 
 import java.nio.ShortBuffer;
 
@@ -49,6 +50,8 @@ class SamplePlayer {
                 mSampleRate,
                 mChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO,
                 AudioFormat.ENCODING_PCM_16BIT);
+        Log.i("SAMS", "BufferSize" + bufferSize);
+        Log.i("SAMS", "Samples" + samples);
         // make sure minBufferSize can contain at least 1 second of audio (16 bits sample).
         if (bufferSize < mChannels * mSampleRate * 2) {
             bufferSize = mChannels * mSampleRate * 2;
