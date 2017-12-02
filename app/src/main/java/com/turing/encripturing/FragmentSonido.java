@@ -13,8 +13,11 @@ import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.DocumentsContract;
@@ -36,6 +39,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.ArrayList;
 
@@ -115,6 +121,11 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
 
     private IntentFilter intentFilter;
     private BecomingNoisyReceiver myNoisyAudioStreamReceiver;
+
+
+    private static String RECORD_DIRECTORY = "ENC";
+    public static String directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
+    private boolean directorioCreado = false;
 
     public FragmentSonido() {
         // Required empty public constructor
@@ -839,15 +850,16 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        short[][] llave = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-                        short[] arreglo = new short[3];
-                        short[] arregloEnc = new short[3];
+                        byte[][] llave = {{17, 17, 5}, {21, 18, 21}, {2, 2, 19}};
+                        //int[][] llave = {{4, 9, 15}, {15, 17, 6}, {24, 0, 17}};
+                        byte[] arreglo = new byte[3];
+                        byte[] arregloEnc = new byte[3];
                         Log.i("ISOUND", "Samples " + mSoundFile.getNumSamples());
                         Log.i("ISOUND", "Frames " + mSoundFile.getNumFrames());
                         Log.i("ISOUND", "SampleRate " + mSoundFile.getSampleRate() + "\nSamplesPerFrame " + mSoundFile.getSamplesPerFrame());
-                        ShortBuffer bufferdshit = mSoundFile.getSamples();
-                        short numero = (short) 2;
-                        Log.i("ISOUND", " 2 en short" + numero);
+                        ByteBuffer bufferdshit = mSoundFile.getDecodedBytes();
+                        ByteBuffer otroBuffer = ByteBuffer.allocate(bufferdshit.limit());
+                        Log.i("ISOUND", "Samples " + mSoundFile.getNumSamples());
                         for(int i = 0; i < mSoundFile.getNumSamples(); i+=3)
                         {
                             arreglo[0] = bufferdshit.get(i);
@@ -862,8 +874,52 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                                     arregloEnc[j] += llave[j][k] * arreglo[k];
                                 }
                             }
-                            //Log.i("ENC", "[" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
+                            otroBuffer.put(i, arregloEnc[0]);
+                            if((i + 1) < bufferdshit.limit())otroBuffer.put(i + 1, arregloEnc[1]);
+                            if((i + 2) < bufferdshit.limit())otroBuffer.put(i + 2, arregloEnc[2]);
+                            //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
                         }
+
+                        for(int i = 0; i < mSoundFile.getNumSamples(); i++){
+                            otroBuffer.put(i, (otroBuffer.get(i)));
+                        }
+
+                        for(int i = 10050; i < 10080; i++)
+                        {
+                            Log.i("ISOUND", "SON" + bufferdshit.getInt(i));
+                            Log.i("ISOUND", "SONE" + otroBuffer.getInt(i));
+                        }
+                        File createDirectory = new File(directorio, RECORD_DIRECTORY);
+
+                        directorioCreado = createDirectory.exists();
+
+                        if(!directorioCreado) directorioCreado = createDirectory.mkdir();
+                        createDirectory = null;
+                        if(directorioCreado){
+                            String recordName = "ENC_" + editTitulo.getText().toString() + ".mp3";
+                            directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
+                            File file = new File(directorio);
+                            try{
+                                WriteFile(file, Float.parseFloat(mStartText.getText().toString()), Float.parseFloat(mEndText.getText().toString()), mSoundFile.getChannels(), mSoundFile.getSampleRate(), otroBuffer);
+                                Log.e("CFILE", "Archivo creado");
+                            }
+                            catch(IOException ioe){
+                                Log.e("CFILE", ioe.getMessage());
+                            }
+
+                        }
+                        /*int numeromenor = 0, numeromayor = 0, numero = 0;
+                        for(int i = 0; i < bufferdshit.limit(); i++){
+                            numero = bufferdshit.get(i);
+                            if(numero < 0){
+                                if(numero < numeromenor) numeromenor = numero;
+                            }
+                            else {
+                                if (numero > numeromayor) numeromayor = numero;
+                            }
+                        }
+                        Log.i("ISOUND", " " + numeromenor + "<" + numeromayor);*/
+
                         Log.i("ISOUND", " multiplicacion terminada");
                     }
                 }).start();
@@ -1151,6 +1207,148 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
                     handlePause();
                 }
             }
+        }
+    }
+
+    public void WriteFile(File outputFile, float startTime, float endTime, int mChannels, int mSampleRate, ByteBuffer mDecodedBytes)
+            throws java.io.IOException {
+        int startOffset = (int)(startTime * mSampleRate) * 2 * mChannels;
+        int numSamples = (int)((endTime - startTime) * mSampleRate);
+        // Some devices have problems reading mono AAC files (e.g. Samsung S3). Making it stereo.
+        int numChannels = (mChannels == 1) ? 2 : mChannels;
+
+        String mimeType = "audio/mp4a-latm";
+        int bitrate = 64000 * numChannels;  // rule of thumb for a good quality: 64kbps per channel.
+        MediaCodec codec = MediaCodec.createEncoderByType(mimeType);
+        MediaFormat format = MediaFormat.createAudioFormat(mimeType, mSampleRate, numChannels);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+        codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        codec.start();
+
+        // Get an estimation of the encoded data based on the bitrate. Add 10% to it.
+        int estimatedEncodedSize = (int)((endTime - startTime) * (bitrate / 8) * 1.1);
+        ByteBuffer encodedBytes = ByteBuffer.allocate(estimatedEncodedSize);
+        ByteBuffer[] inputBuffers = codec.getInputBuffers();
+        ByteBuffer[] outputBuffers = codec.getOutputBuffers();
+        MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+        boolean done_reading = false;
+        long presentation_time = 0;
+
+        int frame_size = 1024;  // number of samples per frame per channel for an mp4 (AAC) stream.
+        byte buffer[] = new byte[frame_size * numChannels * 2];  // a sample is coded with a short.
+        mDecodedBytes.position(startOffset);
+        numSamples += (2 * frame_size);  // Adding 2 frames, Cf. priming frames for AAC.
+        int tot_num_frames = 1 + (numSamples / frame_size);  // first AAC frame = 2 bytes
+        if (numSamples % frame_size != 0) {
+            tot_num_frames++;
+        }
+        int[] frame_sizes = new int[tot_num_frames];
+        int num_out_frames = 0;
+        int num_frames=0;
+        int num_samples_left = numSamples;
+        int encodedSamplesSize = 0;  // size of the output buffer containing the encoded samples.
+        byte[] encodedSamples = null;
+        while (true) {
+            // Feed the samples to the encoder.
+            int inputBufferIndex = codec.dequeueInputBuffer(100);
+            if (!done_reading && inputBufferIndex >= 0) {
+                if (num_samples_left <= 0) {
+                    // All samples have been read.
+                    codec.queueInputBuffer(
+                            inputBufferIndex, 0, 0, -1, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                    done_reading = true;
+                } else {
+                    inputBuffers[inputBufferIndex].clear();
+                    if (buffer.length > inputBuffers[inputBufferIndex].remaining()) {
+                        // Input buffer is smaller than one frame. This should never happen.
+                        continue;
+                    }
+                    // bufferSize is a hack to create a stereo file from a mono stream.
+                    int bufferSize = (mChannels == 1) ? (buffer.length / 2) : buffer.length;
+                    if (mDecodedBytes.remaining() < bufferSize) {
+                        for (int i=mDecodedBytes.remaining(); i < bufferSize; i++) {
+                            buffer[i] = 0;  // pad with extra 0s to make a full frame.
+                        }
+                        mDecodedBytes.get(buffer, 0, mDecodedBytes.remaining());
+                    } else {
+                        mDecodedBytes.get(buffer, 0, bufferSize);
+                    }
+                    if (mChannels == 1) {
+                        for (int i=bufferSize - 1; i >= 1; i -= 2) {
+                            buffer[2*i + 1] = buffer[i];
+                            buffer[2*i] = buffer[i-1];
+                            buffer[2*i - 1] = buffer[2*i + 1];
+                            buffer[2*i - 2] = buffer[2*i];
+                        }
+                    }
+                    num_samples_left -= frame_size;
+                    inputBuffers[inputBufferIndex].put(buffer);
+                    presentation_time = (long) (((num_frames++) * frame_size * 1e6) / mSampleRate);
+                    codec.queueInputBuffer(
+                            inputBufferIndex, 0, buffer.length, presentation_time, 0);
+                }
+            }
+
+            // Get the encoded samples from the encoder.
+            int outputBufferIndex = codec.dequeueOutputBuffer(info, 100);
+            if (outputBufferIndex >= 0 && info.size > 0 && info.presentationTimeUs >=0) {
+                if (num_out_frames < frame_sizes.length) {
+                    frame_sizes[num_out_frames++] = info.size;
+                }
+                if (encodedSamplesSize < info.size) {
+                    encodedSamplesSize = info.size;
+                    encodedSamples = new byte[encodedSamplesSize];
+                }
+                outputBuffers[outputBufferIndex].get(encodedSamples, 0, info.size);
+                outputBuffers[outputBufferIndex].clear();
+                codec.releaseOutputBuffer(outputBufferIndex, false);
+                if (encodedBytes.remaining() < info.size) {  // Hopefully this should not happen.
+                    estimatedEncodedSize = (int)(estimatedEncodedSize * 1.2);  // Add 20%.
+                    ByteBuffer newEncodedBytes = ByteBuffer.allocate(estimatedEncodedSize);
+                    int position = encodedBytes.position();
+                    encodedBytes.rewind();
+                    newEncodedBytes.put(encodedBytes);
+                    encodedBytes = newEncodedBytes;
+                    encodedBytes.position(position);
+                }
+                encodedBytes.put(encodedSamples, 0, info.size);
+            } else if (outputBufferIndex == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+                outputBuffers = codec.getOutputBuffers();
+            } else if (outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                // Subsequent data will conform to new format.
+                // We could check that codec.getOutputFormat(), which is the new output format,
+                // is what we expect.
+            }
+            if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                // We got all the encoded data from the encoder.
+                break;
+            }
+        }
+        int encoded_size = encodedBytes.position();
+        encodedBytes.rewind();
+        codec.stop();
+        codec.release();
+        codec = null;
+
+        // Write the encoded stream to the file, 4kB at a time.
+        buffer = new byte[4096];
+        try {
+            FileOutputStream outputStream = new FileOutputStream(outputFile);
+            outputStream.write(
+                    MP4Header.getMP4Header(mSampleRate, numChannels, frame_sizes, bitrate));
+            while (encoded_size - encodedBytes.position() > buffer.length) {
+                encodedBytes.get(buffer);
+                outputStream.write(buffer);
+            }
+            int remaining = encoded_size - encodedBytes.position();
+            if (remaining > 0) {
+                encodedBytes.get(buffer, 0, remaining);
+                outputStream.write(buffer, 0, remaining);
+            }
+            outputStream.close();
+        } catch (IOException e) {
+            Log.e("Ringdroid", "Failed to create the .m4a file.");
+            Log.e("Ringdroid", e.getMessage());
         }
     }
 

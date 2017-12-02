@@ -186,6 +186,11 @@ public class SoundFile {
         }
     }
 
+    public ByteBuffer getDecodedBytes()
+    {
+        return mDecodedBytes;
+    }
+
     // A SoundFile object should only be created using the static methods create() and record().
     private SoundFile() {
     }
