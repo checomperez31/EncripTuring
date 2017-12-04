@@ -847,83 +847,87 @@ public class FragmentSonido extends Fragment implements com.turing.encripturing.
         encriptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
+                DialogLlaves dialogLlaves = new DialogLlaves(context);
+                dialogLlaves.show();
+                dialogLlaves.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
-                    public void run() {
-                        byte[][] llave = {{17, 17, 5}, {21, 18, 21}, {2, 2, 19}};
-                        //int[][] llave = {{4, 9, 15}, {15, 17, 6}, {24, 0, 17}};
-                        byte[] arreglo = new byte[3];
-                        byte[] arregloEnc = new byte[3];
-                        Log.i("ISOUND", "Samples " + mSoundFile.getNumSamples());
-                        Log.i("ISOUND", "Frames " + mSoundFile.getNumFrames());
-                        Log.i("ISOUND", "SampleRate " + mSoundFile.getSampleRate() + "\nSamplesPerFrame " + mSoundFile.getSamplesPerFrame());
-                        ByteBuffer bufferdshit = mSoundFile.getDecodedBytes();
-                        ByteBuffer otroBuffer = ByteBuffer.allocate(bufferdshit.limit());
-                        Log.i("ISOUND", "Samples " + mSoundFile.getNumSamples());
-                        for(int i = 0; i < mSoundFile.getNumSamples(); i+=3)
-                        {
-                            arreglo[0] = bufferdshit.get(i);
-                            arreglo[1] = bufferdshit.get(i + 1);
-                            arreglo[2] = bufferdshit.get(i + 2);
-                            //Log.i("NENC", "[" + arreglo[0] + ", " + arreglo[1] + ", " + arreglo[2] + "]");
-                            for(int j = 0; j < 3; j ++)
-                            {
-                                arregloEnc[j] = 0;
-                                for(int k = 0; k < 3; k++)
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                DatosEncriptar datos = DatosEncriptar.getInstance();
+                                int[][] llave = datos.getLlave();
+                                //int[][] llave = {{105, 128, 108}, {91, 39, 94}, {72, 117, 113}};
+                                int[] arreglo = new int[3];
+                                int[] arregloSignos = new int[3];
+                                int[] arregloEnc = new int[3];
+                                Log.i("ISOUND", "Samples " + mSoundFile.getNumSamples());
+                                Log.i("ISOUND", "Frames " + mSoundFile.getNumFrames());
+                                Log.i("ISOUND", "SampleRate " + mSoundFile.getSampleRate() + "\nSamplesPerFrame " + mSoundFile.getSamplesPerFrame());
+                                ByteBuffer bufferdshit = mSoundFile.getDecodedBytes();
+                                ByteBuffer otroBuffer = ByteBuffer.allocate(bufferdshit.limit());
+                                Log.i("ISOUND", "Samples " + mSoundFile.getNumSamples());
+                                for(int i = 0; i < bufferdshit.limit(); i+=3)
                                 {
-                                    arregloEnc[j] += llave[j][k] * arreglo[k];
+                                    //Asignamos los valores del Buffer al arrelo a encriptar
+                                    arreglo[0] = bufferdshit.get(i);
+                                    if((i + 1) < bufferdshit.limit())arreglo[1] = bufferdshit.get(i + 1);
+                                    if((i + 2) < bufferdshit.limit())arreglo[2] = bufferdshit.get(i + 2);
+                                    //Verificamos valor de signos
+                                    for(int j = 0; j < 3; j++){
+                                        if(arreglo[j] < 0){
+                                            arregloSignos[j] = -1;
+                                        }
+                                        else{
+                                            arregloSignos[j] = 1;
+                                        }
+                                    }
+                                    //Log.i("NENC", "[" + arreglo[0] + ", " + arreglo[1] + ", " + arreglo[2] + "]");
+
+                                    //Encriptamos
+                                    for(int j = 0; j < 3; j ++)
+                                    {
+                                        arregloEnc[j] = 0;
+                                        for(int k = 0; k < 3; k++)
+                                        {
+                                            arregloEnc[j] += llave[j][k] * arreglo[k];
+                                        }
+                                        //Modulo 29
+                                        arregloEnc[j] = arregloEnc[j]%129;
+                                    }
+
+                                    //Insertamos los datos encriptados en el buffer
+                                    otroBuffer.put(i, ((byte) (arregloEnc[0] * arregloSignos[0])));
+                                    if((i + 1) < bufferdshit.limit())otroBuffer.put(i + 1, ((byte) (arregloEnc[1] * arregloSignos[1])));
+                                    if((i + 2) < bufferdshit.limit())otroBuffer.put(i + 2, ((byte) (arregloEnc[2] * arregloSignos[2])));
+                                    //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
                                 }
+
+                                File createDirectory = new File(directorio, RECORD_DIRECTORY);
+
+                                directorioCreado = createDirectory.exists();
+
+                                if(!directorioCreado) directorioCreado = createDirectory.mkdir();
+                                createDirectory = null;
+                                if(directorioCreado){
+                                    String recordName = "ENC_" + editTitulo.getText().toString() + "(2).mp3";
+                                    directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
+                                    File file = new File(directorio);
+                                    try{
+                                        WriteFile(file, Float.parseFloat(mStartText.getText().toString()), Float.parseFloat(mEndText.getText().toString()), mSoundFile.getChannels(), mSoundFile.getSampleRate(), otroBuffer);
+                                        Log.e("CFILE", "Archivo creado");
+                                    }
+                                    catch(IOException ioe){
+                                        Log.e("CFILE", ioe.getMessage());
+                                    }
+
+                                }
+
+                                Log.i("ISOUND", " multiplicacion terminada");
                             }
-                            otroBuffer.put(i, arregloEnc[0]);
-                            if((i + 1) < bufferdshit.limit())otroBuffer.put(i + 1, arregloEnc[1]);
-                            if((i + 2) < bufferdshit.limit())otroBuffer.put(i + 2, arregloEnc[2]);
-                            //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
-                        }
-
-                        for(int i = 0; i < mSoundFile.getNumSamples(); i++){
-                            otroBuffer.put(i, (otroBuffer.get(i)));
-                        }
-
-                        for(int i = 10050; i < 10080; i++)
-                        {
-                            Log.i("ISOUND", "SON" + bufferdshit.getInt(i));
-                            Log.i("ISOUND", "SONE" + otroBuffer.getInt(i));
-                        }
-                        File createDirectory = new File(directorio, RECORD_DIRECTORY);
-
-                        directorioCreado = createDirectory.exists();
-
-                        if(!directorioCreado) directorioCreado = createDirectory.mkdir();
-                        createDirectory = null;
-                        if(directorioCreado){
-                            String recordName = "ENC_" + editTitulo.getText().toString() + ".mp3";
-                            directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
-                            File file = new File(directorio);
-                            try{
-                                WriteFile(file, Float.parseFloat(mStartText.getText().toString()), Float.parseFloat(mEndText.getText().toString()), mSoundFile.getChannels(), mSoundFile.getSampleRate(), otroBuffer);
-                                Log.e("CFILE", "Archivo creado");
-                            }
-                            catch(IOException ioe){
-                                Log.e("CFILE", ioe.getMessage());
-                            }
-
-                        }
-                        /*int numeromenor = 0, numeromayor = 0, numero = 0;
-                        for(int i = 0; i < bufferdshit.limit(); i++){
-                            numero = bufferdshit.get(i);
-                            if(numero < 0){
-                                if(numero < numeromenor) numeromenor = numero;
-                            }
-                            else {
-                                if (numero > numeromayor) numeromayor = numero;
-                            }
-                        }
-                        Log.i("ISOUND", " " + numeromenor + "<" + numeromayor);*/
-
-                        Log.i("ISOUND", " multiplicacion terminada");
+                        }).start();
                     }
-                }).start();
-
+                });
             }
         });
 

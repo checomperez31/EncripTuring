@@ -7,4 +7,6 @@
     <dimen name="boton_reproduccion_altura">80dp</dimen>
     <dimen name="boton_reproduccion_ancho">100dp</dimen>
     <dimen name="texto_altura">20sp</dimen>
+
+    <dimen name="texto_dialog_llaves">20sp</dimen>
 </resources>

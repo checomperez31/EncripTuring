@@ -5,4 +5,9 @@
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+
+    <dimen name="texto_dialog_llaves">25sp</dimen>
+    <dimen name="texto_boton_dialog_llaves">13sp</dimen>
+    <dimen name="ancho_dialog_llaves">170dp</dimen>
+    <dimen name="dialog_margen_llave">5dp</dimen>
 </resources>
