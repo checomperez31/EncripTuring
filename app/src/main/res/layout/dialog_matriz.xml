@@ -5,119 +5,312 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true">
 
-    <RelativeLayout
-        android:id="@+id/layout_dialog_record"
+    <LinearLayout
+        android:id="@+id/layout_dialog_matriz"
         android:layout_centerInParent="true"
-        android:layout_width="@dimen/ancho_dialog_llaves"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/dialog_width"
+        android:layout_height="@dimen/dialog_height"
+        android:orientation="vertical"
         >
 
-        <TextView
-            android:id="@+id/dialog_matriz00"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="-128"
-            android:textColor="@android:color/black"
-            android:layout_toLeftOf="@+id/dialog_matriz01"
-            android:layout_marginRight="@dimen/dialog_margen_llave"/>
-        <TextView
-            android:id="@+id/dialog_matriz01"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="-128"
-            android:textColor="@android:color/black"
-            android:layout_centerHorizontal="true"/>
-        <TextView
-            android:id="@+id/dialog_matriz02"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="-128"
-            android:textColor="@android:color/black"
-            android:layout_toRightOf="@+id/dialog_matriz01"
-            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialog_height_title"
+            android:background="@color/colorPrimary"
+            >
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+
+                <TextView
+                    android:id="@+id/dialog_matriz_titulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_matriz_titulo"
+                    android:textColor="@color/White"
+                    android:textSize="@dimen/dialog_size_title_text"/>
+
+            </RelativeLayout>
 
 
-        <TextView
-            android:id="@+id/dialog_matriz10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="128"
-            android:textColor="@android:color/black"
-            android:layout_toLeftOf="@+id/dialog_matriz11"
-            android:layout_below="@+id/dialog_matriz00"
-            android:layout_marginRight="@dimen/dialog_margen_llave"/>
-        <TextView
-            android:id="@+id/dialog_matriz11"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="128"
-            android:textColor="@android:color/black"
-            android:layout_below="@+id/dialog_matriz01"
-            android:layout_centerHorizontal="true"/>
-        <TextView
-            android:id="@+id/dialog_matriz12"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="128"
-            android:textColor="@android:color/black"
-            android:layout_toRightOf="@+id/dialog_matriz11"
-            android:layout_below="@+id/dialog_matriz02"
-            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/dialog_layout_buttons"
+                >
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true">
+
+                    <RelativeLayout
+                        android:id="@+id/layout_matriz_llave"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+
+                        <TextView
+                            android:id="@+id/dialog_matriz00"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="-128"
+                            android:textColor="@android:color/black"
+                            android:layout_toLeftOf="@+id/dialog_matriz01"
+                            android:layout_marginRight="@dimen/dialog_margen_llave"
+                            />
+                        <TextView
+                            android:id="@+id/dialog_matriz01"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="-128"
+                            android:textColor="@android:color/black"
+                            android:layout_centerHorizontal="true"/>
+                        <TextView
+                            android:id="@+id/dialog_matriz02"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="-128"
+                            android:textColor="@android:color/black"
+                            android:layout_toRightOf="@+id/dialog_matriz01"
+                            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
 
 
-        <TextView
-            android:id="@+id/dialog_matriz20"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="128"
-            android:textColor="@android:color/black"
-            android:layout_toLeftOf="@+id/dialog_matriz21"
-            android:layout_below="@+id/dialog_matriz10"
-            android:layout_marginRight="@dimen/dialog_margen_llave"/>
-        <TextView
-            android:id="@+id/dialog_matriz21"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="128"
-            android:textColor="@android:color/black"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@+id/dialog_matriz11"/>
-        <TextView
-            android:id="@+id/dialog_matriz22"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/texto_dialog_llaves"
-            android:text="128"
-            android:textColor="@android:color/black"
-            android:layout_toRightOf="@+id/dialog_matriz21"
-            android:layout_below="@+id/dialog_matriz12"
-            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
+                        <TextView
+                            android:id="@+id/dialog_matriz10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toLeftOf="@+id/dialog_matriz11"
+                            android:layout_below="@+id/dialog_matriz00"
+                            android:layout_marginRight="@dimen/dialog_margen_llave"/>
+                        <TextView
+                            android:id="@+id/dialog_matriz11"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_below="@+id/dialog_matriz01"
+                            android:layout_centerHorizontal="true"/>
+                        <TextView
+                            android:id="@+id/dialog_matriz12"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toRightOf="@+id/dialog_matriz11"
+                            android:layout_below="@+id/dialog_matriz02"
+                            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
 
-        <Button
-            android:id="@+id/btn_generar_matriz"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/dialog_matriz21"
-            android:text="Generar Matriz"
-            android:textSize="@dimen/texto_boton_dialog_llaves"
-            android:layout_centerHorizontal="true"/>
 
-        <Button
-            android:id="@+id/btn_aceptar_matriz"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_generar_matriz"
-            android:text="Aceptar"
-            android:textSize="@dimen/texto_boton_dialog_llaves"
-            android:layout_centerHorizontal="true"/>
-    </RelativeLayout>
+                        <TextView
+                            android:id="@+id/dialog_matriz20"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toLeftOf="@+id/dialog_matriz21"
+                            android:layout_below="@+id/dialog_matriz10"
+                            android:layout_marginRight="@dimen/dialog_margen_llave"/>
+                        <TextView
+                            android:id="@+id/dialog_matriz21"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_centerHorizontal="true"
+                            android:layout_below="@+id/dialog_matriz11"/>
+                        <TextView
+                            android:id="@+id/dialog_matriz22"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toRightOf="@+id/dialog_matriz21"
+                            android:layout_below="@+id/dialog_matriz12"
+                            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
+
+                    </RelativeLayout>
+                    <RelativeLayout
+                        android:id="@+id/layout_matriz_llave_des"
+                        android:layout_below="@+id/layout_matriz_llave"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dialog_margen_llave"
+                        >
+
+                        <TextView
+                            android:id="@+id/dialog_matrizd00"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="-128"
+                            android:textColor="@android:color/black"
+                            android:layout_toLeftOf="@+id/dialog_matrizd01"
+                            android:layout_marginRight="@dimen/dialog_margen_llave"
+                            />
+                        <TextView
+                            android:id="@+id/dialog_matrizd01"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="-128"
+                            android:textColor="@android:color/black"
+                            android:layout_centerHorizontal="true"/>
+                        <TextView
+                            android:id="@+id/dialog_matrizd02"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="-128"
+                            android:textColor="@android:color/black"
+                            android:layout_toRightOf="@+id/dialog_matrizd01"
+                            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
+
+
+                        <TextView
+                            android:id="@+id/dialog_matrizd10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toLeftOf="@+id/dialog_matrizd11"
+                            android:layout_below="@+id/dialog_matrizd00"
+                            android:layout_marginRight="@dimen/dialog_margen_llave"/>
+                        <TextView
+                            android:id="@+id/dialog_matrizd11"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_below="@+id/dialog_matrizd01"
+                            android:layout_centerHorizontal="true"/>
+                        <TextView
+                            android:id="@+id/dialog_matrizd12"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toRightOf="@+id/dialog_matrizd11"
+                            android:layout_below="@+id/dialog_matrizd02"
+                            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
+
+
+                        <TextView
+                            android:id="@+id/dialog_matrizd20"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toLeftOf="@+id/dialog_matrizd21"
+                            android:layout_below="@+id/dialog_matrizd10"
+                            android:layout_marginRight="@dimen/dialog_margen_llave"/>
+                        <TextView
+                            android:id="@+id/dialog_matrizd21"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_centerHorizontal="true"
+                            android:layout_below="@+id/dialog_matrizd11"/>
+                        <TextView
+                            android:id="@+id/dialog_matrizd22"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/texto_dialog_llaves"
+                            android:text="128"
+                            android:textColor="@android:color/black"
+                            android:layout_toRightOf="@+id/dialog_matrizd21"
+                            android:layout_below="@+id/dialog_matrizd12"
+                            android:layout_marginLeft="@dimen/dialog_margen_llave"/>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+
+
+                <Button
+                    android:id="@+id/dialog_matriz_btn_generar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Generar Matriz"
+                    android:textSize="@dimen/dialog_size_button_text"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentBottom="true"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    />
+
+                <TextView
+                    android:id="@+id/dialog_matriz_mensaje"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentTop="true"
+                    android:textSize="@dimen/dialog_size_content_text"
+                    android:textColor="@android:color/black"
+                    android:layout_marginTop="8dp"
+                    android:textAlignment="center"
+                    android:text = "@string/dialog_matriz_mensaje_generar"/>
+
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/dialog_layout_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                >
+
+                <Button
+                    android:id="@+id/dialog_matriz_btn_aceptar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dialog_size_button_text"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:text="@string/dialog_aceptar"
+                    android:layout_alignParentRight="true"
+                    android:textColor="@color/colorPrimary"/>
+                <Button
+                    android:id="@+id/dialog_matriz_btn_cancelar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dialog_size_button_text"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:text="@string/dialog_cancelar"
+                    android:layout_toLeftOf="@+id/dialog_matriz_btn_aceptar"
+                    android:textColor="@color/colorPrimary"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

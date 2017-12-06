@@ -4,17 +4,16 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -42,8 +41,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
-import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class FragmentSonido extends Fragment{
 
@@ -51,7 +49,6 @@ public class FragmentSonido extends Fragment{
 
     private Context context;
     private String pathSoundRecorded;
-    private boolean isRecorded = false;
 
     private final int SELECT_AUDIO = 200;
 
@@ -64,9 +61,9 @@ public class FragmentSonido extends Fragment{
     //Variables globales para el reproductor
     private MediaPlayerService player;
     boolean serviceBound = false;
-    ArrayList<Audio> audioList;
 
     private DialogRecord dialogRecord;
+    private DialogLlaves dialogLlaves;
 
     private static String RECORD_DIRECTORY = "ENC";
     public static String directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -99,6 +96,12 @@ public class FragmentSonido extends Fragment{
 
     private File encriptedFile;
 
+    ProgressDialog progressDialog;
+
+    private Handler handler;
+
+    private Long tiempoAntes, tiempoDespues;
+
     public FragmentSonido() {
         // Required empty public constructor
     }
@@ -121,51 +124,55 @@ public class FragmentSonido extends Fragment{
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_fragment_sonido, container, false);
 
-        btn_add = (FloatingActionButton) view.findViewById(R.id.sonido_button_add);
+        btn_add = view.findViewById(R.id.sonido_button_add);
 
-        editTitulo = (EditText) view.findViewById(R.id.sonido_edit_titulo);
-        editTituloEnc = (EditText) view.findViewById(R.id.sonido_edit_titulo_enc);
-        editSize = (EditText) view.findViewById(R.id.sonido_edit_tam);
-        editSizeEnc = (EditText) view.findViewById(R.id.sonido_edit_tam_enc);
-        encriptar = (Button) view.findViewById(R.id.sonido_button_encriptar);
+        editTitulo = view.findViewById(R.id.sonido_edit_titulo);
+        editTituloEnc = view.findViewById(R.id.sonido_edit_titulo_enc);
+        editSize = view.findViewById(R.id.sonido_edit_tam);
+        editSizeEnc = view.findViewById(R.id.sonido_edit_tam_enc);
+        encriptar = view.findViewById(R.id.sonido_button_encriptar);
 
         dialogRecord = new DialogRecord(context);
+        handler = new Handler();
 
         DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         density = metrics.density;
         densityEnc = density;
 
-        startText = (EditText) view.findViewById(R.id.sonido_starttext);
-        startTextEnc = (EditText) view.findViewById(R.id.sonido_starttext_enc);
+        startText = view.findViewById(R.id.sonido_starttext);
+        startTextEnc = view.findViewById(R.id.sonido_starttext_enc);
 
-        endText = (EditText) view.findViewById(R.id.endtext);
-        endTextEnc = (EditText) view.findViewById(R.id.endtext_enc);
+        endText = view.findViewById(R.id.endtext);
+        endTextEnc = view.findViewById(R.id.endtext_enc);
 
-        playButton = (ImageButton)view.findViewById(R.id.play);
-        playButtonEnc = (ImageButton)view.findViewById(R.id.play_enc);
-        rewindButton = (ImageButton)view.findViewById(R.id.rew);
-        rewindButtonEnc = (ImageButton)view.findViewById(R.id.rew_enc);
-        ffwdButton = (ImageButton)view.findViewById(R.id.ffwd);
-        ffwdButtonEnc = (ImageButton)view.findViewById(R.id.ffwd_enc);
+        playButton = view.findViewById(R.id.play);
+        playButtonEnc = view.findViewById(R.id.play_enc);
+        rewindButton = view.findViewById(R.id.rew);
+        rewindButtonEnc = view.findViewById(R.id.rew_enc);
+        ffwdButton = view.findViewById(R.id.ffwd);
+        ffwdButtonEnc = view.findViewById(R.id.ffwd_enc);
 
         waveformView = view.findViewById(R.id.waveform);
         waveformViewEnc = view.findViewById(R.id.waveform_encript);
 
-        info = (TextView)view.findViewById(R.id.info);
-        infoEnc = (TextView)view.findViewById(R.id.info_enc);
+        info = view.findViewById(R.id.info);
+        infoEnc = view.findViewById(R.id.info_enc);
 
-        startMarker = (MarkerView)view.findViewById(R.id.startmarker);
-        startMarkerEnc = (MarkerView)view.findViewById(R.id.startmarker_enc);
+        startMarker = view.findViewById(R.id.startmarker);
+        startMarkerEnc = view.findViewById(R.id.startmarker_enc);
 
-        endMarker = (MarkerView)view.findViewById(R.id.endmarker);
-        endMarkerEnc = (MarkerView)view.findViewById(R.id.endmarker_enc);
+        endMarker = view.findViewById(R.id.endmarker);
+        endMarkerEnc = view.findViewById(R.id.endmarker_enc);
 
         graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker);
 
-        graficaEnc = new GraficaSonido(densityEnc, editTituloEnc, editSizeEnc, playButtonEnc, rewindButtonEnc, ffwdButtonEnc, waveformViewEnc, infoEnc, startMarkerEnc, endMarkerEnc);
+        graficaEnc = new GraficaSonido(densityEnc, startTextEnc, endTextEnc, playButtonEnc, rewindButtonEnc, ffwdButtonEnc, waveformViewEnc, infoEnc, startMarkerEnc, endMarkerEnc);
 
         agregarListeners();
+        directorioCreado = new File(directorio, RECORD_DIRECTORY).exists();
+        if(!directorioCreado) directorioCreado = new File(directorio, RECORD_DIRECTORY).mkdir();
+
 
         return view;
     }
@@ -196,7 +203,6 @@ public class FragmentSonido extends Fragment{
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
@@ -219,22 +225,6 @@ public class FragmentSonido extends Fragment{
             serviceBound = false;
         }
     };
-
-    /**
-     * metodo para reproducir el audio
-     *
-     */
-    private void playAudio(String media) {
-        //Revisar si el servicio esta activo
-        if (!serviceBound) {
-            Intent playerIntent = new Intent(getActivity(), MediaPlayerService.class);
-            playerIntent.putExtra("media", media);
-            getActivity().startService(playerIntent);
-            getActivity().bindService(playerIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-        } else {
-            //Servicio activo
-        }
-    }
 
     /**
      * metodos para evitar que el reproductor crashee
@@ -280,104 +270,171 @@ public class FragmentSonido extends Fragment{
             @Override
             public void onDismiss(DialogInterface dialogInterface)
             {
-                pathSoundRecorded = dialogRecord.directorio;
-                isRecorded = true;
-                obtenerSonido(Uri.parse(new File(dialogRecord.directorio).getPath()));
-                isRecorded = false;
+                if(dialogRecord.getIsReleased()){
+                    File recordFile = dialogRecord.getFile();
+                    editTitulo.setText(recordFile.getName().toString());
+                    graficaOriginal.setmFile(dialogRecord.getFile());
+                    graficaOriginal.generarGrafica();
+                }
+
             }
         });
 
         encriptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogLlaves dialogLlaves = new DialogLlaves(context);
+                dialogLlaves = new DialogLlaves(context);
                 dialogLlaves.show();
                 dialogLlaves.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialogInterface) {
-                        new Runnable(){
-                            @Override
-                            public void run(){
-                                DatosEncriptar datos = DatosEncriptar.getInstance();
-                                int[][] llave = datos.getLlave();
-                                //int[][] llave = {{105, 128, 108}, {91, 39, 94}, {72, 117, 113}};
-                                int[] arreglo = new int[3];
-                                int[] arregloSignos = new int[3];
-                                int[] arregloEnc = new int[3];
-                                Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
-                                Log.i("ISOUND", "Frames " + graficaOriginal.getSoundFile().getNumFrames());
-                                Log.i("ISOUND", "SampleRate " + graficaOriginal.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaOriginal.getSoundFile().getSamplesPerFrame());
-                                ByteBuffer bufferdshit = graficaOriginal.getSoundFile().getDecodedBytes();
-                                ByteBuffer otroBuffer = ByteBuffer.allocate(bufferdshit.limit());
-                                Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
-                                for(int i = 0; i < bufferdshit.limit(); i+=3)
-                                {
-                                    //Asignamos los valores del Buffer al arrelo a encriptar
-                                    arreglo[0] = bufferdshit.get(i);
-                                    if((i + 1) < bufferdshit.limit())arreglo[1] = bufferdshit.get(i + 1);
-                                    if((i + 2) < bufferdshit.limit())arreglo[2] = bufferdshit.get(i + 2);
-                                    //Verificamos valor de signos
-                                    for(int j = 0; j < 3; j++){
-                                        if(arreglo[j] < 0){
-                                            arregloSignos[j] = -1;
-                                        }
-                                        else{
-                                            arregloSignos[j] = 1;
-                                        }
-                                    }
-                                    //Log.i("NENC", "[" + arreglo[0] + ", " + arreglo[1] + ", " + arreglo[2] + "]");
-
-                                    //Encriptamos
-                                    for(int j = 0; j < 3; j ++)
-                                    {
-                                        arregloEnc[j] = 0;
-                                        for(int k = 0; k < 3; k++)
-                                        {
-                                            arregloEnc[j] += llave[j][k] * arreglo[k];
-                                        }
-                                        //Modulo 29
-                                        arregloEnc[j] = arregloEnc[j]%129;
-                                    }
-
-                                    //Insertamos los datos encriptados en el buffer
-                                    otroBuffer.put(i, ((byte) (arregloEnc[0] * arregloSignos[0])));
-                                    if((i + 1) < bufferdshit.limit())otroBuffer.put(i + 1, ((byte) (arregloEnc[1] * arregloSignos[1])));
-                                    if((i + 2) < bufferdshit.limit())otroBuffer.put(i + 2, ((byte) (arregloEnc[2] * arregloSignos[2])));
-                                    //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
-                                }
-
-                                File createDirectory = new File(directorio, RECORD_DIRECTORY);
-
-                                directorioCreado = createDirectory.exists();
-
-                                if(!directorioCreado) directorioCreado = createDirectory.mkdir();
-                                createDirectory = null;
-                                if(directorioCreado){
-                                    String recordName = "ENC_" + editTitulo.getText().toString() + "(2).mp3";
-                                    directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
-                                    encriptedFile = new File(directorio);
-                                    try{
-                                        WriteFile(encriptedFile, Float.parseFloat(startText.getText().toString()), Float.parseFloat(endText.getText().toString()), graficaOriginal.getSoundFile().getChannels(), graficaOriginal.getSoundFile().getSampleRate(), otroBuffer);
-                                        Log.e("CFILE", "Archivo creado");
-
-                                        graficaEnc.setmFile(encriptedFile);
-                                        graficaEnc.generarGrafica();
-                                    }
-                                    catch(IOException ioe){
-                                        Log.e("CFILE", ioe.getMessage());
-                                    }
-
-                                }
-
-                                Log.i("ISOUND", " multiplicacion terminada");
+                        if(!dialogLlaves.getCancelled()){
+                            DatosEncriptar datos = DatosEncriptar.getInstance();
+                            if(datos.getLlave() != null){
+                                encriptar(dialogLlaves.getEncrypt());
                             }
-                        }.run();
+                        }
                     }
                 });
             }
         });
 
 
+    }
+
+    private void encriptar(final boolean encrypt){
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        if(encrypt){
+            progressDialog.setTitle("Encriptando");
+        }
+        else
+        {
+            progressDialog.setTitle("Desencriptando");
+        }
+
+        progressDialog.setCancelable(true);
+        new Thread(){
+            @Override
+            public void run(){
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.show();
+                        progressDialog.setProgress(0);
+                    }
+                });
+                tiempoAntes = System.currentTimeMillis();
+                DatosEncriptar datos = DatosEncriptar.getInstance();
+                int[][] llave;
+                if(dialogLlaves.getEncrypt()){
+                    llave = datos.getLlave();
+                }
+                else{
+                    llave = datos.getLlaveDes();
+                }
+                int[] arreglo = new int[3];
+                int[] arregloSignos = new int[3];
+                int[] arregloEnc = new int[3];
+                Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
+                Log.i("ISOUND", "Frames " + graficaOriginal.getSoundFile().getNumFrames());
+                Log.i("ISOUND", "SampleRate " + graficaOriginal.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaOriginal.getSoundFile().getSamplesPerFrame());
+                ByteBuffer bufferdshit = graficaOriginal.getSoundFile().getDecodedBytes();
+                ByteBuffer otroBuffer = ByteBuffer.allocate(bufferdshit.limit());
+                Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
+                for(int i = 0; i < bufferdshit.limit(); i+=3)
+                {
+                    if(i < 10)Log.i("DATOS", bufferdshit.get(i) + "");
+                    //Asignamos los valores del Buffer al arrelo a encriptar
+                    arreglo[0] = bufferdshit.get(i);
+                    if((i + 1) < bufferdshit.limit())arreglo[1] = bufferdshit.get(i + 1);
+                    if((i + 2) < bufferdshit.limit())arreglo[2] = bufferdshit.get(i + 2);
+                    //Verificamos valor de signos
+                    for(int j = 0; j < 3; j++){
+                        if(arreglo[j] < 0){
+                            arreglo[j] = arreglo[j] * -1;
+                            arregloSignos[j] = -1;
+                        }
+                        else{
+                            arregloSignos[j] = 1;
+                        }
+                    }
+                    //Log.i("NENC", "[" + arreglo[0] + ", " + arreglo[1] + ", " + arreglo[2] + "]");
+
+                    //Encriptamos
+                    for(int j = 0; j < 3; j ++)
+                    {
+                        arregloEnc[j] = 0;
+                        for(int k = 0; k < 3; k++)
+                        {
+                            arregloEnc[j] += llave[j][k] * arreglo[k];
+                        }
+                        //Modulo 29
+                        arregloEnc[j] = arregloEnc[j]%129;
+                    }
+
+                    //Insertamos los datos encriptados en el buffer
+                    otroBuffer.put(i, ((byte) (arregloEnc[0] * arregloSignos[0])));
+                    if((i + 1) < bufferdshit.limit())otroBuffer.put(i + 1, ((byte) (arregloEnc[1] * arregloSignos[1])));
+                    if((i + 2) < bufferdshit.limit())otroBuffer.put(i + 2, ((byte) (arregloEnc[2] * arregloSignos[2])));
+                    //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
+                    progressDialog.setProgress((i * 100) / bufferdshit.limit());
+                }
+                tiempoDespues = System.currentTimeMillis();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.setTitle("Creando Archivo");
+                        progressDialog.setIndeterminate(true);
+                    }
+                });
+
+                Log.e("CFILE", "Archivo creadokljlkjlkjlkjkl" + directorioCreado);
+                if(directorioCreado){
+                    String recordName = "";
+                    if(encrypt){
+                        recordName = "ENC_" + (graficaOriginal.mFile.getName()) + "(2).mp3";
+                    }
+                    else
+                    {
+
+                        recordName = "DES_" + (graficaOriginal.mFile.getName()) + "(2).mp3";
+                    }
+                    directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
+                    directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
+                    Log.e("CFILE", "desc     " + directorio);
+                    encriptedFile = new File(directorio);
+                    try{
+                        Log.e("CFILE", "Creando archivo");
+                        WriteFile(encriptedFile, Float.parseFloat(startText.getText().toString()), Float.parseFloat(endText.getText().toString()), graficaOriginal.getSoundFile().getChannels(), graficaOriginal.getSoundFile().getSampleRate(), otroBuffer);
+                        MediaScannerConnection.scanFile (context, new String[] {encriptedFile.toString()}, null, null);
+                        Log.e("CFILE", "Archivo creado");
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                graficaEnc.setmFile(encriptedFile);
+                                graficaEnc.generarGrafica();
+                            }
+                        });
+                    }
+                    catch(IOException ioe){
+                        Log.e("CFILE", ioe.getMessage());
+                    }
+
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        tiempoDespues = tiempoDespues - tiempoAntes;
+                        editTituloEnc.setText("Tiempo encriptado: " + TimeUnit.MILLISECONDS.toSeconds(tiempoDespues) + " seg");
+                    }
+                });
+
+                Log.i("ISOUND", " multiplicacion terminada");
+            }
+        }.start();
     }
 
     /**
@@ -411,54 +468,76 @@ public class FragmentSonido extends Fragment{
         builder.show();
     }
 
+    public void getPathFromUri(Uri path){
+        String fileName;
+
+        Log.i("FSENC", filenameOr + "\n" + path + "\n" + path.getPath());
+        Cursor cursor = null;
+        try {
+            final String docId = DocumentsContract.getDocumentId(path);
+            final String[] split = docId.split(":");
+            // where id is equal to
+            String sel = MediaStore.Images.Media._ID + "=?";
+            cursor = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{
+                    "_data",
+                    MediaStore.Files.FileColumns.SIZE,
+                    MediaStore.Files.FileColumns.DISPLAY_NAME,
+            }, sel, new String[]{
+                    split[1]
+            }, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                Log.i("FSENC", "Error en path" + cursor);
+                fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
+                filenameOr = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                editTitulo.setText(fileName);
+                float size = Integer.parseInt(cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)));
+                size = size/ (1024* 1024);
+                editSize.setText(size + " MB");
+            }
+        }
+        catch (RuntimeException re){
+            Log.i("FSENC", "Error en path");
+            return;
+        }
+        finally {
+
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
     /**
      * Funcion para extraer los datos de la cancion, su path e instanciarla para reproducirla
      * @param path - Uri que proviene
      */
     public void obtenerSonido(Uri path)
     {
+        filenameOr = null;
+        getPathFromUri(path);
 
-        String fileName;
-
-        final String docId = DocumentsContract.getDocumentId(path);
-        final String[] split = docId.split(":");
-        final String type = split[0];
-
-        Cursor cursor = null;
-        try {
-            cursor = getActivity().getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{
-                    "_data",
-                    MediaStore.Files.FileColumns.SIZE,
-                    MediaStore.Files.FileColumns.DISPLAY_NAME
-            }, "_id=?", new String[]{
-                    split[1]
-            }, null);
-
-            if (cursor != null && cursor.moveToFirst()) {
-                fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
-                filenameOr = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
-                editTitulo.setText(fileName);
-                float size = Integer.parseInt(cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)));
-                size = size/ (1024* 1024);
-                editSize.setText(size + " MB");
-            }
-        } finally {
-
-            if (cursor != null) {
-                cursor.close();
-            }
+        if (filenameOr == null){
+            getPathFromUri(MediaStore.Files.getContentUri(path.getPath()));
         }
-        if(!isRecorded)
-        {
+        if (filenameOr == null){
+            getPathFromUri(MediaStore.Audio.Media.getContentUri(path.getPath()));
+        }
+        if (filenameOr == null){
+            getPathFromUri(MediaStore.getDocumentUri(context, path));
+        }
+        if (filenameOr == null){
+            graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker);
+            graficaOriginal.setmFile(new File(path.getPath()));
+            graficaOriginal.generarGrafica();
+        }
+        else{
+            graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker);
             graficaOriginal.setmFile(new File(filenameOr));
-            Log.i("FSENC", filenameOr);
-        }
-        else
-        {
-            graficaOriginal.setmFile(new File(pathSoundRecorded));
+            graficaOriginal.generarGrafica();
         }
 
-        graficaOriginal.generarGrafica();
+
     }
 
     public void WriteFile(File outputFile, float startTime, float endTime, int mChannels, int mSampleRate, ByteBuffer mDecodedBytes)
@@ -717,7 +796,7 @@ public class FragmentSonido extends Fragment{
             mLastDisplayedEndPos = -1;
 
 
-            mHandler.postDelayed(mTimerRunnable, 100);
+            mHandler.postDelayed(mTimerRunnable, 200);
         }
 
         public void setmFile(File mFile){
@@ -834,7 +913,7 @@ public class FragmentSonido extends Fragment{
                     mLastDisplayedEndPos = mEndPos;
                 }
 
-                mHandler.postDelayed(mTimerRunnable, 100);
+                mHandler.postDelayed(mTimerRunnable, 200);
             }
         };
 
@@ -864,6 +943,9 @@ public class FragmentSonido extends Fragment{
                                         mEndText.getText().toString()));
                         updateDisplay();
                     } catch (NumberFormatException e) {
+                    }
+                    catch(NullPointerException npe){
+
                     }
                 }
             }
@@ -1268,7 +1350,6 @@ public class FragmentSonido extends Fragment{
                 enableDisableButtons();
             } catch (Exception e) {
                 showFinalAlert(e, "Error al reproducir");
-                return;
             }
         }
 
@@ -1401,12 +1482,12 @@ public class FragmentSonido extends Fragment{
         private void showFinalAlert(Exception e, CharSequence message) {
             CharSequence title;
             if (e != null) {
-                Log.e("Ringdroid", "Error: " + message);
-                Log.e("Ringdroid", e.getMessage());
+                Log.e("Encripturing", "Error: " + message);
+                Log.e("Encripturing", "Error" + e.toString());
                 title = "Falla";
                 getActivity().setResult(100, new Intent());
             } else {
-                Log.v("Ringdroid", "Success: " + message);
+                Log.v("Encripturing", "Success: " + message);
                 title = "Exito";
             }
 

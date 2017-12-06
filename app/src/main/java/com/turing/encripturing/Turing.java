@@ -247,9 +247,8 @@ public class Turing extends AppCompatActivity
         if(resultCode == RESULT_OK){
             switch (requestCode){
                 case SELECT_PICTURE:
-                    Uri path = Uri.parse(data.getDataString());
-                    Log.i(TAG, path + "");
-                    fragmentSonido.obtenerSonido(path);
+                    Uri pathSound = data.getData();
+                    fragmentSonido.obtenerSonido(pathSound);
                     break;
                 case SELECT_VIDEO:
                     Uri pathV = data.getData();

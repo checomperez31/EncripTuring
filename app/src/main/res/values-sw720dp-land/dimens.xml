@@ -8,7 +8,11 @@
     <dimen name="boton_reproduccion_ancho">60dp</dimen>
     <dimen name="texto_altura">16sp</dimen>
 
-    <dimen name="texto_dialog_llaves">35sp</dimen>
+    <!-- Dimensiones Dialogs -->
+    <dimen name="dialog_width">310dp</dimen>
+    <dimen name="dialog_height">490dp</dimen>
+
+    <dimen name="texto_dialog_llaves">25sp</dimen>
     <dimen name="texto_boton_dialog_llaves">18sp</dimen>
     <dimen name="ancho_dialog_llaves">240dp</dimen>
     <dimen name="dialog_margen_llave">13dp</dimen>

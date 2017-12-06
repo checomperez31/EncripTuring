@@ -5,28 +5,107 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/layout_dialog_record"
         android:layout_centerInParent="true"
-        android:layout_width="1500dp"
-        android:layout_height="150dp"
+        android:layout_width="@dimen/dialog_width"
+        android:layout_height="@dimen/dialog_height"
+        android:orientation="vertical"
         >
 
-        <TextView
-            android:id="@+id/text_dialog_record"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            android:text="Presiona para grabar"
-            android:textColor="@android:color/black"
-            android:layout_centerHorizontal="true"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialog_height_title"
+            android:background="@color/colorPrimary"
+            >
 
-        <ImageView
-            android:id="@+id/mic_dialog_record"
-            android:layout_below="@id/text_dialog_record"
-            android:layout_centerHorizontal="true"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:src="@drawable/mic_record"/>
-    </RelativeLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/dialog_record_titulo"
+                android:textColor="@color/White"
+                android:textSize="@dimen/dialog_size_title_text"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/dialog_layout_buttons"
+                >
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    >
+
+                    <TextView
+                        android:id="@+id/text_dialog_record"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_record_subtitulo"
+                        android:textColor="@android:color/black"
+                        android:layout_centerHorizontal="true"
+                        android:textSize="@dimen/dialog_size_content_text"/>
+
+                    <ImageView
+                        android:id="@+id/mic_dialog_record"
+                        android:layout_below="@id/text_dialog_record"
+                        android:layout_centerHorizontal="true"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:src="@drawable/mic_record"/>
+
+                    <TextView
+                        android:id="@+id/dialog_record_timer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_below="@+id/mic_dialog_record"
+                        android:text="00:00"
+                        android:textSize="@dimen/dialog_size_content_text"
+                        android:textColor="@android:color/black"/>
+
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/dialog_layout_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                >
+
+                <Button
+                    android:id="@+id/dialog_record_btn_aceptar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dialog_size_button_text"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:text="@string/dialog_aceptar"
+                    android:layout_alignParentRight="true"
+                    android:textColor="@color/colorPrimary"/>
+                <Button
+                    android:id="@+id/dialog_record_btn_cancelar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dialog_size_button_text"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:text="@string/dialog_cancelar"
+                    android:layout_toLeftOf="@+id/dialog_record_btn_aceptar"
+                    android:textColor="@color/colorPrimary"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

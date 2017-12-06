@@ -23,4 +23,18 @@
 
     <string name="start_marker">Marcador Inicial</string>
     <string name="end_marker">Marcador Final</string>
+
+    <!-- Strings botones dialogs -->
+    <string name = "dialog_aceptar">Aceptar</string>
+    <string name = "dialog_cancelar">Cancelar</string>
+
+    <!-- Strings Dialog Grabar Sonido-->
+    <string name="dialog_record_titulo">Grabar Sonido</string>
+    <string name="dialog_record_subtitulo">Presiona para grabar</string>
+    <string name="dialog_record_subtitulo_grabando">Grabando</string>
+
+    <!-- Strings Dialog Generar Matriz-->
+    <string name="dialog_matriz_titulo">Generar Matriz</string>
+    <string name="dialog_matriz_mensaje_generar">No hay una llave almacenada, ¿Deseas generar una?</string>
+    <string name="dialog_matriz_mensaje_volver_generar">Tienes éstas matrices, selecciona una</string>
 </resources>

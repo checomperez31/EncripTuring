@@ -190,10 +190,11 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:paddingLeft="3dp"
                     android:paddingRight="3dp"
-                    android:paddingLeft="3dp">
+                    >
 
                     <RelativeLayout
                         android:id="@+id/sonido_grafica_enc"
@@ -300,6 +301,8 @@
                             android:text="0.0"
                             android:textAlignment="center"
                             />
+
+
 
                     </RelativeLayout>
 

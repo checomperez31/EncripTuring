@@ -8,5 +8,13 @@
     <dimen name="boton_reproduccion_ancho">100dp</dimen>
     <dimen name="texto_altura">20sp</dimen>
 
+    <!-- Dimensiones Dialogs -->
+    <dimen name="dialog_width">320dp</dimen>
+    <dimen name="dialog_height">550dp</dimen>
+    <dimen name="dialog_height_title">90dp</dimen>
+    <dimen name="dialog_size_title_text">25sp</dimen>
+    <dimen name="dialog_size_content_text">20sp</dimen>
+    <dimen name="dialog_size_button_text">15sp</dimen>
+
     <dimen name="texto_dialog_llaves">20sp</dimen>
 </resources>

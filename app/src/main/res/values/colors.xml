@@ -5,6 +5,7 @@
     <color name="colorPrimaryLight">#20a294</color>
     <color name="colorAccent">#1043a0</color>
     <color name = "White">#FFFFFF</color>
+    <color name="colorPrimaryTr">#50009686</color>
 
 
     <color name="waveform_selected">#42b2a6</color>

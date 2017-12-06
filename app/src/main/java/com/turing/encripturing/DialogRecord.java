@@ -5,12 +5,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,13 +28,17 @@ import java.io.IOException;
 
 public class DialogRecord extends Dialog
 {
-    private TextView texto;
+    private TextView texto, timer;
     private ImageView microfono;
+    private Button aceptar, cancelar;
     private boolean grabando = false;
     private MediaRecorder mediaRecorder;
     private static String RECORD_DIRECTORY = "ENC";
     public static String directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
     private boolean directorioCreado = false;
+    private Cronometro timerCount;
+    public boolean isReleased = false;
+    private File file;
 
     public DialogRecord(Context context) {
         super(context);
@@ -44,38 +50,73 @@ public class DialogRecord extends Dialog
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_record);
-        microfono = (ImageView) findViewById(R.id.mic_dialog_record);
-        texto = (TextView) findViewById(R.id.text_dialog_record);
-        setCancelable(true);
+        microfono = findViewById(R.id.mic_dialog_record);
+        texto = findViewById(R.id.text_dialog_record);
+        timer = findViewById(R.id.dialog_record_timer);
+        aceptar = findViewById(R.id.dialog_record_btn_aceptar);
+        cancelar = findViewById(R.id.dialog_record_btn_cancelar);
+        aceptar.setEnabled(false);
+        setCancelable(false);
+        isReleased = false;
 
         microfono.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(grabando)
                 {
-                    texto.setText("Presiona para grabar");
+                    timerCount.pause();
+                    texto.setText(R.string.dialog_record_subtitulo);
                     grabando = false;
+                    aceptar.setEnabled(true);
+                    cancelar.setEnabled(true);
                     microfono.setScaleX(1.0f);
                     microfono.setScaleY(1.0f);
                     microfono.animate().cancel();
                     detenerGrabacion();
-                    dismiss();
                 }
                 else
                 {
-                    texto.setText("Grabando");
+                    timerCount = new Cronometro("timerCount", timer);
+                    texto.setText(R.string.dialog_record_subtitulo_grabando);
                     grabando = true;
+                    aceptar.setEnabled(false);
+                    cancelar.setEnabled(false);
                     animar();
                     grabar();
+                    new Thread(timerCount).start();
                 }
             }
         });
 
-        File file = new File(directorio, RECORD_DIRECTORY);
+        cancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                file.delete();
+                dismiss();
+            }
+        });
+
+        aceptar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isReleased = true;
+                dismiss();
+            }
+        });
+
+
+        //Comprobamos que exista el directorio si no, lo creamos
+        file = new File(directorio, RECORD_DIRECTORY);
 
         directorioCreado = file.exists();
 
         if(!directorioCreado) directorioCreado = file.mkdir();
+
+        //Creamos el archivo donde se guardara el audio grabado
+        Long timestamp = System.currentTimeMillis();
+        String recordName = timestamp.toString() + ".mp3";
+        directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
+        file = new File(directorio);
     }
 
     private void animar()
@@ -127,11 +168,7 @@ public class DialogRecord extends Dialog
     {
         if(directorioCreado)
         {
-            //Creamos el archivo donde se guardara el audio grabado
-            Long timestamp = System.currentTimeMillis();
-            String recordName = timestamp.toString() + ".mp3";
-            directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
-            File file = new File(directorio);
+
 
             mediaRecorder = new MediaRecorder();
             mediaRecorder.setOutputFile(directorio);
@@ -153,5 +190,14 @@ public class DialogRecord extends Dialog
     public void detenerGrabacion() {
         mediaRecorder.stop();
         mediaRecorder.release();
+        MediaScannerConnection.scanFile (getContext(), new String[] {file.toString()}, null, null);
+    }
+
+    public boolean getIsReleased(){
+        return isReleased;
+    }
+
+    public File getFile(){
+        return file;
     }
 }
