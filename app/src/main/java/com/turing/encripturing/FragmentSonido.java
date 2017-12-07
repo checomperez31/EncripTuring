@@ -345,11 +345,16 @@ public class FragmentSonido extends Fragment{
                 Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
                 for(int i = 0; i < bufferdshit.limit(); i+=3)
                 {
-                    if(i < 10)Log.i("DATOS", bufferdshit.get(i) + "");
+                    if(i < 10)Log.i("DATOSB", bufferdshit.get(i) + "");
+                    if(i < 10)Log.i("DATOSB", bufferdshit.get(i + 1) + "");
+                    if(i < 10)Log.i("DATOSB", bufferdshit.get(i + 2) + "");
                     //Asignamos los valores del Buffer al arrelo a encriptar
                     arreglo[0] = bufferdshit.get(i);
                     if((i + 1) < bufferdshit.limit())arreglo[1] = bufferdshit.get(i + 1);
                     if((i + 2) < bufferdshit.limit())arreglo[2] = bufferdshit.get(i + 2);
+                    if(i < 10)Log.i("DATOSA", arreglo[0] + "");
+                    if(i < 10)Log.i("DATOSA", arreglo[1] + "");
+                    if(i < 10)Log.i("DATOSA", arreglo[2] + "");
                     //Verificamos valor de signos
                     for(int j = 0; j < 3; j++){
                         if(arreglo[j] < 0){
@@ -371,13 +376,18 @@ public class FragmentSonido extends Fragment{
                             arregloEnc[j] += llave[j][k] * arreglo[k];
                         }
                         //Modulo 29
+                        if(i < 10)if(i < 30)Log.i("DATOSENM", arregloEnc[j] + "");
                         arregloEnc[j] = arregloEnc[j]%129;
+                        if(i < 10)if(i < 30)Log.i("DATOSE", arregloEnc[j] + "");
                     }
 
                     //Insertamos los datos encriptados en el buffer
                     otroBuffer.put(i, ((byte) (arregloEnc[0] * arregloSignos[0])));
                     if((i + 1) < bufferdshit.limit())otroBuffer.put(i + 1, ((byte) (arregloEnc[1] * arregloSignos[1])));
                     if((i + 2) < bufferdshit.limit())otroBuffer.put(i + 2, ((byte) (arregloEnc[2] * arregloSignos[2])));
+                    if(i < 30)Log.i("DATOSDes", otroBuffer.get(i) + "");
+                    if(i < 30)Log.i("DATOSDes", otroBuffer.get(i + 1) + "");
+                    if(i < 30)Log.i("DATOSDes", otroBuffer.get(i + 2) + "");
                     //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
                     progressDialog.setProgress((i * 100) / bufferdshit.limit());
                 }
@@ -590,7 +600,7 @@ public class FragmentSonido extends Fragment{
                 } else {
                     inputBuffers[inputBufferIndex].clear();
                     if (buffer.length > inputBuffers[inputBufferIndex].remaining()) {
-                        // Input buffer is smaller than one frame. This should never happen.
+                        // Input buffer is smal ler than one frame. This should never happen.
                         continue;
                     }
                     // bufferSize is a hack to create a stereo file from a mono stream.
