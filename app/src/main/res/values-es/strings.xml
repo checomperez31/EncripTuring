@@ -37,4 +37,19 @@
     <string name="dialog_matriz_titulo">Generar Matriz</string>
     <string name="dialog_matriz_mensaje_generar">No hay una llave almacenada, ¿Deseas generar una?</string>
     <string name="dialog_matriz_mensaje_volver_generar">Tienes éstas matrices, selecciona una</string>
+
+    <!-- String Fragment Keys -->
+    <string name="key_example1">00</string>
+    <string name="key_example2">01</string>
+    <string name="key_example3">02</string>
+    <string name="key_example4">10</string>
+    <string name="key_example5">11</string>
+    <string name="key_example6">12</string>
+    <string name="key_example7">20</string>
+    <string name="key_example8">21</string>
+    <string name="key_example9">22</string>
+    <string name="msg_keys">Ingresa la matriz</string>
+    <string name="save_keys">Guardar</string>
+    <string name="msg_key_1">Llave de encriptación</string>
+    <string name="msg_key_2">Llave de desencriptación</string>
 </resources>

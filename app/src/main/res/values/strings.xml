@@ -7,21 +7,21 @@
     <string name="action_settings">Settings</string>
 
     <!-- Strings Fragmento Sonido -->
-    <string name = "nombre_sonido">Audio Name</string>
-    <string name = "tam_sonido">Audio Size</string>
-    <string name = "btn_encriptar">Encrypt</string>
-    <string name = "dialog_cargando_audio">Loading Audio</string>
-    <string name = "opcion_titulo">Choose an Option</string>
-    <string name = "opcion_grabar_sonido">Record Audio</string>
-    <string name = "opcion_elegir">Choose audio from files</string>
-    <string name = "opcion_cancelar">Cancel</string>
+    <string name="nombre_sonido">Audio Name</string>
+    <string name="tam_sonido">Audio Size</string>
+    <string name="btn_encriptar">Encrypt</string>
+    <string name="dialog_cargando_audio">Loading Audio</string>
+    <string name="opcion_titulo">Choose an Option</string>
+    <string name="opcion_grabar_sonido">Record Audio</string>
+    <string name="opcion_elegir">Choose audio from files</string>
+    <string name="opcion_cancelar">Cancel</string>
 
     <!-- Strings Fragmento Video -->
 
     <!-- Strings Menu -->
-    <string name = "opc_sonido">Sounds</string>
-    <string name = "opc_imagenes">Images</string>
-    <string name = "opc_video">Videos</string>
+    <string name="opc_sonido">Sounds</string>
+    <string name="opc_imagenes">Images</string>
+    <string name="opc_video">Videos</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="ok"> Ok</string>
 
@@ -29,16 +29,31 @@
     <string name="end_marker">End marker</string>
 
     <!-- Strings botones dialogs -->
-    <string name = "dialog_aceptar">Aceptar</string>
-    <string name = "dialog_cancelar">Cancelar</string>
+    <string name="dialog_aceptar">Aceptar</string>
+    <string name="dialog_cancelar">Cancelar</string>
 
     <!-- Strings Dialog Grabar Sonido-->
-    <string name="dialog_record_titulo">Grabar Sonido</string>
-    <string name="dialog_record_subtitulo">Presiona para grabar</string>
-    <string name="dialog_record_subtitulo_grabando">Grabando</string>
+    <string name="dialog_record_titulo">Record Sound</string>
+    <string name="dialog_record_subtitulo">Press to record</string>
+    <string name="dialog_record_subtitulo_grabando">Recording</string>
 
     <!-- Strings Dialog Generar Matriz-->
-    <string name="dialog_matriz_titulo">Generar Matriz</string>
-    <string name="dialog_matriz_mensaje_generar">No hay una llave almacenada, ¿Deseas generar una?</string>
-    <string name="dialog_matriz_mensaje_volver_generar">Tienes éstas matrices, selecciona una</string>
+    <string name="dialog_matriz_titulo">Create Matrix</string>
+    <string name="dialog_matriz_mensaje_generar">There is no stored key, create one?</string>
+    <string name="dialog_matriz_mensaje_volver_generar">Your have this matrices, pick one</string>
+
+    <!-- String Fragment Keys -->
+    <string name="key_example1">00</string>
+    <string name="key_example2">01</string>
+    <string name="key_example3">02</string>
+    <string name="key_example4">10</string>
+    <string name="key_example5">11</string>
+    <string name="key_example6">12</string>
+    <string name="key_example7">20</string>
+    <string name="key_example8">21</string>
+    <string name="key_example9">22</string>
+    <string name="msg_keys">Insert the matrix</string>
+    <string name="save_keys">SAVE</string>
+    <string name="msg_key_1">Encryption key</string>
+    <string name="msg_key_2">Decryption key</string>
 </resources>

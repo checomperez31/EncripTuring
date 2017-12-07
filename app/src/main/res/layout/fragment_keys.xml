@@ -1,0 +1,326 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.turing.encripturing.KeysFragment">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
+
+        <LinearLayout
+            android:id="@+id/layout_keys"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                >
+
+                <RelativeLayout
+                    android:id="@+id/dialog_layout_buttons"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    >
+                </RelativeLayout>
+
+            </RelativeLayout>
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:id="@+id/layout_matriz_keys">
+
+            <RelativeLayout
+                android:id="@+id/relativeLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+
+
+            </RelativeLayout>
+
+
+            <Button
+                android:id="@+id/btn_guardar_matrices"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:text="@string/save_keys"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/titulo_fragment_keys"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:text="@string/msg_keys"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+
+            <!-- Llave encriptacion -->
+            <RelativeLayout
+                android:id="@+id/layout_matriz_llave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/titulo_fragment_keys"
+                android:layout_marginTop="12dp">
+
+                <!--Primer renglon -->
+                <EditText
+                    android:id="@+id/edt_key00"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/edt_key10"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignStart="@+id/edt_key10"
+                    android:text="@string/key_example1"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_key01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/edt_key10"
+                    android:layout_toRightOf="@+id/edt_key10"
+                    android:text="@string/key_example2"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_key02"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/edt_key01"
+                    android:layout_toRightOf="@+id/edt_key01"
+                    android:text="@string/key_example3"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <!--Segundo Renglon -->
+                <EditText
+                    android:id="@+id/edt_key10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_key00"
+                    android:layout_marginLeft="@dimen/dialog_margen_llave"
+                    android:layout_toLeftOf="@+id/edt_key11"
+                    android:text="@string/key_example4"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_key11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_key01"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/key_example5"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_key12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_key02"
+                    android:layout_centerHorizontal="true"
+                    android:layout_toRightOf="@+id/edt_key11"
+                    android:text="@string/key_example6"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <!-- Renglon 3 -->
+
+                <EditText
+                    android:id="@+id/edt_key20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_key10"
+                    android:layout_marginLeft="@dimen/dialog_margen_llave"
+                    android:layout_toLeftOf="@+id/edt_key21"
+                    android:text="@string/key_example7"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_key21"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_key11"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/key_example8"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_key22"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_key12"
+                    android:layout_centerHorizontal="true"
+                    android:layout_toRightOf="@+id/edt_key21"
+                    android:text="@string/key_example9"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_key20"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/msg_key_1" />
+
+
+            </RelativeLayout>
+
+            <!-- Llave desencriptado -->
+            <RelativeLayout
+                android:id="@+id/layout_matriz_llaveinv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/layout_matriz_llave"
+                android:layout_marginTop="12dp">
+
+                <!--Primer renglon -->
+                <EditText
+                    android:id="@+id/edt_keyinv00"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/edt_keyinv10"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignStart="@+id/edt_keyinv10"
+                    android:text="@string/key_example1"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_keyinv01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/edt_keyinv10"
+                    android:layout_toRightOf="@+id/edt_keyinv10"
+                    android:text="@string/key_example2"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_keyinv02"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/edt_keyinv01"
+                    android:layout_toRightOf="@+id/edt_keyinv01"
+                    android:text="@string/key_example3"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <!--Segundo Renglon -->
+                <EditText
+                    android:id="@+id/edt_keyinv10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyinv00"
+                    android:layout_marginLeft="@dimen/dialog_margen_llave"
+                    android:layout_toLeftOf="@+id/edt_keyinv11"
+                    android:text="@string/key_example4"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_keyinv11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyinv01"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/key_example5"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_keyinv12"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyinv02"
+                    android:layout_centerHorizontal="true"
+                    android:layout_toRightOf="@+id/edt_keyinv11"
+                    android:text="@string/key_example6"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <!-- Renglon 3 -->
+
+                <EditText
+                    android:id="@+id/edt_keyinv20"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyinv10"
+                    android:layout_marginLeft="@dimen/dialog_margen_llave"
+                    android:layout_toLeftOf="@+id/edt_keyinv21"
+                    android:text="@string/key_example7"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_keyinv21"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyinv11"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/key_example8"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <EditText
+                    android:id="@+id/edt_keyinv22"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyinv12"
+                    android:layout_centerHorizontal="true"
+                    android:layout_toRightOf="@+id/edt_keyinv21"
+                    android:text="@string/key_example9"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyinv20"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/msg_key_2" />
+
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+
+
+    </RelativeLayout>
+</FrameLayout>
