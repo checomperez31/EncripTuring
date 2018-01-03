@@ -56,7 +56,7 @@ public class FragmentSonido extends Fragment{
     private FloatingActionButton btn_add;
 
     private EditText editTitulo, editSize;
-    private Button encriptar;
+    private Button encriptar, encriptar2;
 
     //Variables globales para el reproductor
     private MediaPlayerService player;
@@ -131,6 +131,7 @@ public class FragmentSonido extends Fragment{
         editSize = view.findViewById(R.id.sonido_edit_tam);
         editSizeEnc = view.findViewById(R.id.sonido_edit_tam_enc);
         encriptar = view.findViewById(R.id.sonido_button_encriptar);
+        encriptar2 = view.findViewById(R.id.sonido_button_encriptar_enc);
 
         dialogRecord = new DialogRecord(context);
         handler = new Handler();
@@ -299,6 +300,41 @@ public class FragmentSonido extends Fragment{
             }
         });
 
+        encriptar2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
+                Log.i("ISOUND", "Bytes " + graficaOriginal.getSoundFile().getDecodedBytes());
+                Log.i("ISOUND", "Frames " + graficaOriginal.getSoundFile().getNumFrames());
+                Log.i("ISOUND", "SampleRate " + graficaOriginal.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaOriginal.getSoundFile().getSamplesPerFrame());
+                Log.i("ISOUND", "Samples " + graficaEnc.getSoundFile().getNumSamples());
+                Log.i("ISOUND", "Bytes " + graficaEnc.getSoundFile().getDecodedBytes());
+                Log.i("ISOUND", "Frames " + graficaEnc.getSoundFile().getNumFrames());
+                Log.i("ISOUND", "SampleRate " + graficaEnc.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaEnc.getSoundFile().getSamplesPerFrame());
+                for(int i = 0; i < graficaOriginal.getSoundFile().getDecodedBytes().limit(); i++){
+                    if(graficaOriginal.getSoundFile().getDecodedBytes().get(i) == 1){
+                        for(int j = 0; j < 100; j++){
+                            Log.i("Bytes", i+j + " " +
+                                    graficaOriginal.getSoundFile().getDecodedBytes().get(i+j));
+                        }
+                        break;
+                    }
+
+                }
+
+                for(int i = 0; i < graficaEnc.getSoundFile().getDecodedBytes().limit(); i++){
+                    if(graficaEnc.getSoundFile().getDecodedBytes().get(i) == 1){
+                        for(int j = 0; j < 100; j++){
+                            Log.i("Bytes", i+j + " " +
+                                    graficaEnc.getSoundFile().getDecodedBytes().get(i+j));
+                        }
+                        break;
+                    }
+
+                }
+            }
+        });
+
 
     }
 
@@ -325,6 +361,7 @@ public class FragmentSonido extends Fragment{
                         progressDialog.setProgress(0);
                     }
                 });
+                int offset = 0;
                 tiempoAntes = System.currentTimeMillis();
                 DatosEncriptar datos = DatosEncriptar.getInstance();
                 int[][] llave;
@@ -333,28 +370,37 @@ public class FragmentSonido extends Fragment{
                 }
                 else{
                     llave = datos.getLlaveDes();
+                    offset = 2;
                 }
                 int[] arreglo = new int[3];
                 int[] arregloSignos = new int[3];
                 int[] arregloEnc = new int[3];
+                /*Debug*/
                 Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
                 Log.i("ISOUND", "Frames " + graficaOriginal.getSoundFile().getNumFrames());
                 Log.i("ISOUND", "SampleRate " + graficaOriginal.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaOriginal.getSoundFile().getSamplesPerFrame());
-                ByteBuffer bufferdshit = graficaOriginal.getSoundFile().getDecodedBytes();
-                ByteBuffer otroBuffer = ByteBuffer.allocate(bufferdshit.limit());
+
+                /*
+                Creamos los buffers, uno con los datos del sonido original y el segundo donde se alojaran los datos encriptados
+                 */
+                ByteBuffer bufferSonidoOriginal = graficaOriginal.getSoundFile().getDecodedBytes();
+                ByteBuffer otroBuffer = ByteBuffer.allocate(bufferSonidoOriginal.limit());
                 Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
-                for(int i = 0; i < bufferdshit.limit(); i+=3)
+                Log.i("ISOUND", "llave " + llave);
+                Log.i("ISOUND", "Bytes " + graficaOriginal.getSoundFile().getDecodedBytes());
+                for(int i = offset; i < bufferSonidoOriginal.limit(); i+=3)
                 {
-                    if(i < 10)Log.i("DATOSB", bufferdshit.get(i) + "");
-                    if(i < 10)Log.i("DATOSB", bufferdshit.get(i + 1) + "");
-                    if(i < 10)Log.i("DATOSB", bufferdshit.get(i + 2) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", i + "--" + bufferSonidoOriginal.get(i) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", bufferSonidoOriginal.get(i + 1) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", bufferSonidoOriginal.get(i + 2) + "");
                     //Asignamos los valores del Buffer al arrelo a encriptar
-                    arreglo[0] = bufferdshit.get(i);
-                    if((i + 1) < bufferdshit.limit())arreglo[1] = bufferdshit.get(i + 1);
-                    if((i + 2) < bufferdshit.limit())arreglo[2] = bufferdshit.get(i + 2);
-                    if(i < 10)Log.i("DATOSA", arreglo[0] + "");
-                    if(i < 10)Log.i("DATOSA", arreglo[1] + "");
-                    if(i < 10)Log.i("DATOSA", arreglo[2] + "");
+                    arreglo[0] = bufferSonidoOriginal.get(i);
+                    if((i + 1) < bufferSonidoOriginal.limit()) arreglo[1] = bufferSonidoOriginal.get(i + 1);
+                    if((i + 2) < bufferSonidoOriginal.limit()) arreglo[2] = bufferSonidoOriginal.get(i + 2);
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[0] + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[1] + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[2] + "");
+
                     //Verificamos valor de signos
                     for(int j = 0; j < 3; j++){
                         if(arreglo[j] < 0){
@@ -368,7 +414,7 @@ public class FragmentSonido extends Fragment{
                     //Log.i("NENC", "[" + arreglo[0] + ", " + arreglo[1] + ", " + arreglo[2] + "]");
 
                     //Encriptamos
-                    for(int j = 0; j < 3; j ++)
+                    for(int j = 0; j < 3; j++)
                     {
                         arregloEnc[j] = 0;
                         for(int k = 0; k < 3; k++)
@@ -376,21 +422,28 @@ public class FragmentSonido extends Fragment{
                             arregloEnc[j] += llave[j][k] * arreglo[k];
                         }
                         //Modulo 29
-                        if(i < 10)if(i < 30)Log.i("DATOSENM", arregloEnc[j] + "");
-                        arregloEnc[j] = arregloEnc[j]%129;
-                        if(i < 10)if(i < 30)Log.i("DATOSE", arregloEnc[j] + "");
+                        if(i%100 == 0 && i < 10000)Log.i("DATOSENM", arregloEnc[j] + "");
+                        arregloEnc[j] = arregloEnc[j]%128;
+                        if(i%100 == 0 && i < 10000)Log.i("DATOSE", arregloEnc[j] + "");
                     }
 
                     //Insertamos los datos encriptados en el buffer
                     otroBuffer.put(i, ((byte) (arregloEnc[0] * arregloSignos[0])));
-                    if((i + 1) < bufferdshit.limit())otroBuffer.put(i + 1, ((byte) (arregloEnc[1] * arregloSignos[1])));
-                    if((i + 2) < bufferdshit.limit())otroBuffer.put(i + 2, ((byte) (arregloEnc[2] * arregloSignos[2])));
-                    if(i < 30)Log.i("DATOSDes", otroBuffer.get(i) + "");
-                    if(i < 30)Log.i("DATOSDes", otroBuffer.get(i + 1) + "");
-                    if(i < 30)Log.i("DATOSDes", otroBuffer.get(i + 2) + "");
+                    if((i + 1) < bufferSonidoOriginal.limit())otroBuffer.put(i + 1, ((byte) (arregloEnc[1] * arregloSignos[1])));
+                    if((i + 2) < bufferSonidoOriginal.limit())otroBuffer.put(i + 2, ((byte) (arregloEnc[2] * arregloSignos[2])));
+                    /*otroBuffer.put(i, bufferSonidoOriginal.get(i));
+                    if((i + 1) < bufferSonidoOriginal.limit())otroBuffer.put(i + 1, bufferSonidoOriginal.get(i+1));
+                    if((i + 2) < bufferSonidoOriginal.limit())otroBuffer.put(i + 2, bufferSonidoOriginal.get(i+2));*/
+
+
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 1) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 2) + "");
                     //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
-                    progressDialog.setProgress((i * 100) / bufferdshit.limit());
+                    progressDialog.setProgress((i * 100) / bufferSonidoOriginal.limit());
+
                 }
+                Log.i("ISOUND", "Bytes " + graficaOriginal.getSoundFile().getDecodedBytes());
                 tiempoDespues = System.currentTimeMillis();
                 handler.post(new Runnable() {
                     @Override
@@ -400,7 +453,6 @@ public class FragmentSonido extends Fragment{
                     }
                 });
 
-                Log.e("CFILE", "Archivo creadokljlkjlkjlkjkl" + directorioCreado);
                 if(directorioCreado){
                     String recordName = "";
                     if(encrypt){
@@ -417,7 +469,11 @@ public class FragmentSonido extends Fragment{
                     encriptedFile = new File(directorio);
                     try{
                         Log.e("CFILE", "Creando archivo");
-                        WriteFile(encriptedFile, Float.parseFloat(startText.getText().toString()), Float.parseFloat(endText.getText().toString()), graficaOriginal.getSoundFile().getChannels(), graficaOriginal.getSoundFile().getSampleRate(), otroBuffer);
+                        WriteWAVFile(encriptedFile, Float.parseFloat(startText.getText().toString()),
+                                Float.parseFloat(graficaOriginal.getMaxTime()),
+                                graficaOriginal.getSoundFile().getChannels(),
+                                graficaOriginal.getSoundFile().getSampleRate(),
+                                otroBuffer);
                         MediaScannerConnection.scanFile (context, new String[] {encriptedFile.toString()}, null, null);
                         Log.e("CFILE", "Archivo creado");
                         handler.post(new Runnable() {
@@ -550,15 +606,18 @@ public class FragmentSonido extends Fragment{
 
     }
 
-    public void WriteFile(File outputFile, float startTime, float endTime, int mChannels, int mSampleRate, ByteBuffer mDecodedBytes)
+    public void WriteFile(File outputFile, float startTime, float endTime, int mChannels, int mSampleRate, ByteBuffer mDecodedBytes, int mBitrate)
             throws java.io.IOException {
         int startOffset = (int)(startTime * mSampleRate) * 2 * mChannels;
         int numSamples = (int)((endTime - startTime) * mSampleRate);
+
         // Some devices have problems reading mono AAC files (e.g. Samsung S3). Making it stereo.
-        int numChannels = (mChannels == 1) ? 2 : mChannels;
+        //int numChannels = (mChannels == 1) ? 2 : mChannels;
+        int numChannels = mChannels;
 
         String mimeType = "audio/mp4a-latm";
-        int bitrate = 64000 * numChannels;  // rule of thumb for a good quality: 64kbps per channel.
+        //int bitrate = 64000 * numChannels;  // rule of thumb for a good quality: 64kbps per channel.
+        int bitrate = mBitrate*1000;
         MediaCodec codec = MediaCodec.createEncoderByType(mimeType);
         MediaFormat format = MediaFormat.createAudioFormat(mimeType, mSampleRate, numChannels);
         format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
@@ -566,7 +625,8 @@ public class FragmentSonido extends Fragment{
         codec.start();
 
         // Get an estimation of the encoded data based on the bitrate. Add 10% to it.
-        int estimatedEncodedSize = (int)((endTime - startTime) * (bitrate / 8) * 1.1);
+        //int estimatedEncodedSize = (int)((endTime - startTime) * (bitrate / 8) * 1.1);
+        int estimatedEncodedSize = (int)((endTime - startTime) * (bitrate / 8) * 1);//quitamos el 10%
         ByteBuffer encodedBytes = ByteBuffer.allocate(estimatedEncodedSize);
         ByteBuffer[] inputBuffers = codec.getInputBuffers();
         ByteBuffer[] outputBuffers = codec.getOutputBuffers();
@@ -577,7 +637,7 @@ public class FragmentSonido extends Fragment{
         int frame_size = 1024;  // number of samples per frame per channel for an mp4 (AAC) stream.
         byte buffer[] = new byte[frame_size * numChannels * 2];  // a sample is coded with a short.
         mDecodedBytes.position(startOffset);
-        numSamples += (2 * frame_size);  // Adding 2 frames, Cf. priming frames for AAC.
+        //numSamples += (2 * frame_size);  // Adding 2 frames, Cf. priming frames for AAC.
         int tot_num_frames = 1 + (numSamples / frame_size);  // first AAC frame = 2 bytes
         if (numSamples % frame_size != 0) {
             tot_num_frames++;
@@ -600,27 +660,32 @@ public class FragmentSonido extends Fragment{
                 } else {
                     inputBuffers[inputBufferIndex].clear();
                     if (buffer.length > inputBuffers[inputBufferIndex].remaining()) {
-                        // Input buffer is smal ler than one frame. This should never happen.
+                        // Input buffer is smaller than one frame. This should never happen.
                         continue;
                     }
                     // bufferSize is a hack to create a stereo file from a mono stream.
-                    int bufferSize = (mChannels == 1) ? (buffer.length / 2) : buffer.length;
+                    int bufferSize = buffer.length;
+                    Log.i("bufferSize", ""+bufferSize + " " + mChannels + " " + buffer.length);
+                    Log.i("Remaining", mDecodedBytes.remaining() + " " + bufferSize);
                     if (mDecodedBytes.remaining() < bufferSize) {
+                        Log.i("Otro que no", "pero si");
                         for (int i=mDecodedBytes.remaining(); i < bufferSize; i++) {
                             buffer[i] = 0;  // pad with extra 0s to make a full frame.
                         }
                         mDecodedBytes.get(buffer, 0, mDecodedBytes.remaining());
                     } else {
+                        Log.i("Otro que no", "pero six2");
                         mDecodedBytes.get(buffer, 0, bufferSize);
                     }
-                    if (mChannels == 1) {
+                    /*if (mChannels == 1) {
+                        //Log.i("Canales", "Un solo canal alv");
                         for (int i=bufferSize - 1; i >= 1; i -= 2) {
                             buffer[2*i + 1] = buffer[i];
                             buffer[2*i] = buffer[i-1];
                             buffer[2*i - 1] = buffer[2*i + 1];
                             buffer[2*i - 2] = buffer[2*i];
                         }
-                    }
+                    }*/
                     num_samples_left -= frame_size;
                     inputBuffers[inputBufferIndex].put(buffer);
                     presentation_time = (long) (((num_frames++) * frame_size * 1e6) / mSampleRate);
@@ -643,7 +708,8 @@ public class FragmentSonido extends Fragment{
                 outputBuffers[outputBufferIndex].clear();
                 codec.releaseOutputBuffer(outputBufferIndex, false);
                 if (encodedBytes.remaining() < info.size) {  // Hopefully this should not happen.
-                    estimatedEncodedSize = (int)(estimatedEncodedSize * 1.2);  // Add 20%.
+                    //Log.i("No deberia", "Si pasa" + info.size + " " + encodedBytes.remaining());
+                    estimatedEncodedSize = (int)(estimatedEncodedSize * 1.1);  // Add 20%.
                     ByteBuffer newEncodedBytes = ByteBuffer.allocate(estimatedEncodedSize);
                     int position = encodedBytes.position();
                     encodedBytes.rewind();
@@ -690,6 +756,73 @@ public class FragmentSonido extends Fragment{
             Log.e("Ringdroid", "Failed to create the .m4a file.");
             Log.e("Ringdroid", e.getMessage());
         }
+    }
+
+    private void swapLeftRightChannels(byte[] buffer) {
+        byte left[] = new byte[2];
+        byte right[] = new byte[2];
+        if (buffer.length % 4 != 0) {  // 2 channels, 2 bytes per sample (for one channel).
+            // Invalid buffer size.
+            return;
+        }
+        for (int offset = 0; offset < buffer.length; offset += 4) {
+            left[0] = buffer[offset];
+            left[1] = buffer[offset + 1];
+            right[0] = buffer[offset + 2];
+            right[1] = buffer[offset + 3];
+            buffer[offset] = right[0];
+            buffer[offset + 1] = right[1];
+            buffer[offset + 2] = left[0];
+            buffer[offset + 3] = left[1];
+        }
+    }
+
+    public void WriteWAVFile(File outputFile, float startTime, float endTime, int mChannels, int mSampleRate, ByteBuffer mDecodedBytes)
+            throws java.io.IOException {
+        int startOffset = (int)(startTime * mSampleRate) * 2 * mChannels;
+        int numSamples = (int)((endTime - startTime) * mSampleRate);
+
+        // Start by writing the RIFF header.
+        FileOutputStream outputStream = new FileOutputStream(outputFile);
+        outputStream.write(WAVHeader.getWAVHeader(mSampleRate, mChannels, numSamples));
+
+        // Write the samples to the file, 1024 at a time.
+        byte buffer[] = new byte[1024 * mChannels * 2];  // Each sample is coded with a short.
+        Log.i("OFFSET", startOffset + "");
+        mDecodedBytes.position(startOffset);
+        int numBytesLeft = numSamples * mChannels * 2;
+        while (numBytesLeft >= buffer.length) {
+            if (mDecodedBytes.remaining() < buffer.length) {
+                // This should not happen.
+                for (int i = mDecodedBytes.remaining(); i < buffer.length; i++) {
+                    buffer[i] = 0;  // pad with extra 0s to make a full frame.
+                }
+                mDecodedBytes.get(buffer, 0, mDecodedBytes.remaining());
+            } else {
+                mDecodedBytes.get(buffer);
+            }
+            if (mChannels == 2) {
+                swapLeftRightChannels(buffer);
+            }
+            outputStream.write(buffer);
+            numBytesLeft -= buffer.length;
+        }
+        if (numBytesLeft > 0) {
+            if (mDecodedBytes.remaining() < numBytesLeft) {
+                // This should not happen.
+                for (int i = mDecodedBytes.remaining(); i < numBytesLeft; i++) {
+                    buffer[i] = 0;  // pad with extra 0s to make a full frame.
+                }
+                mDecodedBytes.get(buffer, 0, mDecodedBytes.remaining());
+            } else {
+                mDecodedBytes.get(buffer, 0, numBytesLeft);
+            }
+            if (mChannels == 2) {
+                swapLeftRightChannels(buffer);
+            }
+            outputStream.write(buffer, 0, numBytesLeft);
+        }
+        outputStream.close();
     }
 
     private class GraficaSonido implements com.turing.encripturing.MarkerView.MarkerListener, WaveformView.WaveformListener{
@@ -1478,6 +1611,11 @@ public class FragmentSonido extends Fragment{
             mInfo.setText(mCaption);
 
             updateDisplay();
+        }
+
+        public String getMaxTime()
+        {
+            return formatTime(mMaxPos);
         }
 
         private void resetPositions() {

@@ -100,12 +100,12 @@ public class DialogLlaves extends Dialog{
                 do{
                     generarLlave();
                     mat.set_matrix(llave);
-                    mat.set_modulo(129);
+                    mat.set_modulo(128);
                     int determinate = mat.get_determinant();
-                    if(obtenerMCD(determinate, 129) == 1){
+                    if(obtenerMCD(determinate, 128) == 1){
                         generar = false;
                         Log.i("DET", determinate + "");
-                        Log.i("DET", obtenerMCD(determinate, 129) + "");
+                        Log.i("DET", obtenerMCD(determinate, 128) + "");
                     }
                 }
                 while(generar);

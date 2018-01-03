@@ -344,6 +344,10 @@ public class SoundFile {
             }
             if ((info.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0
                     || (mDecodedBytes.position() / (2 * mChannels)) >= expectedNumSamples) {
+                //Log.i("lel", "Entra en el tercero if");
+                //Siempre entra en este if cuando termina de leer los datos
+
+
                 // We got all the decoded data from the decoder. Stop here.
                 // Theoretically dequeueOutputBuffer(info, ...) should have set info.flags to
                 // MediaCodec.BUFFER_FLAG_END_OF_STREAM. However some phones (e.g. Samsung S3)
@@ -401,6 +405,10 @@ public class SoundFile {
         }
         mDecodedSamples.rewind();
         // DumpSamples();  // Uncomment this line to dump the samples in a TSV file.
+        Log.i("BuffersOut", "" + outputBuffers.length);
+        Log.i("BuffersIn", "" + inputBuffers.length);
+        Log.i("info", "Size" + info.size + "\nflags" + info.flags);
+        Log.i("MIME", format.getString(MediaFormat.KEY_MIME));
     }
 
     private void RecordAudio() {
