@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
 public class FragmentSonido extends Fragment{
@@ -166,9 +167,9 @@ public class FragmentSonido extends Fragment{
         endMarker = view.findViewById(R.id.endmarker);
         endMarkerEnc = view.findViewById(R.id.endmarker_enc);
 
-        graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker);
+        graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker, editTitulo, editSize);
 
-        graficaEnc = new GraficaSonido(densityEnc, startTextEnc, endTextEnc, playButtonEnc, rewindButtonEnc, ffwdButtonEnc, waveformViewEnc, infoEnc, startMarkerEnc, endMarkerEnc);
+        graficaEnc = new GraficaSonido(densityEnc, startTextEnc, endTextEnc, playButtonEnc, rewindButtonEnc, ffwdButtonEnc, waveformViewEnc, infoEnc, startMarkerEnc, endMarkerEnc, editTituloEnc, editSizeEnc);
 
         agregarListeners();
         directorioCreado = new File(directorio, RECORD_DIRECTORY).exists();
@@ -259,6 +260,12 @@ public class FragmentSonido extends Fragment{
     {
         editTitulo.setKeyListener(null);
         editSize.setKeyListener(null);
+        editTituloEnc.setKeyListener(null);
+        editSizeEnc.setKeyListener(null);
+        startText.setKeyListener(null);
+        startTextEnc.setKeyListener(null);
+        endText.setKeyListener(null);
+        endTextEnc.setKeyListener(null);
 
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -390,16 +397,16 @@ public class FragmentSonido extends Fragment{
                 Log.i("ISOUND", "Bytes " + graficaOriginal.getSoundFile().getDecodedBytes());
                 for(int i = offset; i < bufferSonidoOriginal.limit(); i+=3)
                 {
-                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", i + "--" + bufferSonidoOriginal.get(i) + "");
+                    /*if(i%100 == 0 && i < 10000)Log.i("DATOSB", i + "--" + bufferSonidoOriginal.get(i) + "");
                     if(i%100 == 0 && i < 10000)Log.i("DATOSB", bufferSonidoOriginal.get(i + 1) + "");
-                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", bufferSonidoOriginal.get(i + 2) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", bufferSonidoOriginal.get(i + 2) + "");*/
                     //Asignamos los valores del Buffer al arrelo a encriptar
                     arreglo[0] = bufferSonidoOriginal.get(i);
                     if((i + 1) < bufferSonidoOriginal.limit()) arreglo[1] = bufferSonidoOriginal.get(i + 1);
                     if((i + 2) < bufferSonidoOriginal.limit()) arreglo[2] = bufferSonidoOriginal.get(i + 2);
-                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[0] + "");
+                    /*if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[0] + "");
                     if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[1] + "");
-                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[2] + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[2] + "");*/
 
                     //Verificamos valor de signos
                     for(int j = 0; j < 3; j++){
@@ -421,10 +428,10 @@ public class FragmentSonido extends Fragment{
                         {
                             arregloEnc[j] += llave[j][k] * arreglo[k];
                         }
-                        //Modulo 29
-                        if(i%100 == 0 && i < 10000)Log.i("DATOSENM", arregloEnc[j] + "");
+                        //Modulo 128
+                        //if(i%100 == 0 && i < 10000)Log.i("DATOSENM", arregloEnc[j] + "");
                         arregloEnc[j] = arregloEnc[j]%128;
-                        if(i%100 == 0 && i < 10000)Log.i("DATOSE", arregloEnc[j] + "");
+                        //if(i%100 == 0 && i < 10000)Log.i("DATOSE", arregloEnc[j] + "");
                     }
 
                     //Insertamos los datos encriptados en el buffer
@@ -436,10 +443,10 @@ public class FragmentSonido extends Fragment{
                     if((i + 2) < bufferSonidoOriginal.limit())otroBuffer.put(i + 2, bufferSonidoOriginal.get(i+2));*/
 
 
-                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i) + "");
+                    /*if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i) + "");
                     if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 1) + "");
                     if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 2) + "");
-                    //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");
+                    //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");*/
                     progressDialog.setProgress((i * 100) / bufferSonidoOriginal.limit());
 
                 }
@@ -456,12 +463,12 @@ public class FragmentSonido extends Fragment{
                 if(directorioCreado){
                     String recordName = "";
                     if(encrypt){
-                        recordName = "ENC_" + (graficaOriginal.mFile.getName()) + "(2).mp3";
+                        recordName = "ENC_" + (graficaOriginal.mFile.getName().substring(0, (graficaOriginal.mFile.getName().length() - 4))) + ".wav";
                     }
                     else
                     {
 
-                        recordName = "DES_" + (graficaOriginal.mFile.getName()) + "(2).mp3";
+                        recordName = "DES_" + (graficaOriginal.mFile.getName().substring(0, (graficaOriginal.mFile.getName().length() - 4))) + ".wav";
                     }
                     directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
                     directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
@@ -494,7 +501,7 @@ public class FragmentSonido extends Fragment{
                     public void run() {
                         progressDialog.dismiss();
                         tiempoDespues = tiempoDespues - tiempoAntes;
-                        editTituloEnc.setText("Tiempo encriptado: " + TimeUnit.MILLISECONDS.toSeconds(tiempoDespues) + " seg");
+                        //editTituloEnc.setText("Tiempo encriptado: " + TimeUnit.MILLISECONDS.toSeconds(tiempoDespues) + " seg");
                     }
                 });
 
@@ -556,10 +563,6 @@ public class FragmentSonido extends Fragment{
                 Log.i("FSENC", "Error en path" + cursor);
                 fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME));
                 filenameOr = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                editTitulo.setText(fileName);
-                float size = Integer.parseInt(cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)));
-                size = size/ (1024* 1024);
-                editSize.setText(size + " MB");
             }
         }
         catch (RuntimeException re){
@@ -593,12 +596,14 @@ public class FragmentSonido extends Fragment{
             getPathFromUri(MediaStore.getDocumentUri(context, path));
         }
         if (filenameOr == null){
-            graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker);
+            Log.i("IF", "Entra al 1er if");
+            graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker, editTitulo, editSize);
             graficaOriginal.setmFile(new File(path.getPath()));
             graficaOriginal.generarGrafica();
         }
         else{
-            graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker);
+            Log.i("IF", "Entra al 2do if " + filenameOr);
+            graficaOriginal = new GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker, editTitulo, editSize);
             graficaOriginal.setmFile(new File(filenameOr));
             graficaOriginal.generarGrafica();
         }
@@ -876,13 +881,18 @@ public class FragmentSonido extends Fragment{
         private int mMarkerTopOffset;
         private int mMarkerBottomOffset;
 
+        private EditText mTitulo, mSize;
+
         private Thread mLoadSoundFileThread;
 
 
         public GraficaSonido(float mDensity, EditText mStartText, EditText mEndText, ImageButton mPlayButton, ImageButton mRewindButton, ImageButton mFfwdButton,
-                             WaveformView mWaveformView, TextView mInfo, MarkerView mStartMarker, MarkerView mEndMarker){
+                             WaveformView mWaveformView, TextView mInfo, MarkerView mStartMarker, MarkerView mEndMarker, EditText titulo, EditText size){
             intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
             myNoisyAudioStreamReceiver = new BecomingNoisyReceiver();
+
+            mTitulo = titulo;
+            mSize = size;
 
             //Wave form
             mPlayer = null;
@@ -944,6 +954,9 @@ public class FragmentSonido extends Fragment{
 
         public void setmFile(File mFile){
             this.mFile = mFile;
+            mTitulo.setText(this.mFile.getName());
+            DecimalFormat df = new DecimalFormat("#.00");
+            mSize.setText(df.format(((double)this.mFile.length())/1024) + " KB");
         }
 
         public SoundFile getSoundFile(){
