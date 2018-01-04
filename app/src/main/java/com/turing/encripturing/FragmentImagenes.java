@@ -33,6 +33,11 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import org.jcodec.api.FrameGrab;
+import org.jcodec.api.JCodecException;
+import org.jcodec.common.AndroidUtil;
+import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.model.Picture;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
@@ -50,6 +55,7 @@ import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 
 
@@ -95,6 +101,14 @@ public class FragmentImagenes extends Fragment {
     private Mat rgba;
     private Mat bn;
 
+    /**
+    Variables de Checo
+    **/
+    private Button btnFrames;
+    private ImageView imgFrames;
+    Bitmap[] frames;
+    private File fileVideo;
+
     private OnFragmentInteractionListener mListener;
 
     public FragmentImagenes() {
@@ -129,6 +143,9 @@ public class FragmentImagenes extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_fragment_imagenes, container, false);
+
+        btnFrames = view.findViewById(R.id.btnFrames);
+        imgFrames = view.findViewById(R.id.framesContainer);
 
         btn_SeleccionarVideo = view.findViewById(R.id.btn_SeleccionarVideo);
         agregarVideo();
@@ -263,6 +280,66 @@ public class FragmentImagenes extends Fragment {
                 showOptions();
             }
         });
+
+        btnFrames.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int durationOfVideo = reproductor.getDuration();
+                double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 30-31 frames por segundo
+                frames = new Bitmap[(durationOfVideo/330) + 2];
+                double time = 0;
+                /*for(int i = 0; i < frames.length; i++){
+                    frames[i] = mmdr.getFrameAtTime(time*1000, MediaMetadataRetriever.OPTION_CLOSEST);
+                    time+=timeforFrame;
+                }
+                frames[frames.length-1] = mmdr.getFrameAtTime(durationOfVideo*1000, MediaMetadataRetriever.OPTION_CLOSEST);
+                Log.i("TEST", "Termino de extraer Frames");
+                imgFrames.setImageBitmap(frames[frames.length-1]);*/
+                Log.i("Debug", "NumberOfFrames: " + frames.length);
+
+                try {
+                    FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo));
+
+                    for (int i = 0; i < frames.length; i++) {
+                        grab.seekToSecondPrecise(time);
+                        Picture picture = grab.getNativeFrame();
+                        //System.out.println(picture.getWidth() + "x" + picture.getHeight() + " " + picture.getColor());
+
+                        //for Android (jcodec-android)
+                        frames[i] = AndroidUtil.toBitmap(picture);
+
+
+                        time+=timeforFrame;
+                    }
+                    Log.i("TEST", "Termino de extraer Frames");
+                    imgFrames.setImageBitmap(frames[0]);
+                    Log.i("Debug", "Duracion del video: " + durationOfVideo);
+                }
+                catch(IOException ioe){
+
+                }
+                catch(JCodecException jce){
+
+                }
+            }
+        });
+
+        imgFrames.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i("TEST", "Inicia");
+                try {
+                    for (int i = 0; i < frames.length; i++) {
+                        imgFrames.setImageBitmap(frames[i]);
+                        Thread.sleep(66);
+                    }
+                }
+                catch(InterruptedException ie){
+                    Log.i("TEST", "Termino de extraer Frames" + ie.getMessage());
+                }
+                Log.i("TEST", "Terminó");
+            }
+        });
     }
 
     public void showOptions()
@@ -322,6 +399,7 @@ public class FragmentImagenes extends Fragment {
                 reproductor = getView().findViewById(R.id.reproductorVideo);
 
                 reproductor.setVideoURI(Uri.parse(data));
+                fileVideo = new File(data);
                 Log.i("RUTA", data);
                 mmdr.setDataSource(data);
 
@@ -341,6 +419,11 @@ public class FragmentImagenes extends Fragment {
                     }
                     @Override
                     public void onPause() {
+                        /*
+                        Bloque de codigo de chequiño :v
+                         */
+
+                        //TERMINA
                         //mensaje que se muestra cuando está pausado
                         Toast.makeText(getActivity(),"Está pausado"
                                 +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();

@@ -22,6 +22,7 @@ import android.os.IBinder;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -49,7 +50,6 @@ public class FragmentSonido extends Fragment{
     private OnFragmentInteractionListener mListener;
 
     private Context context;
-    private String pathSoundRecorded;
 
     private final int SELECT_AUDIO = 200;
 
@@ -71,7 +71,7 @@ public class FragmentSonido extends Fragment{
     private boolean directorioCreado = false;
 
     //Instanciar WaveForme
-    private EditText startText, endText;
+    private TextInputEditText startText, endText;
     private float density;
     private ImageButton playButton, rewindButton, ffwdButton;
     private WaveformView waveformView;
@@ -84,14 +84,12 @@ public class FragmentSonido extends Fragment{
 
     //Instanciar WaveFormEncriptada
     private EditText editTituloEnc, editSizeEnc;
-    private EditText startTextEnc, endTextEnc;
+    private TextInputEditText startTextEnc, endTextEnc;
     private float densityEnc;
     private ImageButton playButtonEnc, rewindButtonEnc, ffwdButtonEnc;
     private WaveformView waveformViewEnc;
     private TextView infoEnc;
     private MarkerView startMarkerEnc, endMarkerEnc;
-
-    private String filenameOrEnc;
 
     private GraficaSonido graficaEnc;
 
@@ -383,18 +381,15 @@ public class FragmentSonido extends Fragment{
                 int[] arregloSignos = new int[3];
                 int[] arregloEnc = new int[3];
                 /*Debug*/
-                Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
+                /*Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
                 Log.i("ISOUND", "Frames " + graficaOriginal.getSoundFile().getNumFrames());
-                Log.i("ISOUND", "SampleRate " + graficaOriginal.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaOriginal.getSoundFile().getSamplesPerFrame());
+                Log.i("ISOUND", "SampleRate " + graficaOriginal.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaOriginal.getSoundFile().getSamplesPerFrame());*/
 
                 /*
                 Creamos los buffers, uno con los datos del sonido original y el segundo donde se alojaran los datos encriptados
                  */
                 ByteBuffer bufferSonidoOriginal = graficaOriginal.getSoundFile().getDecodedBytes();
                 ByteBuffer otroBuffer = ByteBuffer.allocate(bufferSonidoOriginal.limit());
-                Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
-                Log.i("ISOUND", "llave " + llave);
-                Log.i("ISOUND", "Bytes " + graficaOriginal.getSoundFile().getDecodedBytes());
                 for(int i = offset; i < bufferSonidoOriginal.limit(); i+=3)
                 {
                     /*if(i%100 == 0 && i < 10000)Log.i("DATOSB", i + "--" + bufferSonidoOriginal.get(i) + "");
@@ -450,7 +445,6 @@ public class FragmentSonido extends Fragment{
                     progressDialog.setProgress((i * 100) / bufferSonidoOriginal.limit());
 
                 }
-                Log.i("ISOUND", "Bytes " + graficaOriginal.getSoundFile().getDecodedBytes());
                 tiempoDespues = System.currentTimeMillis();
                 handler.post(new Runnable() {
                     @Override
@@ -472,17 +466,15 @@ public class FragmentSonido extends Fragment{
                     }
                     directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
                     directorio = directorio + File.separator + RECORD_DIRECTORY + File.separator + recordName;
-                    Log.e("CFILE", "desc     " + directorio);
                     encriptedFile = new File(directorio);
                     try{
-                        Log.e("CFILE", "Creando archivo");
                         WriteWAVFile(encriptedFile, Float.parseFloat(startText.getText().toString()),
                                 Float.parseFloat(graficaOriginal.getMaxTime()),
                                 graficaOriginal.getSoundFile().getChannels(),
                                 graficaOriginal.getSoundFile().getSampleRate(),
                                 otroBuffer);
                         MediaScannerConnection.scanFile (context, new String[] {encriptedFile.toString()}, null, null);
-                        Log.e("CFILE", "Archivo creado");
+                        //Log.e("CFILE", "Archivo creado");
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -504,8 +496,6 @@ public class FragmentSonido extends Fragment{
                         //editTituloEnc.setText("Tiempo encriptado: " + TimeUnit.MILLISECONDS.toSeconds(tiempoDespues) + " seg");
                     }
                 });
-
-                Log.i("ISOUND", " multiplicacion terminada");
             }
         }.start();
     }
@@ -758,8 +748,8 @@ public class FragmentSonido extends Fragment{
             }
             outputStream.close();
         } catch (IOException e) {
-            Log.e("Ringdroid", "Failed to create the .m4a file.");
-            Log.e("Ringdroid", e.getMessage());
+            Log.e("EncripTuring", "Failed to create the .m4a file.");
+            Log.e("EncripTuring", e.getMessage());
         }
     }
 
@@ -793,7 +783,6 @@ public class FragmentSonido extends Fragment{
 
         // Write the samples to the file, 1024 at a time.
         byte buffer[] = new byte[1024 * mChannels * 2];  // Each sample is coded with a short.
-        Log.i("OFFSET", startOffset + "");
         mDecodedBytes.position(startOffset);
         int numBytesLeft = numSamples * mChannels * 2;
         while (numBytesLeft >= buffer.length) {
@@ -844,8 +833,8 @@ public class FragmentSonido extends Fragment{
         private WaveformView mWaveformView;
         private MarkerView mStartMarker;
         private MarkerView mEndMarker;
-        private TextView mStartText;
-        private TextView mEndText;
+        private TextInputEditText mStartText;
+        private TextInputEditText mEndText;
         private TextView mInfo;
         private String mInfoContent;
         private ImageButton mPlayButton;
@@ -886,7 +875,7 @@ public class FragmentSonido extends Fragment{
         private Thread mLoadSoundFileThread;
 
 
-        public GraficaSonido(float mDensity, EditText mStartText, EditText mEndText, ImageButton mPlayButton, ImageButton mRewindButton, ImageButton mFfwdButton,
+        public GraficaSonido(float mDensity, TextInputEditText mStartText, TextInputEditText mEndText, ImageButton mPlayButton, ImageButton mRewindButton, ImageButton mFfwdButton,
                              WaveformView mWaveformView, TextView mInfo, MarkerView mStartMarker, MarkerView mEndMarker, EditText titulo, EditText size){
             intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
             myNoisyAudioStreamReceiver = new BecomingNoisyReceiver();
@@ -1046,7 +1035,7 @@ public class FragmentSonido extends Fragment{
                         };
                         mHandler.post(runnable);
                     } else if (mFinishActivity){
-                        //RingdroidEditActivity.this.finish();
+
                     }
                 }
             };

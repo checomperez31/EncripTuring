@@ -64,7 +64,7 @@
                         android:layout_height="@dimen/herramientas_reproduccion_altura"
                         >
 
-                        <EditText
+                        <android.support.design.widget.TextInputEditText
                             android:id="@+id/sonido_starttext"
                             android:textSize="@dimen/texto_altura"
                             android:inputType="number|numberDecimal"
@@ -113,7 +113,7 @@
                             android:layout_height="@dimen/boton_reproduccion_altura"
                             android:layout_width="@dimen/boton_reproduccion_ancho"
                             />
-                        <EditText
+                        <android.support.design.widget.TextInputEditText
                             android:id="@+id/endtext"
                             android:textSize="@dimen/texto_altura"
                             android:inputType="number|numberDecimal"
@@ -231,7 +231,7 @@
                         android:layout_height="@dimen/herramientas_reproduccion_altura"
                         >
 
-                        <EditText
+                        <android.support.design.widget.TextInputEditText
                             android:id="@+id/sonido_starttext_enc"
                             android:textSize="@dimen/texto_altura"
                             android:inputType="number|numberDecimal"
@@ -280,7 +280,7 @@
                             android:layout_height="@dimen/boton_reproduccion_altura"
                             android:layout_width="@dimen/boton_reproduccion_ancho"
                             />
-                        <EditText
+                        <android.support.design.widget.TextInputEditText
                             android:id="@+id/endtext_enc"
                             android:textSize="@dimen/texto_altura"
                             android:inputType="number|numberDecimal"
