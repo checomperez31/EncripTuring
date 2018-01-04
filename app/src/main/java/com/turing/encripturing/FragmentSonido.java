@@ -354,7 +354,7 @@ public class FragmentSonido extends Fragment{
             progressDialog.setTitle("Desencriptando");
         }
 
-        progressDialog.setCancelable(true);
+        progressDialog.setCancelable(false);
         new Thread(){
             @Override
             public void run(){

@@ -36,6 +36,16 @@
                 android:id="@+id/framesContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/btnSigFrame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "Frame Siguientee"/>
+            <Button
+                android:id="@+id/btnAntFrame"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text = "Frame Anterior"/>
 
             <ImageView
                 android:id="@+id/histogramaImgView"

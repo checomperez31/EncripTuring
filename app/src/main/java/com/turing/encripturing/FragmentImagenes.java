@@ -1,6 +1,7 @@
 package com.turing.encripturing;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -104,10 +106,13 @@ public class FragmentImagenes extends Fragment {
     /**
     Variables de Checo
     **/
-    private Button btnFrames;
+    private Button btnFrames, btnSig, btnAnt;
     private ImageView imgFrames;
     Bitmap[] frames;
     private File fileVideo;
+    ProgressDialog progressDialog;
+    private Handler handler;
+    private int positionFrame = 0;
 
     private OnFragmentInteractionListener mListener;
 
@@ -146,6 +151,9 @@ public class FragmentImagenes extends Fragment {
 
         btnFrames = view.findViewById(R.id.btnFrames);
         imgFrames = view.findViewById(R.id.framesContainer);
+        btnSig = view.findViewById(R.id.btnSigFrame);
+        btnAnt = view.findViewById(R.id.btnAntFrame);
+        handler = new Handler();
 
         btn_SeleccionarVideo = view.findViewById(R.id.btn_SeleccionarVideo);
         agregarVideo();
@@ -284,60 +292,22 @@ public class FragmentImagenes extends Fragment {
         btnFrames.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int durationOfVideo = reproductor.getDuration();
-                double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 30-31 frames por segundo
-                frames = new Bitmap[(durationOfVideo/330) + 2];
-                double time = 0;
-                /*for(int i = 0; i < frames.length; i++){
-                    frames[i] = mmdr.getFrameAtTime(time*1000, MediaMetadataRetriever.OPTION_CLOSEST);
-                    time+=timeforFrame;
-                }
-                frames[frames.length-1] = mmdr.getFrameAtTime(durationOfVideo*1000, MediaMetadataRetriever.OPTION_CLOSEST);
-                Log.i("TEST", "Termino de extraer Frames");
-                imgFrames.setImageBitmap(frames[frames.length-1]);*/
-                Log.i("Debug", "NumberOfFrames: " + frames.length);
-
-                try {
-                    FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo));
-
-                    for (int i = 0; i < frames.length; i++) {
-                        grab.seekToSecondPrecise(time);
-                        Picture picture = grab.getNativeFrame();
-                        //System.out.println(picture.getWidth() + "x" + picture.getHeight() + " " + picture.getColor());
-
-                        //for Android (jcodec-android)
-                        frames[i] = AndroidUtil.toBitmap(picture);
-
-
-                        time+=timeforFrame;
-                    }
-                    Log.i("TEST", "Termino de extraer Frames");
-                    imgFrames.setImageBitmap(frames[0]);
-                    Log.i("Debug", "Duracion del video: " + durationOfVideo);
-                }
-                catch(IOException ioe){
-
-                }
-                catch(JCodecException jce){
-
-                }
+                getFramesOfVideo();
             }
         });
 
-        imgFrames.setOnClickListener(new View.OnClickListener() {
+        btnSig.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.i("TEST", "Inicia");
-                try {
-                    for (int i = 0; i < frames.length; i++) {
-                        imgFrames.setImageBitmap(frames[i]);
-                        Thread.sleep(66);
-                    }
-                }
-                catch(InterruptedException ie){
-                    Log.i("TEST", "Termino de extraer Frames" + ie.getMessage());
-                }
-                Log.i("TEST", "Terminó");
+                positionFrame++;
+                imgFrames.setImageBitmap(frames[positionFrame]);
+            }
+        });
+        btnAnt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                positionFrame--;
+                imgFrames.setImageBitmap(frames[positionFrame]);
             }
         });
     }
@@ -591,16 +561,68 @@ public class FragmentImagenes extends Fragment {
         return bmFinal;
     }
 
-    //Función para generar matriz de números random del 1 al 99 xdxd
-    public int[][] generarLlave(){
-        int[][] llave = new int[3][3];
-        for (int i = 0; i<=llave.length; i++){
-            for (int j = 0; j<=llave[i].length; j++){
-                llave[i][j] = (int)(Math.random()*99)+1;
-            }
-        }
+    /**
+     * Funcion para extraer los frames de un video
+     */
+    public void getFramesOfVideo(){
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setCancelable(false);
+        progressDialog.setTitle("Obteniendo Frames");
+        new Thread(){
+            @Override
+            public void run(){
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.show();
+                        progressDialog.setProgress(0);
+                    }
+                });
 
-        return llave;
+                int durationOfVideo = reproductor.getDuration();
+                double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 30-31 frames por segundo
+                frames = new Bitmap[(durationOfVideo/330) + 1];
+                double time = 0;
+                Log.i("Debug", "NumberOfFrames: " + frames.length);
+
+                try {
+                    FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo));
+
+                    for (int i = 0; i < frames.length; i++) {
+                        Log.i("TEST", "I" + i + "\nTime " + time);
+                        grab.seekToSecondPrecise(time);
+                        Picture picture = grab.getNativeFrame();
+                        //System.out.println(picture.getWidth() + "x" + picture.getHeight() + " " + picture.getColor());
+
+                        //for Android (jcodec-android)
+                        frames[i] = AndroidUtil.toBitmap(picture);
+
+                        time+=timeforFrame;
+
+                        progressDialog.setProgress((i*100)/frames.length);
+                    }
+                    Log.i("TEST", "Termino de extraer Frames");
+
+                    Log.i("Debug", "Duracion del video: " + durationOfVideo);
+                }
+                catch(IOException ioe){
+
+                }
+                catch(JCodecException jce){
+
+                }
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        imgFrames.setImageBitmap(frames[0]);
+                    }
+                });
+            }
+
+        }.start();
     }
-    
+
 }
