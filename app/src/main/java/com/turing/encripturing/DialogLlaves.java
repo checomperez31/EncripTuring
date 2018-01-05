@@ -22,6 +22,12 @@ public class DialogLlaves extends Dialog{
     DatosEncriptar datosEncriptar;
     private boolean canceled = false, keygenerated = false, encrypt = true;
     private RelativeLayout matrizEnc, matrizDes;
+    private int modulo = 128;
+
+    public void setModulo(int modulo) {
+        this.modulo = modulo;
+        Log.i("RGB", "modulo: " + modulo);
+    }
 
     public DialogLlaves(Context context) {
         super(context);
@@ -100,12 +106,12 @@ public class DialogLlaves extends Dialog{
                 do{
                     generarLlave();
                     mat.set_matrix(llave);
-                    mat.set_modulo(128);
+                    mat.set_modulo(modulo);
                     int determinate = mat.get_determinant();
-                    if(obtenerMCD(determinate, 128) == 1){
+                    if(obtenerMCD(determinate, modulo) == 1){
                         generar = false;
                         Log.i("DET", determinate + "");
-                        Log.i("DET", obtenerMCD(determinate, 128) + "");
+                        Log.i("DET", obtenerMCD(determinate, modulo) + "");
                     }
                 }
                 while(generar);
@@ -162,7 +168,7 @@ public class DialogLlaves extends Dialog{
     public void generarLlave(){
         for (int i = 0; i < llave.length; i++){
             for (int j = 0; j < llave.length; j++){
-                llave[i][j] = (int)(Math.random()*128)+1;
+                llave[i][j] = (int)(Math.random()*modulo)+1;
             }
         }
     }

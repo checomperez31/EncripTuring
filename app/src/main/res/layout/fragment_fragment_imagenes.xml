@@ -35,7 +35,8 @@
             <ImageView
                 android:id="@+id/framesContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"/>
             <Button
                 android:id="@+id/btnSigFrame"
                 android:layout_width="match_parent"
@@ -75,6 +76,16 @@
                 android:background="@color/background_wave"
                 android:adjustViewBounds="true"
                 android:visibility="gone"/>
+            <ImageView
+                android:id="@+id/ImgViewEncriptado"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="85dp"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:background="@color/background_wave"
+                android:adjustViewBounds="true"
+                android:visibility="gone"/>
         </LinearLayout>
     </ScrollView>
     <RelativeLayout
@@ -92,5 +103,14 @@
             android:layout_marginRight="21dp"
             android:src="@drawable/add_item"
             android:tint="@color/White" />
+        <Button
+            android:id="@+id/btn_encriptar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="21dp"
+            android:layout_marginLeft="21dp"
+            android:text="Encriptar"/>
     </RelativeLayout>
 </FrameLayout>
