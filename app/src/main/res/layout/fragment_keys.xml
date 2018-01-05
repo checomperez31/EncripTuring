@@ -88,6 +88,7 @@
                 <!--Primer renglon -->
                 <EditText
                     android:id="@+id/edt_key00"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/edt_key10"
@@ -99,6 +100,7 @@
 
                 <EditText
                     android:id="@+id/edt_key01"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -110,6 +112,7 @@
 
                 <EditText
                     android:id="@+id/edt_key02"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -122,6 +125,7 @@
                 <!--Segundo Renglon -->
                 <EditText
                     android:id="@+id/edt_key10"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_key00"
@@ -133,6 +137,7 @@
 
                 <EditText
                     android:id="@+id/edt_key11"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_key01"
@@ -143,6 +148,7 @@
 
                 <EditText
                     android:id="@+id/edt_key12"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_key02"
@@ -156,6 +162,7 @@
 
                 <EditText
                     android:id="@+id/edt_key20"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_key10"
@@ -167,6 +174,7 @@
 
                 <EditText
                     android:id="@+id/edt_key21"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_key11"
@@ -177,6 +185,7 @@
 
                 <EditText
                     android:id="@+id/edt_key22"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_key12"
@@ -209,6 +218,7 @@
                 <!--Primer renglon -->
                 <EditText
                     android:id="@+id/edt_keyinv00"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/edt_keyinv10"
@@ -220,6 +230,7 @@
 
                 <EditText
                     android:id="@+id/edt_keyinv01"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -231,6 +242,7 @@
 
                 <EditText
                     android:id="@+id/edt_keyinv02"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -243,6 +255,7 @@
                 <!--Segundo Renglon -->
                 <EditText
                     android:id="@+id/edt_keyinv10"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_keyinv00"
@@ -254,6 +267,7 @@
 
                 <EditText
                     android:id="@+id/edt_keyinv11"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_keyinv01"
@@ -264,6 +278,7 @@
 
                 <EditText
                     android:id="@+id/edt_keyinv12"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_keyinv02"
@@ -277,6 +292,7 @@
 
                 <EditText
                     android:id="@+id/edt_keyinv20"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_keyinv10"
@@ -288,6 +304,7 @@
 
                 <EditText
                     android:id="@+id/edt_keyinv21"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_keyinv11"
@@ -298,6 +315,7 @@
 
                 <EditText
                     android:id="@+id/edt_keyinv22"
+                    android:inputType="number"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/edt_keyinv12"

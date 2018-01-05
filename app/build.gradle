@@ -12,9 +12,16 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug{
+            //...
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        dev {
+            //...
+            matchingFallbacks = ['debug', 'release']
         }
     }
 
@@ -36,4 +43,5 @@ dependencies {
     compile 'org.jcodec:jcodec-android:0.2.2'
     testCompile 'junit:junit:4.12'
     compile files('libs/opencv-android.jar')
+    //compile project(':libs:ffmpeg-android-java-master')
 }

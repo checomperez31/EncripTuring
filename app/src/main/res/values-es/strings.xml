@@ -48,6 +48,7 @@
     <string name="key_example7">20</string>
     <string name="key_example8">21</string>
     <string name="key_example9">22</string>
+    <string name="key_example11">222</string>
     <string name="msg_keys">Ingresa la matriz</string>
     <string name="save_keys">Guardar</string>
     <string name="msg_key_1">Llave de encriptación</string>

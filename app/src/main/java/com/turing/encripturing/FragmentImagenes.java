@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.media.MediaPlayer;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -59,6 +60,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Collections;
 
 
@@ -94,6 +96,7 @@ public class FragmentImagenes extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
+    private Bitmap bm;
     private String mParam1;
     private String mParam2;
     private int[] px;
@@ -103,6 +106,13 @@ public class FragmentImagenes extends Fragment {
     //Creamos los arrays requeridos y convertimos el bitmap a Mat para que pueda acomodarse la info de la misma a los arrelgos
     private Mat rgba;
     private Mat bn;
+
+    //Variables para encriptación
+    private Long tiempoAntes, tiempoDespues;
+    private Button btnEncriptar;
+    private DialogLlaves dialogLlaves;
+    private Bitmap frameEncriptado;
+    private ImageView imgViewEncriptado;
 
     /**
     Variables de Checo
@@ -158,7 +168,9 @@ public class FragmentImagenes extends Fragment {
         imgFrames = view.findViewById(R.id.framesContainer);
         btnSig = view.findViewById(R.id.btnSigFrame);
         btnAnt = view.findViewById(R.id.btnAntFrame);
+        btnEncriptar = view.findViewById(R.id.btn_encriptar);
         handler = new Handler();
+        imgViewEncriptado = view.findViewById(R.id.ImgViewEncriptado);
 
         btn_SeleccionarVideo = view.findViewById(R.id.btn_SeleccionarVideo);
         agregarVideo();
@@ -212,6 +224,25 @@ public class FragmentImagenes extends Fragment {
      */
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
+        btnEncriptar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialogLlaves = new DialogLlaves(context);
+                dialogLlaves.setModulo(256);
+                dialogLlaves.show();
+                dialogLlaves.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        if(!dialogLlaves.getCancelled()){
+                            DatosEncriptar datos = DatosEncriptar.getInstance();
+                            if(datos.getLlave() != null){
+                                encriptar(dialogLlaves.getEncrypt());
+                            }
+                        }
+                    }
+                });
+            }
+        });
         reproductor = getView().findViewById(R.id.reproductorVideo);
         //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
         reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -391,6 +422,7 @@ public class FragmentImagenes extends Fragment {
                         histograma.setVisibility(ImageView.GONE);
                         imgViewBN.setVisibility(ImageView.GONE);
                         histogramaLum.setVisibility(ImageView.GONE);
+                        imgViewEncriptado.setVisibility(ImageView.GONE);
                     }
                     @Override
                     public void onPause() {
@@ -403,7 +435,9 @@ public class FragmentImagenes extends Fragment {
                         Toast.makeText(getActivity(),"Está pausado"
                                 +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
                         //Extraemos el frame en el instante que se da pause
-                        Bitmap bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                        bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                        //SingletonBitmap.getInstance().setBm(bm);
+                        Log.i("SINGLETON", "Setea el BM desde el on Pause");
                         Mat bmMat = new Mat();
                         Utils.bitmapToMat(bm, bmMat);
                         Mat bmGrayMat = new Mat();
@@ -615,6 +649,88 @@ public class FragmentImagenes extends Fragment {
         }else if(numberOfFramesExtracted == frames.length){
             progressDialog.dismiss();
         }
+    }
+
+    private void encriptar(final boolean encrypt){
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        if(encrypt){
+            progressDialog.setTitle("Encriptando");
+        }
+        else
+        {
+            progressDialog.setTitle("Desencriptando");
+        }
+
+        progressDialog.setCancelable(false);
+        new Thread(){
+            @Override
+            public void run(){
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.show();
+                        progressDialog.setProgress(0);
+                    }
+                });
+                tiempoAntes = System.currentTimeMillis();
+                DatosEncriptar datos = DatosEncriptar.getInstance();
+                int[][] llave;
+                if(dialogLlaves.getEncrypt()){
+                    llave = datos.getLlave();
+                }
+                else{
+                    llave = datos.getLlaveDes();
+                }
+                SingletonBitmap.getInstance().setBm(bm);
+                frameEncriptado = SingletonBitmap.getInstance().getBm();
+                Log.i("SINGLETON", "Obtiene el BM desde el thread");
+                /*Log.i("LLAVE", Integer.toString(llave[0][0]) + Integer.toString(llave[0][1]) + Integer.toString(llave[0][2]));
+                Log.i("LLAVE", Integer.toString(llave[1][0]) + Integer.toString(llave[1][1]) + Integer.toString(llave[1][2]));
+                Log.i("LLAVE", Integer.toString(llave[2][0]) + Integer.toString(llave[2][1]) + Integer.toString(llave[2][2]));*/
+                int[] arregloEnc = new int[3];
+                int contador = 0;
+                for (int i = 0; i < bm.getWidth(); i++) {
+                    for (int j = 0; j < bm.getHeight(); j++) {
+                        int pixel = bm.getPixel(i, j);
+                        int R = Color.red(pixel);
+                        int G = Color.green(pixel);
+                        int B = Color.blue(pixel);
+                        //Log.i("RGB", "Pixel: "+ contador + " R: " + R + " G: " + G + " B: " + B);
+                        contador++;
+                        arregloEnc[0] = (R * llave[0][0]) + (G * llave[0][1]) + (B * llave[0][2]);
+                        arregloEnc[1] = (R * llave[1][0]) + (G * llave[1][1]) + (B * llave[1][2]);
+                        arregloEnc[2] = (R * llave[2][0]) + (G * llave[2][1]) + (B * llave[2][2]);
+                        if(i==0 && j==0){
+                            Log.i("ENCRIPTADO", Integer.toString(R));
+                            Log.i("ENCRIPTADO", Integer.toString(G));
+                            Log.i("ENCRIPTADO", Integer.toString(B));
+                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[0]));
+                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[1]));
+                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[2]));
+                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[0]%256));
+                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[1]%256));
+                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[2]%256));
+                        }
+                        frameEncriptado.setPixel(i,j, Color.rgb(arregloEnc[0]%256, arregloEnc[1]%256, arregloEnc[2]%256));
+                        progressDialog.setProgress((contador * 100) / (bm.getHeight()*bm.getHeight()));
+                    }
+                }
+                SingletonBitmap.getInstance().setBm(frameEncriptado);
+                Log.i("SINGLETON", "Setea el BM desde el thread");
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        imgViewEncriptado.setImageBitmap(SingletonBitmap.getInstance().getBm());
+                        Log.i("SINGLETON", "Obtiene el BM desde el el final del thread");
+                        imgViewEncriptado.setVisibility(ImageView.VISIBLE);
+                    }
+                });
+
+            }
+        }.start();
     }
 
     public static class HilosPorFrame implements Runnable{
