@@ -39,6 +39,7 @@ import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.common.AndroidUtil;
 import org.jcodec.common.io.NIOUtils;
+import org.jcodec.common.model.Frame;
 import org.jcodec.common.model.Picture;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
@@ -108,11 +109,15 @@ public class FragmentImagenes extends Fragment {
     **/
     private Button btnFrames, btnSig, btnAnt;
     private ImageView imgFrames;
-    Bitmap[] frames;
+    public static Bitmap[] frames;
+    public static FrameGrab grab;
     private File fileVideo;
-    ProgressDialog progressDialog;
+    private static ProgressDialog progressDialog;
+    private static int numberOfFramesExtracted = 0;
     private Handler handler;
     private int positionFrame = 0;
+    public static double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 30-31 frames por segundo
+    private static double time = 0;
 
     private OnFragmentInteractionListener mListener;
 
@@ -581,48 +586,70 @@ public class FragmentImagenes extends Fragment {
                 });
 
                 int durationOfVideo = reproductor.getDuration();
-                double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 30-31 frames por segundo
                 frames = new Bitmap[(durationOfVideo/330) + 1];
-                double time = 0;
                 Log.i("Debug", "NumberOfFrames: " + frames.length);
-
                 try {
-                    FrameGrab grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo));
-
-                    for (int i = 0; i < frames.length; i++) {
-                        Log.i("TEST", "I" + i + "\nTime " + time);
-                        grab.seekToSecondPrecise(time);
-                        Picture picture = grab.getNativeFrame();
-                        //System.out.println(picture.getWidth() + "x" + picture.getHeight() + " " + picture.getColor());
-
-                        //for Android (jcodec-android)
-                        frames[i] = AndroidUtil.toBitmap(picture);
-
+                    grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo));
+                    for (numberOfFramesExtracted = 0; numberOfFramesExtracted < 4; numberOfFramesExtracted++) {
+                        DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(time, numberOfFramesExtracted, grab));
                         time+=timeforFrame;
-
-                        progressDialog.setProgress((i*100)/frames.length);
                     }
-                    Log.i("TEST", "Termino de extraer Frames");
-
-                    Log.i("Debug", "Duracion del video: " + durationOfVideo);
-                }
-                catch(IOException ioe){
-
                 }
                 catch(JCodecException jce){
-
+                    Log.e("JCOED", "");
                 }
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressDialog.dismiss();
-                        imgFrames.setImageBitmap(frames[0]);
-                    }
-                });
+                catch(IOException ioe){
+                    Log.e("IOE", "");
+                }
+                if(grab == null)Log.e("IOE", "Es null alv");
             }
 
         }.start();
+    }
+
+    public static void reportProgressFrames(){
+        numberOfFramesExtracted++;
+        progressDialog.setProgress((numberOfFramesExtracted * 100)/FragmentImagenes.frames.length);
+        if(numberOfFramesExtracted < frames.length){
+            DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(time, numberOfFramesExtracted, grab));
+            time+=timeforFrame;
+        }else if(numberOfFramesExtracted == frames.length){
+            progressDialog.dismiss();
+        }
+    }
+
+    public static class HilosPorFrame implements Runnable{
+        double seconds;
+        int posicion;
+        FrameGrab frameGrab;
+
+        public HilosPorFrame(double seconds, int posicion, FrameGrab frameGrab){
+            this.seconds = seconds;
+            this.posicion = posicion;
+            this.frameGrab = frameGrab;
+        }
+
+        public synchronized void buscarSegundo(double segundo, int position){
+            try {
+                Log.i("TEST", "Inicia Frame " + position);
+                frameGrab.seekToSecondPrecise(segundo);
+                Picture picture = frameGrab.getNativeFrame();
+                FragmentImagenes.frames[position] = AndroidUtil.toBitmap(picture);
+                Log.i("TEST", "Termino de extraer Frame " + position);
+                FragmentImagenes.reportProgressFrames();
+            }
+            catch(IOException ioe){
+                Log.e("IOE", "");
+            }
+            catch(JCodecException jce){
+                Log.e("JCOED", "");
+            }
+        }
+
+        @Override
+        public void run() {
+            buscarSegundo(seconds, posicion);
+        }
     }
 
 }
