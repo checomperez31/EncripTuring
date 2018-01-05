@@ -601,7 +601,6 @@ public class FragmentImagenes extends Fragment {
                 catch(IOException ioe){
                     Log.e("IOE", "");
                 }
-                if(grab == null)Log.e("IOE", "Es null alv");
             }
 
         }.start();
