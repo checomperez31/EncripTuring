@@ -43,12 +43,13 @@ import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class Turing extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FragmentSonido.OnFragmentInteractionListener, FragmentImagenes.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentSonido.OnFragmentInteractionListener, FragmentImagenes.OnFragmentInteractionListener, KeysFragment.OnFragmentInteractionListener {
 
     private VideoView reproductor;
     private int posicionVideo;
     private FragmentSonido fragmentSonido;
     private FragmentImagenes fragmentImagenes;
+    private KeysFragment fragmentKeys;
     private View vistaPrincipal;
     private final int MY_PERMISSIONS = 100;
     private final int SELECT_PICTURE = 200;
@@ -107,6 +108,7 @@ public class Turing extends AppCompatActivity
 
         fragmentSonido = new FragmentSonido();
         fragmentImagenes = new FragmentImagenes();
+        fragmentKeys = new KeysFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.FragmentContent, fragmentSonido).commit();
 
@@ -166,6 +168,9 @@ public class Turing extends AppCompatActivity
         else if (id == R.id.nav_video)
         {
 
+        }
+        else if (id == R.id.nav_keys){
+            transaction.replace(R.id.FragmentContent, fragmentKeys, "FRAGMENT_KEYS");
         }
 
         transaction.commit();
