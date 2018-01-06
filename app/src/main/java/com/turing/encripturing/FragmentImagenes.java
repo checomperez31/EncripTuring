@@ -126,8 +126,9 @@ public class FragmentImagenes extends Fragment {
     private static int numberOfFramesExtracted = 0;
     private Handler handler;
     private int positionFrame = 0;
-    public static double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 30-31 frames por segundo
+    public static double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 3 frames por segundo
     private static double time = 0;
+    public static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
 
     private OnFragmentInteractionListener mListener;
 
@@ -607,7 +608,7 @@ public class FragmentImagenes extends Fragment {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setCancelable(false);
-        progressDialog.setTitle("Obteniendo Frames");
+        progressDialog.setTitle("Obteniendo Frames " + Runtime.getRuntime().availableProcessors());
         new Thread(){
             @Override
             public void run(){
@@ -619,14 +620,33 @@ public class FragmentImagenes extends Fragment {
                     }
                 });
 
-                int durationOfVideo = reproductor.getDuration();
-                frames = new Bitmap[(durationOfVideo/330) + 1];
-                Log.i("Debug", "NumberOfFrames: " + frames.length);
                 try {
                     grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo));
-                    for (numberOfFramesExtracted = 0; numberOfFramesExtracted < 4; numberOfFramesExtracted++) {
-                        DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(time, numberOfFramesExtracted, grab));
-                        time+=timeforFrame;
+                    int durationOfVideo = reproductor.getDuration();
+                    frames = new Bitmap[(durationOfVideo/330) + 1];//calculamos el numero total de frames
+                    Log.i("Debug", "NumberOfFrames: " + frames.length);
+                    int framesThread = frames.length/NUMBER_OF_CORES;//calculamos el numero de hilos por nucleo
+                    int initialPosition = 0;
+                    double initialTime = 0;
+                    for(int i = 1; i <= NUMBER_OF_CORES; i++){
+                        if(i != NUMBER_OF_CORES){
+                            DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(
+                                    initialPosition,
+                                    initialPosition + framesThread,
+                                    initialTime,
+                                    grab
+                            ));
+                        }
+                        else{//Ultimo fragmento de frames
+                            DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(
+                                    initialPosition,
+                                    (frames.length - 1),
+                                    initialTime,
+                                    grab
+                            ));
+                        }
+                        initialPosition = initialPosition + framesThread + 1;
+                        initialTime = initialTime + (timeforFrame * framesThread) + timeforFrame;
                     }
                 }
                 catch(JCodecException jce){
@@ -643,10 +663,7 @@ public class FragmentImagenes extends Fragment {
     public static void reportProgressFrames(){
         numberOfFramesExtracted++;
         progressDialog.setProgress((numberOfFramesExtracted * 100)/FragmentImagenes.frames.length);
-        if(numberOfFramesExtracted < frames.length){
-            DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(time, numberOfFramesExtracted, grab));
-            time+=timeforFrame;
-        }else if(numberOfFramesExtracted == frames.length){
+        if(numberOfFramesExtracted == frames.length){
             progressDialog.dismiss();
         }
     }
@@ -674,6 +691,7 @@ public class FragmentImagenes extends Fragment {
                         progressDialog.setProgress(0);
                     }
                 });
+
                 tiempoAntes = System.currentTimeMillis();
                 DatosEncriptar datos = DatosEncriptar.getInstance();
                 int[][] llave;
@@ -734,24 +752,27 @@ public class FragmentImagenes extends Fragment {
     }
 
     public static class HilosPorFrame implements Runnable{
-        double seconds;
-        int posicion;
+        double initialTime;
+        int initialPosition, finalPoisition;
         FrameGrab frameGrab;
 
-        public HilosPorFrame(double seconds, int posicion, FrameGrab frameGrab){
-            this.seconds = seconds;
-            this.posicion = posicion;
+        public HilosPorFrame(int initialPosition, int finalPosition, double initialTime, FrameGrab frameGrab){
+            this.initialPosition = initialPosition;
+            this.finalPoisition = finalPosition;
+            this.initialTime = initialTime;
             this.frameGrab = frameGrab;
         }
 
-        public synchronized void buscarSegundo(double segundo, int position){
+        public synchronized void buscarSegundo(){
             try {
-                Log.i("TEST", "Inicia Frame " + position);
-                frameGrab.seekToSecondPrecise(segundo);
-                Picture picture = frameGrab.getNativeFrame();
-                FragmentImagenes.frames[position] = AndroidUtil.toBitmap(picture);
-                Log.i("TEST", "Termino de extraer Frame " + position);
-                FragmentImagenes.reportProgressFrames();
+                for(int i = initialPosition; i <= finalPoisition; i++){
+                    frameGrab.seekToSecondPrecise(initialTime);
+                    Picture picture = frameGrab.getNativeFrame();
+                    FragmentImagenes.frames[i] = AndroidUtil.toBitmap(picture);
+                    Log.i("TEST", "Termino de extraer Frame " + i);
+                    FragmentImagenes.reportProgressFrames();
+                    initialTime+=FragmentImagenes.timeforFrame;
+                }
             }
             catch(IOException ioe){
                 Log.e("IOE", "");
@@ -763,7 +784,7 @@ public class FragmentImagenes extends Fragment {
 
         @Override
         public void run() {
-            buscarSegundo(seconds, posicion);
+            buscarSegundo();
         }
     }
 
