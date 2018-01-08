@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorMatrix;
@@ -437,7 +438,7 @@ public class FragmentImagenes extends Fragment {
                                 +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
                         //Extraemos el frame en el instante que se da pause
                         bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                        //SingletonBitmap.getInstance().setBm(bm);
+                        SingletonBitmap.getInstance().setBm(bm);
                         Log.i("SINGLETON", "Setea el BM desde el on Pause");
                         Mat bmMat = new Mat();
                         Utils.bitmapToMat(bm, bmMat);
@@ -520,6 +521,13 @@ public class FragmentImagenes extends Fragment {
         //Definimos la altura del histograma y  el ancho de la barra
         int histogramHeight = (int) rgbaSize.height;
         double binWidth = 2.5; //A menor sea el número menos separación existe entre las barras
+        if(rgbaSize.width==1920 && rgbaSize.height == 1080 || rgbaSize.width==1440 && rgbaSize.height == 1080){
+            binWidth = 7.5;
+        }if(rgbaSize.width==1080 && rgbaSize.height == 1920 || rgbaSize.width==1080 && rgbaSize.height == 1440){
+            binWidth = 4.25;
+        }if(rgbaSize.width==1280 && rgbaSize.height == 720 ){
+            binWidth = 5;
+        }
 
         //Definimos el rango de valores
         MatOfFloat histogramRange = new MatOfFloat(0f, 256f);
@@ -570,6 +578,13 @@ public class FragmentImagenes extends Fragment {
         //Definimos la altura del histograma y  el ancho de la barra
         int histogramHeight = (int) bnSize.height;
         double binWidth = 2.5; //A menor sea el número menos separación existe entre las barras
+        if(bnSize.width==1920 && bnSize.height == 1080 || bnSize.width==1440 && bnSize.height == 1080){
+            binWidth = 7.5;
+        }if(bnSize.width==1080 && bnSize.height == 1920 || bnSize.width==1080 && bnSize.height == 1440){
+            binWidth = 4.25;
+        }if(bnSize.width==1280 && bnSize.height == 720 ){
+            binWidth = 5;
+        }
 
         //Definimos el rango de valores
         MatOfFloat histogramRange = new MatOfFloat(0f, 256f);
@@ -701,37 +716,35 @@ public class FragmentImagenes extends Fragment {
                 else{
                     llave = datos.getLlaveDes();
                 }
-                SingletonBitmap.getInstance().setBm(bm);
-                frameEncriptado = SingletonBitmap.getInstance().getBm();
-                Log.i("SINGLETON", "Obtiene el BM desde el thread");
-                /*Log.i("LLAVE", Integer.toString(llave[0][0]) + Integer.toString(llave[0][1]) + Integer.toString(llave[0][2]));
-                Log.i("LLAVE", Integer.toString(llave[1][0]) + Integer.toString(llave[1][1]) + Integer.toString(llave[1][2]));
-                Log.i("LLAVE", Integer.toString(llave[2][0]) + Integer.toString(llave[2][1]) + Integer.toString(llave[2][2]));*/
+                Bitmap bmLocal = SingletonBitmap.getInstance().getBm();
+                frameEncriptado = Bitmap.createBitmap(bmLocal.getWidth(),bm.getHeight(), Bitmap.Config.ARGB_8888);
                 int[] arregloEnc = new int[3];
                 int contador = 0;
-                for (int i = 0; i < bm.getWidth(); i++) {
-                    for (int j = 0; j < bm.getHeight(); j++) {
-                        int pixel = bm.getPixel(i, j);
+                Log.i("ENCRIPTADO", "Cols: "+bmLocal.getWidth());
+                Log.i("ENCRIPTADO", "Rows: "+bmLocal.getHeight());
+                for (int i = 0; i < bmLocal.getWidth(); i++) {
+                    for (int j = 0; j < bmLocal.getHeight(); j++) {
+                        int pixel = bmLocal.getPixel(i, j);
+                        int A = Color.alpha(pixel);
                         int R = Color.red(pixel);
                         int G = Color.green(pixel);
                         int B = Color.blue(pixel);
-                        //Log.i("RGB", "Pixel: "+ contador + " R: " + R + " G: " + G + " B: " + B);
                         contador++;
-                        arregloEnc[0] = (R * llave[0][0]) + (G * llave[0][1]) + (B * llave[0][2]);
-                        arregloEnc[1] = (R * llave[1][0]) + (G * llave[1][1]) + (B * llave[1][2]);
-                        arregloEnc[2] = (R * llave[2][0]) + (G * llave[2][1]) + (B * llave[2][2]);
+                        arregloEnc[0] = ((R * llave[0][0]) + (G * llave[0][1]) + (B * llave[0][2]))%256;
+                        arregloEnc[1] = ((R * llave[1][0]) + (G * llave[1][1]) + (B * llave[1][2]))%256;
+                        arregloEnc[2] = ((R * llave[2][0]) + (G * llave[2][1]) + (B * llave[2][2]))%256;
                         if(i==0 && j==0){
-                            Log.i("ENCRIPTADO", Integer.toString(R));
-                            Log.i("ENCRIPTADO", Integer.toString(G));
-                            Log.i("ENCRIPTADO", Integer.toString(B));
-                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[0]));
-                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[1]));
-                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[2]));
-                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[0]%256));
-                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[1]%256));
-                            Log.i("ENCRIPTADO", Integer.toString(arregloEnc[2]%256));
+                            Log.i("ENCRIPTADO", Double.toString(R));
+                            Log.i("ENCRIPTADO", Double.toString(G));
+                            Log.i("ENCRIPTADO", Double.toString(B));
+                            Log.i("ENCRIPTADO", Double.toString(arregloEnc[0]*256));
+                            Log.i("ENCRIPTADO", Double.toString(arregloEnc[1]*256));
+                            Log.i("ENCRIPTADO", Double.toString(arregloEnc[2]*256));
+                            Log.i("ENCRIPTADO", Double.toString(arregloEnc[0]%256));
+                            Log.i("ENCRIPTADO", Double.toString(arregloEnc[1]%256));
+                            Log.i("ENCRIPTADO", Double.toString(arregloEnc[2]%256));
                         }
-                        frameEncriptado.setPixel(i,j, Color.rgb(arregloEnc[0]%256, arregloEnc[1]%256, arregloEnc[2]%256));
+                        frameEncriptado.setPixel(i,j, Color.argb(A,arregloEnc[0],arregloEnc[1],arregloEnc[2]));
                         progressDialog.setProgress((contador * 100) / (bm.getHeight()*bm.getHeight()));
                     }
                 }
