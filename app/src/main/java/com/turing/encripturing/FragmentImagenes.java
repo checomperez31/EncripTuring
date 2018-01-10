@@ -119,13 +119,13 @@ public class FragmentImagenes extends Fragment {
     Variables de Checo
     **/
     private Button btnFrames, btnSig, btnAnt;
-    private ImageView imgFrames;
+    private static ImageView imgFrames;
     public static Bitmap[] frames;
     public static FrameGrab grab;
     private File fileVideo;
     private static ProgressDialog progressDialog;
     private static int numberOfFramesExtracted = 0;
-    private Handler handler;
+    private static Handler handler;
     private int positionFrame = 0;
     public static double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 3 frames por segundo
     private static double time = 0;
@@ -623,7 +623,7 @@ public class FragmentImagenes extends Fragment {
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         progressDialog.setCancelable(false);
-        progressDialog.setTitle("Obteniendo Frames " + Runtime.getRuntime().availableProcessors());
+        progressDialog.setTitle("Obteniendo Frames ");
         new Thread(){
             @Override
             public void run(){
@@ -643,13 +643,19 @@ public class FragmentImagenes extends Fragment {
                     int framesThread = frames.length/NUMBER_OF_CORES;//calculamos el numero de hilos por nucleo
                     int initialPosition = 0;
                     double initialTime = 0;
+                    /*DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(
+                            initialPosition,
+                            (frames.length - 1),
+                            initialTime,
+                            grab
+                    ));*/
                     for(int i = 1; i <= NUMBER_OF_CORES; i++){
                         if(i != NUMBER_OF_CORES){
                             DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new HilosPorFrame(
                                     initialPosition,
                                     initialPosition + framesThread,
                                     initialTime,
-                                    grab
+                                    FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo))
                             ));
                         }
                         else{//Ultimo fragmento de frames
@@ -657,7 +663,7 @@ public class FragmentImagenes extends Fragment {
                                     initialPosition,
                                     (frames.length - 1),
                                     initialTime,
-                                    grab
+                                    FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo))
                             ));
                         }
                         initialPosition = initialPosition + framesThread + 1;
@@ -680,6 +686,14 @@ public class FragmentImagenes extends Fragment {
         progressDialog.setProgress((numberOfFramesExtracted * 100)/FragmentImagenes.frames.length);
         if(numberOfFramesExtracted == frames.length){
             progressDialog.dismiss();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    imgFrames.setImageBitmap(frames[0]);
+                    numberOfFramesExtracted = 0;
+                }
+            });
+
         }
     }
 
