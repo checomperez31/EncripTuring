@@ -41,12 +41,14 @@
                 android:id="@+id/btnSigFrame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text = "Frame Siguientee"/>
+                android:text = "Frame Siguientee"
+                android:enabled="false"/>
             <Button
                 android:id="@+id/btnAntFrame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text = "Frame Anterior"/>
+                android:text = "Frame Anterior"
+                android:enabled="false"/>
 
             <ImageView
                 android:id="@+id/histogramaImgView"
