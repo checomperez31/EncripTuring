@@ -56,7 +56,7 @@ public class WaveformView extends View {
     private Paint mGridPaint;
     private Paint mSelectedLinePaint;
     private Paint mUnselectedLinePaint;
-    private Paint mUnselectedBkgndLinePaint;
+    public Paint mUnselectedBkgndLinePaint;
     private Paint mBorderLinePaint;
     private Paint mPlaybackLinePaint;
     private Paint mTimecodePaint;

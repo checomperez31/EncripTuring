@@ -994,7 +994,7 @@ public class FragmentSonido extends Fragment{
                             String[] components = name.split("\\.");
                             String err;
                             if (components.length < 2) {
-                                err = "Error";
+                                err = "Error, Archivo sin extensión";
                             } else {
                                 err = "Error de extension" + " " + components[components.length - 1];
                             }

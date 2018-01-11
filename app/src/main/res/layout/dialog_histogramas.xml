@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
+
+    <LinearLayout
+        android:id="@+id/layout_dialog_histogramas"
+        android:layout_centerInParent="true"
+        android:layout_width="@dimen/dialog_histogramas_ancho"
+        android:layout_height="@dimen/dialog_histogramas_altura"
+        android:orientation="vertical"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/dialog_height_title"
+            android:background="@color/colorPrimary"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/dialog_histogramas_titulo"
+                android:textColor="@color/White"
+                android:textSize="@dimen/dialog_histogramas_titulo"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/dialog_histogramas_buttons"
+                android:orientation="vertical"
+                android:weightSum="2"
+                >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/dialog_histogramas_titulo_original"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_histogramas_subtitulo_original"
+                        android:layout_centerHorizontal="true"
+                        android:textColor="@android:color/black"
+                        android:textSize="@dimen/dialog_histogramas_subtitulo"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@+id/dialog_histogramas_titulo_original"
+                        android:weightSum="2"
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <ImageView
+                                android:id="@+id/dialog_histogramas_img_original"
+                                android:layout_width="@dimen/dialog_histogramas_ancho_imagenes"
+                                android:layout_height="@dimen/dialog_histogramas_altura_imagenes"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/icon_hist"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <ImageView
+                                android:id="@+id/dialog_histogramas_hist_original"
+                                android:layout_width="@dimen/dialog_histogramas_ancho_imagenes"
+                                android:layout_height="@dimen/dialog_histogramas_altura_imagenes"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/icon_hist"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/dialog_histogramas_titulo_bn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_histogramas_subtitulo_bn"
+                        android:layout_centerHorizontal="true"
+                        android:textColor="@android:color/black"
+                        android:textSize="@dimen/dialog_histogramas_subtitulo"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@+id/dialog_histogramas_titulo_bn"
+                        android:weightSum="2"
+                        android:orientation="horizontal">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <ImageView
+                                android:id="@+id/dialog_histogramas_img_bn"
+                                android:layout_width="@dimen/dialog_histogramas_ancho_imagenes"
+                                android:layout_height="@dimen/dialog_histogramas_altura_imagenes"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/icon_hist"/>
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1">
+
+                            <ImageView
+                                android:id="@+id/dialog_histogramas_hist_bn"
+                                android:layout_width="@dimen/dialog_histogramas_ancho_imagenes"
+                                android:layout_height="@dimen/dialog_histogramas_altura_imagenes"
+                                android:layout_centerInParent="true"
+                                android:src="@drawable/icon_hist"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/dialog_histogramas_buttons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                >
+
+                <Button
+                    android:id="@+id/dialog_histogramas_btn_aceptar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dialog_histogramas_texto_botones"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:text="@string/dialog_aceptar"
+                    android:layout_alignParentRight="true"
+                    android:textColor="@color/colorPrimary"/>
+                <Button
+                    android:id="@+id/dialog_histogramas_btn_cancelar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/dialog_histogramas_texto_botones"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:text="@string/dialog_cancelar"
+                    android:layout_toLeftOf="@+id/dialog_histogramas_btn_aceptar"
+                    android:textColor="@color/colorPrimary"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</RelativeLayout>

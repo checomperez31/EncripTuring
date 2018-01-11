@@ -56,4 +56,13 @@
     <string name="save_keys">SAVE</string>
     <string name="msg_key_1">Encryption key</string>
     <string name="msg_key_2">Decryption key</string>
+
+    <!-- Dialog Histogramas -->
+    <string name="dialog_histogramas_titulo">Histograms</string>
+    <string name="dialog_histogramas_subtitulo_original">Original Frame</string>
+    <string name="dialog_histogramas_subtitulo_bn">Black and White Frame</string>
+
+    <!-- Fragment Video -->
+    <string name="fragment_video_name">Video Name</string>
+    <string name="fragment_video_size">Video Size</string>
 </resources>

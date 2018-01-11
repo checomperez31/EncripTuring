@@ -19,11 +19,13 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -31,6 +33,7 @@ import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -63,7 +66,7 @@ public class FragmentVideo extends Fragment {
     private EditText editTitulo, editSize;
     private TextInputEditText startText, endText;
     private float density;
-    private ImageButton playButton, rewindButton, ffwdButton;
+    private ImageButton playButton, rewindButton, ffwdButton, histButton;
     private WaveformView waveformView;
     private TextView info;
     private MarkerView startMarker, endMarker;
@@ -111,6 +114,7 @@ public class FragmentVideo extends Fragment {
         info = view.findViewById(R.id.fragment_video_info);
         startMarker = view.findViewById(R.id.fragment_video_startmarker);
         endMarker = view.findViewById(R.id.fragment_video_endmarker);
+        histButton = view.findViewById(R.id.fragment_video_btn_histogramas);
         return view;
     }
     /**
@@ -138,10 +142,18 @@ public class FragmentVideo extends Fragment {
                         mc = new MediaController(getActivity());
                         //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
                         //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
-                        reproductor.setMediaController(mc);
-                        mc.setAnchorView(reproductor);
+                        /*reproductor.setMediaController(mc);
+                        mc.setAnchorView(reproductor);*/
                     }
                 });
+            }
+        });
+
+        histButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHistogramas dialogHistogramas = new DialogHistogramas(context);
+                dialogHistogramas.show();
             }
         });
     }
@@ -263,16 +275,13 @@ public class FragmentVideo extends Fragment {
         if (dataOfFile != null){
             Log.i("IF", "Entra al 2do if " + dataOfFile);
             File file = new File(dataOfFile);
-            reproductor.setVideoURI(Uri.parse(dataOfFile));
-            reproductor.start();
-            reproductor.requestFocus();
-            graficaOriginal = new FragmentVideo.GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker, editTitulo, editSize);
+            graficaOriginal = new FragmentVideo.GraficaSonido(density, startText, endText, playButton, rewindButton, ffwdButton, waveformView, info, startMarker, endMarker, editTitulo, editSize, reproductor, dataOfFile);
             graficaOriginal.setmFile(file);
             graficaOriginal.generarGrafica();
         }
     }
 
-    private class GraficaSonido implements com.turing.encripturing.MarkerView.MarkerListener, WaveformView.WaveformListener{
+    private class GraficaSonido implements com.turing.encripturing.MarkerView.MarkerListener, WaveformView.WaveformListener, VideoView.OnTouchListener{
         private FragmentVideo.GraficaSonido.BecomingNoisyReceiver myNoisyAudioStreamReceiver;
         private IntentFilter intentFilter;
 
@@ -324,17 +333,23 @@ public class FragmentVideo extends Fragment {
         private int mMarkerBottomOffset;
 
         private EditText mTitulo, mSize;
+        private CustomVideoView mReproductor;
+        private String mDataOfFile;
 
         private Thread mLoadSoundFileThread;
 
 
         public GraficaSonido(float mDensity, TextInputEditText mStartText, TextInputEditText mEndText, ImageButton mPlayButton, ImageButton mRewindButton, ImageButton mFfwdButton,
-                             WaveformView mWaveformView, TextView mInfo, MarkerView mStartMarker, MarkerView mEndMarker, EditText titulo, EditText size){
+                             WaveformView mWaveformView, TextView mInfo, MarkerView mStartMarker, MarkerView mEndMarker, EditText titulo, EditText size, CustomVideoView mReproductor,
+                             String dataOfFile){
             intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
             myNoisyAudioStreamReceiver = new FragmentVideo.GraficaSonido.BecomingNoisyReceiver();
 
             mTitulo = titulo;
             mSize = size;
+            this.mReproductor = mReproductor;
+            this.mReproductor.setOnTouchListener(this);
+            this.mDataOfFile = dataOfFile;
 
             //Wave form
             mPlayer = null;
@@ -392,6 +407,8 @@ public class FragmentVideo extends Fragment {
 
 
             mHandler.postDelayed(mTimerRunnable, 200);
+
+            mWaveformView.mUnselectedBkgndLinePaint.setColor(ContextCompat.getColor(context, R.color.waveform_unselected_bkgnd_overlay_transparent));
         }
 
         public void setmFile(File mFile){
@@ -461,6 +478,14 @@ public class FragmentVideo extends Fragment {
                             return;
                         }
                         mPlayer = new SamplePlayer(mSoundFile);
+                        mHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mReproductor.setVideoURI(Uri.parse(mDataOfFile));
+                            }
+                        });
+
+
                     } catch (final Exception e) {
                         mProgressDialog.dismiss();
                         e.printStackTrace();
@@ -585,6 +610,7 @@ public class FragmentVideo extends Fragment {
         private synchronized void handlePause() {
             if (mPlayer != null && mPlayer.isPlaying()) {
                 mPlayer.pause();
+                mReproductor.pause();
             }
             mWaveformView.setPlayback(-1);
             mIsPlaying = false;
@@ -592,6 +618,7 @@ public class FragmentVideo extends Fragment {
         }
 
         private void enableDisableButtons() {
+
             if (mIsPlaying) {
                 mPlayButton.setImageResource(R.drawable.ic_media_stop);
             } else {
@@ -903,6 +930,7 @@ public class FragmentVideo extends Fragment {
                     if (seekMsec >= mPlayStartMsec &&
                             seekMsec < mPlayEndMsec) {
                         mPlayer.seekTo(seekMsec);
+                        mReproductor.seekTo(seekMsec);
                     } else {
                         handlePause();
                     }
@@ -942,8 +970,11 @@ public class FragmentVideo extends Fragment {
                 mIsPlaying = true;
 
                 mPlayer.seekTo(mPlayStartMsec);
+                mReproductor.seekTo(mPlayStartMsec);
                 context.registerReceiver(myNoisyAudioStreamReceiver, intentFilter);
                 mPlayer.start();//Se comienza a reproducir el audio
+                mReproductor.start();
+                mReproductor.requestFocus();//Se comienza a reproducir el video
                 updateDisplay();
                 enableDisableButtons();
             } catch (Exception e) {
@@ -1006,6 +1037,7 @@ public class FragmentVideo extends Fragment {
                     if (newPos < mPlayStartMsec)
                         newPos = mPlayStartMsec;
                     mPlayer.seekTo(newPos);
+                    mReproductor.seekTo(newPos);
                 } else {
                     mStartMarker.requestFocus();
                     markerFocus(mStartMarker);
@@ -1020,12 +1052,29 @@ public class FragmentVideo extends Fragment {
                     if (newPos > mPlayEndMsec)
                         newPos = mPlayEndMsec;
                     mPlayer.seekTo(newPos);
+                    mReproductor.seekTo(newPos);
                 } else {
                     mEndMarker.requestFocus();
                     markerFocus(mEndMarker);
                 }
             }
         };
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if(mWaveformView.getVisibility() == View.GONE){
+                mWaveformView.setVisibility(View.VISIBLE);
+                mStartMarker.setVisibility(View.VISIBLE);
+                mEndMarker.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                mWaveformView.setVisibility(View.GONE);
+                mStartMarker.setVisibility(View.GONE);
+                mEndMarker.setVisibility(View.GONE);
+            }
+            return false;
+        }
 
 
         private class BecomingNoisyReceiver extends BroadcastReceiver {

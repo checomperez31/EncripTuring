@@ -11,6 +11,7 @@
     <color name="waveform_selected">#42b2a6</color>
     <color name="waveform_unselected">#20a294</color>
     <color name="waveform_unselected_bkgnd_overlay">#00776a</color>
+    <color name="waveform_unselected_bkgnd_overlay_transparent">#7000776a</color>
     <color name="selection_border">#1043a0</color>
     <color name="playback_indicator">#1bc800</color>
     <color name="grid_line">#072763</color>

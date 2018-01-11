@@ -20,4 +20,14 @@
     <dimen name="dialog_margen_llave">8dp</dimen>
 
     <dimen name="edt_fragment_keys">19sp</dimen>
+
+    <dimen name="fragment_video_altura_video">100dp</dimen>
+
+    <dimen name="dialog_histogramas_altura">800dp</dimen>
+    <dimen name="dialog_histogramas_ancho">280dp</dimen>
+    <dimen name="dialog_histogramas_titulo">25sp</dimen>
+    <dimen name="dialog_histogramas_subtitulo">12sp</dimen>
+    <dimen name="dialog_histogramas_altura_imagenes">70dp</dimen>
+    <dimen name="dialog_histogramas_ancho_imagenes">70dp</dimen>
+    <dimen name="dialog_histogramas_texto_botones">12sp</dimen>
 </resources>

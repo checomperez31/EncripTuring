@@ -16,4 +16,12 @@
     <dimen name="texto_boton_dialog_llaves">18sp</dimen>
     <dimen name="ancho_dialog_llaves">240dp</dimen>
     <dimen name="dialog_margen_llave">13dp</dimen>
+
+    <dimen name="dialog_histogramas_altura">830dp</dimen>
+    <dimen name="dialog_histogramas_ancho">400dp</dimen>
+    <dimen name="dialog_histogramas_titulo">27sp</dimen>
+    <dimen name="dialog_histogramas_subtitulo">18sp</dimen>
+    <dimen name="dialog_histogramas_altura_imagenes">145dp</dimen>
+    <dimen name="dialog_histogramas_ancho_imagenes">145dp</dimen>
+    <dimen name="dialog_histogramas_texto_botones">18sp</dimen>
 </resources>

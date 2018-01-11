@@ -16,4 +16,22 @@
     <dimen name="texto_boton_dialog_llaves">15sp</dimen>
     <dimen name="ancho_dialog_llaves">210dp</dimen>
     <dimen name="dialog_margen_llave">10dp</dimen>
+
+    <dimen name="fragment_video_altura_video">400dp</dimen>
+    <dimen name="fragment_video_altura_grafica">160dp</dimen>
+    <dimen name="fragment_video_altura_tiempos">55dp</dimen>
+    <dimen name="fragment_video_ancho_tiempos">55dp</dimen>
+    <dimen name="fragment_video_altura_tiempos_textos">14sp</dimen>
+    <dimen name="fragment_video_altura_herramientas_reproduccion">60dp</dimen>
+    <dimen name="fragment_video_altura_boton_reproduccion">55dp</dimen>
+    <dimen name="fragment_video_ancho_boton_reproduccion">65dp</dimen>
+    <dimen name="fragment_video_size_texto_descripcion">17sp</dimen>
+
+    <dimen name="dialog_histogramas_altura">900dp</dimen>
+    <dimen name="dialog_histogramas_ancho">450dp</dimen>
+    <dimen name="dialog_histogramas_titulo">28sp</dimen>
+    <dimen name="dialog_histogramas_subtitulo">18sp</dimen>
+    <dimen name="dialog_histogramas_altura_imagenes">150dp</dimen>
+    <dimen name="dialog_histogramas_ancho_imagenes">160dp</dimen>
+    <dimen name="dialog_histogramas_texto_botones">18sp</dimen>
 </resources>
