@@ -1,0 +1,221 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.turing.encripturing.FragmentVideo">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="500dp"
+                    android:background="@color/colorPrimaryTr">
+                    <com.turing.encripturing.CustomVideoView
+                        android:id="@+id/fragment_video_reproductor"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        />
+
+                    <RelativeLayout
+                        android:id="@+id/fragment_video_grafica_noenc"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_alignParentBottom="true">
+
+                        <com.turing.encripturing.WaveformView
+                            android:id="@+id/fragment_video_waveform"
+                            android:layout_width="fill_parent"
+                            android:layout_height="fill_parent"
+                            android:background="@color/background_wave_transparent"/>
+
+                        <com.turing.encripturing.MarkerView
+                            android:id="@+id/fragment_video_startmarker"
+                            android:nextFocusDown="@+id/endmarker"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/marker_left"
+                            android:contentDescription="@string/start_marker" />
+
+                        <com.turing.encripturing.MarkerView
+                            android:id="@+id/fragment_video_endmarker"
+                            android:nextFocusUp="@+id/startmarker"
+                            android:nextFocusDown="@+id/info"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/marker_right"
+                            android:contentDescription="@string/end_marker" />
+
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/fragment_video_info"
+                        android:nextFocusUp="@+id/fragment_video_endmarker"
+                        android:nextFocusDown="@+id/fragment_video_play"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/AudioFileInfoOverlayText"
+                        android:gravity="center" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/herramientas_reproduccion_altura"
+                        >
+
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/fragment_video_starttext"
+                            android:textSize="@dimen/texto_altura"
+                            android:inputType="number|numberDecimal"
+                            android:layout_width="@dimen/edit_text_reproduccion_ancho"
+                            android:layout_height="@dimen/edit_text_reproduccion_altura"
+                            android:layout_centerVertical="true"
+                            android:layout_toLeftOf="@+id/fragment_video_rew"
+                            android:text="0.0"
+                            android:textAlignment="center"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/fragment_video_rew"
+                            style="@android:style/MediaButton"
+                            android:contentDescription="Rewind"
+                            android:src="@drawable/ic_media_backward"
+                            android:tint="@color/colorPrimary"
+                            android:scaleType="centerInside"
+                            android:layout_toLeftOf="@+id/fragment_video_play"
+                            android:layout_centerVertical="true"
+                            android:layout_height="@dimen/boton_reproduccion_altura"
+                            android:layout_width="@dimen/boton_reproduccion_ancho"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/fragment_video_play"
+                            style="@android:style/MediaButton"
+                            android:contentDescription="Play"
+                            android:src="@drawable/ic_media_play"
+                            android:tint="@color/colorPrimary"
+                            android:scaleType="centerInside"
+                            android:layout_centerInParent="true"
+                            android:layout_height="@dimen/boton_reproduccion_altura"
+                            android:layout_width="@dimen/boton_reproduccion_ancho"
+                            />
+
+                        <ImageButton
+                            android:id="@+id/fragment_video_ffwd"
+                            style="@android:style/MediaButton"
+                            android:contentDescription="FastForward"
+                            android:src="@drawable/ic_media_forward"
+                            android:tint="@color/colorPrimary"
+                            android:scaleType="centerInside"
+                            android:layout_toRightOf="@+id/fragment_video_play"
+                            android:layout_centerVertical="true"
+                            android:layout_height="@dimen/boton_reproduccion_altura"
+                            android:layout_width="@dimen/boton_reproduccion_ancho"
+                            />
+                        <android.support.design.widget.TextInputEditText
+                            android:id="@+id/fragment_video_endtext"
+                            android:textSize="@dimen/texto_altura"
+                            android:inputType="number|numberDecimal"
+                            android:layout_width="@dimen/edit_text_reproduccion_ancho"
+                            android:layout_height="@dimen/edit_text_reproduccion_altura"
+                            android:layout_centerVertical="true"
+                            android:layout_toRightOf="@+id/fragment_video_ffwd"
+                            android:text="0.0"
+                            android:textAlignment="center"
+                            />
+
+                    </RelativeLayout>
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/fragment_video_til_titulo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <EditText
+                                android:id="@+id/fragment_video_edit_titulo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:lines="1"
+                                android:hint="@string/nombre_sonido"
+                                android:textSize="@dimen/texto_altura"
+                                />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <android.support.design.widget.TextInputLayout
+                            android:id="@+id/fragment_video_til_tam"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <EditText
+                                android:id="@+id/fragment_video_edit_tam"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:lines="1"
+                                android:hint="@string/tam_sonido"
+                                android:textSize="@dimen/texto_altura"
+                                />
+                        </android.support.design.widget.TextInputLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <Button
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentRight="true"
+                                android:id="@+id/fragment_video_button_encriptar"
+                                android:text="@string/btn_encriptar"
+                                style="@style/Widget.AppCompat.Button.Borderless"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="@dimen/texto_altura"
+                                />
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+        </ScrollView>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fragment_video_btn_seleccionar_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="21dp"
+            android:layout_marginEnd="21dp"
+            android:layout_marginRight="21dp"
+            android:src="@drawable/add_item"
+            android:tint="@color/White" />
+    </RelativeLayout>
+
+
+
+
+
+</FrameLayout>

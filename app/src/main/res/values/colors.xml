@@ -17,4 +17,5 @@
     <color name="timecode">#ddffffdd</color>
     <color name="timecode_shadow">#ffffff</color>
     <color name = "background_wave">#009686</color>
+    <color name = "background_wave_transparent">#50009686</color>
 </resources>

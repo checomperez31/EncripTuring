@@ -43,18 +43,21 @@ import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class Turing extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, FragmentSonido.OnFragmentInteractionListener, FragmentImagenes.OnFragmentInteractionListener, KeysFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, FragmentSonido.OnFragmentInteractionListener, FragmentImagenes.OnFragmentInteractionListener, FragmentVideo.OnFragmentInteractionListener,KeysFragment.OnFragmentInteractionListener {
 
     private VideoView reproductor;
     private int posicionVideo;
     private FragmentSonido fragmentSonido;
     private FragmentImagenes fragmentImagenes;
+    private FragmentVideo fragmentVideo;
     private KeysFragment fragmentKeys;
     private View vistaPrincipal;
     private final int MY_PERMISSIONS = 100;
     private final int SELECT_PICTURE = 200;
     private final int SELECT_VIDEO = 201;
     private final int GRABAR_VIDEO = 202;
+    private final int SELECT_VIDEO_FV = 301;
+    private final int GRABAR_VIDEO_FV = 302;
     public final String TAG = "MECT";
 
     static {
@@ -108,6 +111,7 @@ public class Turing extends AppCompatActivity
 
         fragmentSonido = new FragmentSonido();
         fragmentImagenes = new FragmentImagenes();
+        fragmentVideo = new FragmentVideo();
         fragmentKeys = new KeysFragment();
 
         getSupportFragmentManager().beginTransaction().add(R.id.FragmentContent, fragmentSonido).commit();
@@ -167,7 +171,7 @@ public class Turing extends AppCompatActivity
         }
         else if (id == R.id.nav_video)
         {
-
+            transaction.replace(R.id.FragmentContent, fragmentVideo, "FRAMENT_VIDEO");
         }
         else if (id == R.id.nav_keys){
             transaction.replace(R.id.FragmentContent, fragmentKeys, "FRAGMENT_KEYS");
@@ -264,6 +268,10 @@ public class Turing extends AppCompatActivity
                 case GRABAR_VIDEO:
                     Uri pathVG = data.getData();
                     fragmentImagenes.obtenerVideo(pathVG);
+                    break;
+                case SELECT_VIDEO_FV:
+                    Uri pathVideo = data.getData();
+                    fragmentVideo.obtenerVideo(pathVideo);
                     break;
             }
         }
