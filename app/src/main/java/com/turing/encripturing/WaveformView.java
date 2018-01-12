@@ -128,13 +128,13 @@ public class WaveformView extends View {
             context,
             new ScaleGestureDetector.SimpleOnScaleGestureListener() {
                 public boolean onScaleBegin(ScaleGestureDetector d) {
-                    Log.v("Ringdroid", "ScaleBegin " + d.getCurrentSpanX());
+                    Log.v("Encripturing", "ScaleBegin " + d.getCurrentSpanX());
                     mInitialScaleSpan = Math.abs(d.getCurrentSpanX());
                     return true;
                 }
                 public boolean onScale(ScaleGestureDetector d) {
                     float scale = Math.abs(d.getCurrentSpanX());
-                    Log.v("Ringdroid", "Scale " + (scale - mInitialScaleSpan));
+                    Log.v("Encripturing", "Scale " + (scale - mInitialScaleSpan));
                     if (scale - mInitialScaleSpan > 40) {
                         mListener.waveformZoomIn();
                         mInitialScaleSpan = scale;
@@ -146,7 +146,7 @@ public class WaveformView extends View {
                     return true;
                 }
                 public void onScaleEnd(ScaleGestureDetector d) {
-                    Log.v("Ringdroid", "ScaleEnd " + d.getCurrentSpanX());
+                    Log.v("Encripturing", "ScaleEnd " + d.getCurrentSpanX());
                 }
             }
         );
@@ -340,6 +340,7 @@ public class WaveformView extends View {
         if (width > measuredWidth)
             width = measuredWidth;
 
+
         // Draw grid
         double onePixelInSecs = pixelsToSeconds(1);
         boolean onlyEveryFiveSecs = (onePixelInSecs > 1.0 / 50.0);
@@ -527,29 +528,46 @@ public class WaveformView extends View {
         mZoomFactorByZoomLevel = new double[5];
         mValuesByZoomLevel = new double[5][];
 
-        // Level 0 is doubled, with interpolated values
-        mLenByZoomLevel[0] = numFrames * 2;
-        mZoomFactorByZoomLevel[0] = 2.0;
+        // Level 0 is 4th, with interpolated values
+        mLenByZoomLevel[0] = numFrames * 4;
+        mZoomFactorByZoomLevel[0] = 4.0;
         mValuesByZoomLevel[0] = new double[mLenByZoomLevel[0]];
         if (numFrames > 0) {
             mValuesByZoomLevel[0][0] = 0.5 * heights[0];
             mValuesByZoomLevel[0][1] = heights[0];
+            mValuesByZoomLevel[0][2] = heights[0];
+            mValuesByZoomLevel[0][3] = 0.5 * heights[0];
         }
         for (int i = 1; i < numFrames; i++) {
-            mValuesByZoomLevel[0][2 * i] = 0.5 * (heights[i - 1] + heights[i]);
-            mValuesByZoomLevel[0][2 * i + 1] = heights[i];
+            mValuesByZoomLevel[0][4 * i] = 0.5 * (heights[i - 1] + heights[i]);
+            mValuesByZoomLevel[0][4 * i + 1] = heights[i];
+            mValuesByZoomLevel[0][4 * i + 2] = heights[i];
+            mValuesByZoomLevel[0][4 * i + 3] = 0.5 * (heights[i - 1] + heights[i]);
         }
 
-        // Level 1 is normal
-        mLenByZoomLevel[1] = numFrames;
+        // Level 1 is doubled, with interpolated values
+        mLenByZoomLevel[1] = numFrames * 2;
+        mZoomFactorByZoomLevel[1] = 2.0;
         mValuesByZoomLevel[1] = new double[mLenByZoomLevel[1]];
-        mZoomFactorByZoomLevel[1] = 1.0;
-        for (int i = 0; i < mLenByZoomLevel[1]; i++) {
-            mValuesByZoomLevel[1][i] = heights[i];
+        if (numFrames > 0) {
+            mValuesByZoomLevel[1][0] = 0.5 * heights[0];
+            mValuesByZoomLevel[1][1] = heights[0];
+        }
+        for (int i = 1; i < numFrames; i++) {
+            mValuesByZoomLevel[1][2 * i] = 0.5 * (heights[i - 1] + heights[i]);
+            mValuesByZoomLevel[1][2 * i + 1] = heights[i];
+        }
+
+        // Level 2 is normal
+        mLenByZoomLevel[2] = numFrames;
+        mValuesByZoomLevel[2] = new double[mLenByZoomLevel[2]];
+        mZoomFactorByZoomLevel[2] = 1.0;
+        for (int i = 0; i < mLenByZoomLevel[2]; i++) {
+            mValuesByZoomLevel[2][i] = heights[i];
         }
 
         // 3 more levels are each halved
-        for (int j = 2; j < 5; j++) {
+        for (int j = 3; j < 5; j++) {
             mLenByZoomLevel[j] = mLenByZoomLevel[j - 1] / 2;
             mValuesByZoomLevel[j] = new double[mLenByZoomLevel[j]];
             mZoomFactorByZoomLevel[j] = mZoomFactorByZoomLevel[j - 1] / 2.0;
@@ -559,16 +577,19 @@ public class WaveformView extends View {
                            mValuesByZoomLevel[j - 1][2 * i + 1]);
             }
         }
-
+        Log.i("Frames", "" + numFrames);
         if (numFrames > 5000) {
+            mZoomLevel = 4;
+        } else if (numFrames > 2000) {
             mZoomLevel = 3;
-        } else if (numFrames > 1000) {
+        } else if (numFrames > 500) {
             mZoomLevel = 2;
-        } else if (numFrames > 300) {
+        } else if (numFrames > 300){
             mZoomLevel = 1;
-        } else {
+        }else{
             mZoomLevel = 0;
         }
+        Log.i("ZoomLvl", "" + mZoomLevel);
 
         mInitialized = true;
     }
