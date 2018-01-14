@@ -39,10 +39,15 @@ import android.widget.VideoView;
 
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
+import org.jcodec.api.SequenceEncoder;
 import org.jcodec.common.AndroidUtil;
+import org.jcodec.common.DemuxerTrack;
+import org.jcodec.common.DemuxerTrackMeta;
 import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.model.Frame;
 import org.jcodec.common.model.Picture;
+import org.jcodec.containers.mp4.demuxer.MP4Demuxer;
+import org.jcodec.scale.BitmapUtil;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
@@ -239,8 +244,10 @@ public class FragmentImagenes extends Fragment {
                     public void onDismiss(DialogInterface dialogInterface) {
                         if(!dialogLlaves.getCancelled()){
                             DatosEncriptar datos = DatosEncriptar.getInstance();
-                            if(datos.getLlave() != null){
+                            if(datos.getLlave() != null && frames!=null){
                                 encriptarFramesThread();
+                            }else{
+                                Toast.makeText(getActivity(), "No has obtenido los frames de un video",Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
@@ -719,6 +726,18 @@ public class FragmentImagenes extends Fragment {
                 @Override
                 public void run() {
                     imgFrames.setImageBitmap(frames[0]);
+                    /*File file = new File("storage/emulated/0/ENC/videoPrueba.mp4");
+                    try{
+
+                        SequenceEncoder enc = SequenceEncoder.createSequenceEncoder(file,30);
+                        for(int i=0; i<frames.length; i++){
+                            Picture frameTmp = BitmapUtil.fromBitmap(frames[i]);
+                            enc.encodeNativeFrame(frameTmp);
+                        }
+                    }catch (IOException ioe){
+                        Log.i("GENERACION VIDEO", ioe.toString());
+                    }*/
+
                     numberOfFramesEncriptados = 0;
                 }
             });
@@ -851,7 +870,7 @@ public class FragmentImagenes extends Fragment {
     public void encriptarFramesThread(){
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setCancelable(true);
+        progressDialog.setCancelable(false);
         progressDialog.setTitle("Encriptando/Desencriptando Frames ");
         new Thread(){
             @Override
