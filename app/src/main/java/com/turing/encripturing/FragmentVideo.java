@@ -28,6 +28,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.MediaController;
@@ -57,6 +58,7 @@ public class FragmentVideo extends Fragment {
 
     private FloatingActionButton btnSeleccionarVideo;
     private CustomVideoView reproductor;
+    private Button btnEncripttar;
 
     private String dataOfFile = null;
     private FragmentVideo.GraficaSonido graficaOriginal;
@@ -115,6 +117,7 @@ public class FragmentVideo extends Fragment {
         startMarker = view.findViewById(R.id.fragment_video_startmarker);
         endMarker = view.findViewById(R.id.fragment_video_endmarker);
         histButton = view.findViewById(R.id.fragment_video_btn_histogramas);
+        btnEncripttar = view.findViewById(R.id.fragment_video_button_encriptar);
         return view;
     }
     /**
@@ -154,6 +157,14 @@ public class FragmentVideo extends Fragment {
             public void onClick(View view) {
                 DialogHistogramas dialogHistogramas = new DialogHistogramas(context);
                 dialogHistogramas.show();
+            }
+        });
+
+        btnEncripttar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogProgress dp = new DialogProgress(context);
+                dp.show();
             }
         });
     }
@@ -289,7 +300,7 @@ public class FragmentVideo extends Fragment {
         private long mLoadingLastUpdateTime;
         private boolean mLoadingKeepGoing;
         private boolean mFinishActivity;
-        private ProgressDialog mProgressDialog;
+        private DialogProgress mProgressDialog;
         private SoundFile mSoundFile;
         private File mFile;
         private WaveformView mWaveformView;
@@ -426,8 +437,7 @@ public class FragmentVideo extends Fragment {
             mLoadingLastUpdateTime = getCurrentTime();
             mLoadingKeepGoing = true;
             mFinishActivity = false;
-            mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog = new DialogProgress(getActivity());
             mProgressDialog.setTitle(R.string.dialog_cargando_audio);
             mProgressDialog.setCancelable(true);
             mProgressDialog.setOnCancelListener(
@@ -441,11 +451,19 @@ public class FragmentVideo extends Fragment {
 
             final SoundFile.ProgressListener listener =
                     new SoundFile.ProgressListener() {
-                        public boolean reportProgress(double fractionComplete) {
+                        public boolean reportProgress(final double fractionComplete) {
                             long now = getCurrentTime();
                             if (now - mLoadingLastUpdateTime > 100) {
-                                mProgressDialog.setProgress(
-                                        (int) (mProgressDialog.getMax() * fractionComplete));
+                                final int progress = (int) (100 * fractionComplete * 4);
+                                if (progress > mProgressDialog.getProgress()){
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mProgressDialog.setProgress(progress);
+                                            Log.i("Fraction", fractionComplete + "");
+                                        }
+                                    });
+                                }
                                 mLoadingLastUpdateTime = now;
                             }
                             return mLoadingKeepGoing;
