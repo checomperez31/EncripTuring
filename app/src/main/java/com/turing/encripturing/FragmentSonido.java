@@ -1525,6 +1525,7 @@ public class FragmentSonido extends Fragment{
             mEndPos = mWaveformView.getEnd();
             mMaxPos = mWaveformView.maxPos();
             mOffset = mWaveformView.getOffset();
+            Log.i("Zoom", mOffset + " " + mOffsetGoal);
             mOffsetGoal = mOffset;
             updateDisplay();
         }
@@ -1601,8 +1602,9 @@ public class FragmentSonido extends Fragment{
             mOffsetGoal = 0;
             mFlingVelocity = 0;
             resetPositions();
-            if (mEndPos > mMaxPos)
-                mEndPos = mMaxPos;
+            /*if (mEndPos > mMaxPos)
+                mEndPos = mMaxPos;*/
+            mEndPos = mMaxPos;
 
             mCaption =
                     mSoundFile.getFiletype() + ", " +

@@ -486,6 +486,7 @@ public class FragmentVideo extends Fragment {
                         });
 
 
+
                     } catch (final Exception e) {
                         mProgressDialog.dismiss();
                         e.printStackTrace();
@@ -1103,8 +1104,9 @@ public class FragmentVideo extends Fragment {
             mOffsetGoal = 0;
             mFlingVelocity = 0;
             resetPositions();
-            if (mEndPos > mMaxPos)
-                mEndPos = mMaxPos;
+            /*if (mEndPos > mMaxPos)
+                mEndPos = mMaxPos;*/
+            mEndPos = mMaxPos;
 
             mCaption =
                     mSoundFile.getFiletype() + ", " +
