@@ -33,6 +33,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException;
+
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
@@ -118,6 +122,32 @@ public class Turing extends AppCompatActivity
 
 
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_2_0, this, mLoaderCallBack);
+        FFmpeg ffmpeg = FFmpeg.getInstance(this);
+        try{
+            ffmpeg.loadBinary(new LoadBinaryResponseHandler(){
+                @Override
+                public void onStart(){
+                    Log.i("FFMPEG", "Inició la carga de binarios");
+                }
+
+                @Override
+                public void onFailure(){
+                    Log.i("FFMPEG", "Falló la carga de binarios");
+                }
+
+                @Override
+                public void onSuccess(){
+                    Log.i("FFMPEG", "Terminó con éxito la carga de binarios");
+                }
+
+                @Override
+                public void onFinish(){
+                    Log.i("FFMPEG", "Terminó la carga de binarios");
+                }
+            });
+        }catch (FFmpegNotSupportedException e){
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -61,14 +61,17 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 
 
 /**
@@ -716,6 +719,15 @@ public class FragmentImagenes extends Fragment {
         }
     }
 
+    public static String getFechaActual(){
+        Date ahora = new Date();
+        SimpleDateFormat formateador = new SimpleDateFormat("yyyyMMDDhhmmss");
+        return formateador.format(ahora);
+    }
+
+    public static void generatVideo(){
+    }
+
     public static void reportProgressFramesEncriptados(){
         Log.i("PROGRESO", Integer.toString(numberOfFramesEncriptados) + "=" + Integer.toString((numberOfFramesEncriptados * 100)/FragmentImagenes.frames.length));
         numberOfFramesEncriptados++;
@@ -726,22 +738,31 @@ public class FragmentImagenes extends Fragment {
                 @Override
                 public void run() {
                     imgFrames.setImageBitmap(frames[0]);
-                    /*File file = new File("storage/emulated/0/ENC/videoPrueba.mp4");
-                    try{
-
-                        SequenceEncoder enc = SequenceEncoder.createSequenceEncoder(file,30);
-                        for(int i=0; i<frames.length; i++){
-                            Picture frameTmp = BitmapUtil.fromBitmap(frames[i]);
-                            enc.encodeNativeFrame(frameTmp);
-                        }
-                    }catch (IOException ioe){
-                        Log.i("GENERACION VIDEO", ioe.toString());
-                    }*/
-
+                    crearDirectorio();
                     numberOfFramesEncriptados = 0;
                 }
             });
 
+        }
+    }
+
+    public static void crearDirectorio(){
+        FileOutputStream fos = null;
+        for(int i=0; i<frames.length; i++){
+            File file = new File("storage/emulated/0/ENC/tmp/img00"+ (i+1) + ".jpeg");
+            Bitmap bmTMP = frames[i];
+            try{
+                if(file.exists()){
+                    file.delete();
+                }
+                fos = new FileOutputStream(file);
+                bmTMP.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.flush();
+                fos.close();
+            }
+            catch (IOException ioe){
+                ioe.printStackTrace();
+            }
         }
     }
 
