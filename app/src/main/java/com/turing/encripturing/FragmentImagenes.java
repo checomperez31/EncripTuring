@@ -238,7 +238,7 @@ public class FragmentImagenes extends Fragment {
         btnEncriptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialogLlaves = new DialogLlaves(context);
+                dialogLlaves = new DialogLlaves(context, 2);
                 dialogLlaves.setModulo(256);
                 dialogLlaves.show();
                 dialogLlaves.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -246,7 +246,7 @@ public class FragmentImagenes extends Fragment {
                     public void onDismiss(DialogInterface dialogInterface) {
                         if(!dialogLlaves.getCancelled()){
                             DatosEncriptar datos = DatosEncriptar.getInstance();
-                            if(datos.getLlave() != null && frames!=null){
+                            if(datos.getLlaveVideo() != null && frames!=null){
                                 encriptarFramesThread();
                             }else{
                                 Toast.makeText(getActivity(), "No has obtenido los frames de un video",Toast.LENGTH_SHORT).show();
@@ -797,10 +797,10 @@ public class FragmentImagenes extends Fragment {
                 DatosEncriptar datos = DatosEncriptar.getInstance();
                 int[][] llave;
                 if(dialogLlaves.getEncrypt()){
-                    llave = datos.getLlave();
+                    llave = datos.getLlaveVideo();
                 }
                 else{
-                    llave = datos.getLlaveDes();
+                    llave = datos.getLlaveDesVideo();
                 }
                 Bitmap bmLocal = SingletonBitmap.getInstance().getBm();
                 frameEncriptado = Bitmap.createBitmap(bmLocal.getWidth(),bm.getHeight(), Bitmap.Config.ARGB_8888);
@@ -950,9 +950,9 @@ public class FragmentImagenes extends Fragment {
             DatosEncriptar datos = DatosEncriptar.getInstance();
             int[][] llave;
             if (dialogLlaves.getEncrypt()) {
-                llave = datos.getLlave();
+                llave = datos.getLlaveVideo();
             } else {
-                llave = datos.getLlaveDes();
+                llave = datos.getLlaveDesVideo();
             }
             for (int o = 0; o < framesAEncriptar.length; o++) {
                 Bitmap bmLocal = framesAEncriptar[o];

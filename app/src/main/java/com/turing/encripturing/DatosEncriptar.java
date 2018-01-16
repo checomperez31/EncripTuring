@@ -6,8 +6,10 @@ package com.turing.encripturing;
 
 public class DatosEncriptar {
     private static DatosEncriptar ourInstance = new DatosEncriptar();
-    int llave[][];
-    int llaveDes[][];
+    int llaveVideo[][];
+    int llaveDesVideo[][];
+    int llaveAudio[][];
+    int llaveDesAudio[][];
 
     public static synchronized DatosEncriptar getInstance() {
         if(ourInstance == null){
@@ -18,11 +20,35 @@ public class DatosEncriptar {
 
     private DatosEncriptar() {}
 
-    public int[][] getLlave(){return llave;}
+    public int[][] getLlaveVideo() {
+        return llaveVideo;
+    }
 
-    public int[][] getLlaveDes(){return llaveDes;}
+    public void setLlaveVideo(int[][] llaveVideo) {
+        this.llaveVideo = llaveVideo;
+    }
 
-    public void setLlave(int[][] llave){this.llave = llave;}
+    public int[][] getLlaveDesVideo() {
+        return llaveDesVideo;
+    }
 
-    public void setLlaveDes(int[][] llaveDes){this.llaveDes = llaveDes;}
+    public void setLlaveDesVideo(int[][] llaveDesVideo) {
+        this.llaveDesVideo = llaveDesVideo;
+    }
+
+    public int[][] getLlaveAudio() {
+        return llaveAudio;
+    }
+
+    public void setLlaveAudio(int[][] llaveAudio) {
+        this.llaveAudio = llaveAudio;
+    }
+
+    public int[][] getLlaveDesAudio() {
+        return llaveDesAudio;
+    }
+
+    public void setLlaveDesAudio(int[][] llaveDesAudio) {
+        this.llaveDesAudio = llaveDesAudio;
+    }
 }
