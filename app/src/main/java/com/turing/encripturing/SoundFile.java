@@ -81,7 +81,6 @@ public class SoundFile {
         }
     }
 
-    // TODO(nfaralli): what is the real list of supported extensions? Is it device dependent?
     public static String[] getSupportedExtensions() {
         return new String[] {"mp3", "wav", "3gpp", "3gp", "amr", "aac", "m4a", "ogg", "mp4"};
     }
@@ -461,7 +460,6 @@ public class SoundFile {
                 mDecodedSamples = mDecodedBytes.asShortBuffer();
                 mDecodedSamples.position(position);
             }
-            // TODO(nfaralli): maybe use the read method that takes a direct ByteBuffer argument.
             audioRecord.read(buffer, 0, buffer.length);
             mDecodedSamples.put(buffer);
             // Let the progress listener know how many seconds have been recorded.

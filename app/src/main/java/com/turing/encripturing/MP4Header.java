@@ -89,7 +89,7 @@ class Atom {  // note: latest versions of spec simply call it 'box' instead of '
 
     public boolean setData(byte[] data) {
         if (mChildren != null || data == null) {
-            // TODO(nfaralli): log something here
+
             return false;
         }
         mData = data;
@@ -103,7 +103,7 @@ class Atom {  // note: latest versions of spec simply call it 'box' instead of '
 
     public boolean addChild(Atom child) {
         if (mData != null || child == null) {
-            // TODO(nfaralli): log something here
+
             return false;
         }
         int numChildren = 1;
@@ -209,7 +209,6 @@ public class MP4Header {
     // Creates a new MP4Header object that should be used to generate an .m4a file header.
     public MP4Header(int sampleRate, int numChannels, int[] frame_size, int bitrate) {
         if (frame_size == null || frame_size.length < 2 || frame_size[0] != 2) {
-            //TODO(nfaralli): log something here
             return;
         }
         mSampleRate = sampleRate;
@@ -539,7 +538,7 @@ public class MP4Header {
         int offset;
         int bufferSize = 0x300;
         while (bufferSize < 2 * mMaxFrameSize) {
-            // TODO(nfaralli): what should be the minimum size of the decoder buffer?
+
             // Should it be a multiple of 256?
             bufferSize += 0x100;
         }
@@ -566,7 +565,6 @@ public class MP4Header {
             }
         }
         if (index == samplingFrequencies.length) {
-            // TODO(nfaralli): log something here.
             // Invalid sampling frequency. Default to 44100Hz...
             index = 4;
         }

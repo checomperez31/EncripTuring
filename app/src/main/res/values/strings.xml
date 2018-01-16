@@ -54,8 +54,11 @@
     <string name="key_example9">22</string>
     <string name="msg_keys">Insert the matrix</string>
     <string name="save_keys">SAVE</string>
-    <string name="msg_key_1">Encryption key</string>
-    <string name="msg_key_2">Decryption key</string>
+    <string name="msg_key_1">Audio Encryption key</string>
+    <string name="msg_key_2">Audio Decryption key</string>
+    <string name="msg_key_3">VIDEO Encryption key</string>
+    <string name="msg_key_4">VIDEO Decryption key</string>
+
 
     <!-- Dialog Histogramas -->
     <string name="dialog_histogramas_titulo">Histograms</string>
