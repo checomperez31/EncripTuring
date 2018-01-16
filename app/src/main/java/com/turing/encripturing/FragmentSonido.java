@@ -95,11 +95,13 @@ public class FragmentSonido extends Fragment{
 
     private File encriptedFile;
 
-    ProgressDialog progressDialog;
+    DialogProgress progressDialog;
 
     private Handler handler;
 
     private Long tiempoAntes, tiempoDespues;
+
+    private int lastProgress = 0;
 
     public FragmentSonido() {
         // Required empty public constructor
@@ -170,6 +172,7 @@ public class FragmentSonido extends Fragment{
         graficaEnc = new GraficaSonido(densityEnc, startTextEnc, endTextEnc, playButtonEnc, rewindButtonEnc, ffwdButtonEnc, waveformViewEnc, infoEnc, startMarkerEnc, endMarkerEnc, editTituloEnc, editSizeEnc);
 
         agregarListeners();
+        progressDialog = null;
         directorioCreado = new File(directorio, RECORD_DIRECTORY).exists();
         if(!directorioCreado) directorioCreado = new File(directorio, RECORD_DIRECTORY).mkdir();
 
@@ -289,14 +292,14 @@ public class FragmentSonido extends Fragment{
         encriptar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialogLlaves = new DialogLlaves(context);
+                dialogLlaves = new DialogLlaves(context, 1);
                 dialogLlaves.show();
                 dialogLlaves.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @Override
                     public void onDismiss(DialogInterface dialogInterface) {
                         if(!dialogLlaves.getCancelled()){
                             DatosEncriptar datos = DatosEncriptar.getInstance();
-                            if(datos.getLlave() != null){
+                            if(datos.getLlaveAudio() != null){
                                 encriptar(dialogLlaves.getEncrypt());
                             }
                         }
@@ -344,25 +347,25 @@ public class FragmentSonido extends Fragment{
     }
 
     private void encriptar(final boolean encrypt){
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        if(encrypt){
+        progressDialog = new DialogProgress(context);
+
+        /*if(encrypt){
             progressDialog.setTitle("Encriptando");
         }
         else
         {
             progressDialog.setTitle("Desencriptando");
         }
-
+*/
         progressDialog.setCancelable(false);
+        progressDialog.show();
         new Thread(){
             @Override
             public void run(){
-
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        progressDialog.show();
+
                         progressDialog.setProgress(0);
                     }
                 });
@@ -371,10 +374,10 @@ public class FragmentSonido extends Fragment{
                 DatosEncriptar datos = DatosEncriptar.getInstance();
                 int[][] llave;
                 if(dialogLlaves.getEncrypt()){
-                    llave = datos.getLlave();
+                    llave = datos.getLlaveAudio();
                 }
                 else{
-                    llave = datos.getLlaveDes();
+                    llave = datos.getLlaveDesAudio();
                     offset = 2;
                 }
                 int[] arreglo = new int[3];
@@ -390,6 +393,7 @@ public class FragmentSonido extends Fragment{
                  */
                 ByteBuffer bufferSonidoOriginal = graficaOriginal.getSoundFile().getDecodedBytes();
                 ByteBuffer otroBuffer = ByteBuffer.allocate(bufferSonidoOriginal.limit());
+                int lastProgress = 0;
                 for(int i = offset; i < bufferSonidoOriginal.limit(); i+=3)
                 {
                     /*if(i%100 == 0 && i < 10000)Log.i("DATOSB", i + "--" + bufferSonidoOriginal.get(i) + "");
@@ -440,9 +444,20 @@ public class FragmentSonido extends Fragment{
 
                     /*if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i) + "");
                     if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 1) + "");
-                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 2) + "");
-                    //Log.i("ENC", i + " [" + arregloEnc[0] + ", " + arregloEnc[1] + ", " + arregloEnc[2] + "]");*/
-                    progressDialog.setProgress((i * 100) / bufferSonidoOriginal.limit());
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 2) + "");*/
+
+                    final int progresoEncriptacion = (i * 100) / bufferSonidoOriginal.limit();
+
+                    if(progresoEncriptacion > lastProgress){
+                        lastProgress = progresoEncriptacion;
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                progressDialog.setProgress(progresoEncriptacion);
+                            }
+                        });
+                    }
 
                 }
                 tiempoDespues = System.currentTimeMillis();
@@ -450,7 +465,6 @@ public class FragmentSonido extends Fragment{
                     @Override
                     public void run() {
                         progressDialog.setTitle("Creando Archivo");
-                        progressDialog.setIndeterminate(true);
                     }
                 });
 
@@ -781,10 +795,19 @@ public class FragmentSonido extends Fragment{
         FileOutputStream outputStream = new FileOutputStream(outputFile);
         outputStream.write(WAVHeader.getWAVHeader(mSampleRate, mChannels, numSamples));
 
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setProgress(0);
+            }
+        });
+
         // Write the samples to the file, 1024 at a time.
         byte buffer[] = new byte[1024 * mChannels * 2];  // Each sample is coded with a short.
         mDecodedBytes.position(startOffset);
         int numBytesLeft = numSamples * mChannels * 2;
+        int lastProgress = 0, contador = 0;
+        Log.i("FILE", "" + numBytesLeft);
         while (numBytesLeft >= buffer.length) {
             if (mDecodedBytes.remaining() < buffer.length) {
                 // This should not happen.
@@ -798,8 +821,20 @@ public class FragmentSonido extends Fragment{
             if (mChannels == 2) {
                 swapLeftRightChannels(buffer);
             }
+            final int progress = (100*contador)/numBytesLeft;
+            if(progress > lastProgress){
+                lastProgress = progress;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.setProgress(progress);
+                    }
+                });
+
+            }
             outputStream.write(buffer);
             numBytesLeft -= buffer.length;
+            contador++;
         }
         if (numBytesLeft > 0) {
             if (mDecodedBytes.remaining() < numBytesLeft) {
@@ -827,7 +862,7 @@ public class FragmentSonido extends Fragment{
         private long mLoadingLastUpdateTime;
         private boolean mLoadingKeepGoing;
         private boolean mFinishActivity;
-        private ProgressDialog mProgressDialog;
+        private DialogProgress mProgressDialog;
         private SoundFile mSoundFile;
         private File mFile;
         private WaveformView mWaveformView;
@@ -956,10 +991,10 @@ public class FragmentSonido extends Fragment{
             mLoadingLastUpdateTime = getCurrentTime();
             mLoadingKeepGoing = true;
             mFinishActivity = false;
-            mProgressDialog = new ProgressDialog(getActivity());
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            mProgressDialog = new DialogProgress(getActivity());
             mProgressDialog.setTitle(R.string.dialog_cargando_audio);
             mProgressDialog.setCancelable(true);
+            mProgressDialog.setProgress(0);
             mProgressDialog.setOnCancelListener(
                     new DialogInterface.OnCancelListener() {
                         public void onCancel(DialogInterface dialog) {
@@ -971,11 +1006,20 @@ public class FragmentSonido extends Fragment{
 
             final SoundFile.ProgressListener listener =
                     new SoundFile.ProgressListener() {
-                        public boolean reportProgress(double fractionComplete) {
+                        public boolean reportProgress(final double fractionComplete) {
                             long now = getCurrentTime();
                             if (now - mLoadingLastUpdateTime > 100) {
-                                mProgressDialog.setProgress(
-                                        (int) (mProgressDialog.getMax() * fractionComplete));
+                                final int progress = (int) (100 * fractionComplete * 4);
+                                if (lastProgress < progress){
+                                    lastProgress = progress;
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mProgressDialog.setProgress(progress);
+                                            Log.i("Fraction", fractionComplete + "");
+                                        }
+                                    });
+                                }
                                 mLoadingLastUpdateTime = now;
                             }
                             return mLoadingKeepGoing;
