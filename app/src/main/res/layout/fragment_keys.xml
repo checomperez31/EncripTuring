@@ -4,6 +4,9 @@
     android:layout_height="match_parent"
     tools:context="com.turing.encripturing.KeysFragment">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -35,6 +38,7 @@
             </RelativeLayout>
         </LinearLayout>
 
+        <!-- Llave audio -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -52,8 +56,8 @@
 
             </RelativeLayout>
 
-
-            <Button
+            <!-- TODO descomentar-->
+            <!--<Button
                 android:id="@+id/btn_guardar_matrices"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
@@ -61,7 +65,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_centerHorizontal="true"
                 android:text="@string/save_keys"
-                android:textSize="14sp" />
+                android:textSize="14sp" />-->
 
             <TextView
                 android:id="@+id/titulo_fragment_keys"
@@ -205,7 +209,7 @@
 
             </RelativeLayout>
 
-            <!-- Llave desencriptado -->
+            <!-- Llave desencriptado AUDIO -->
             <RelativeLayout
                 android:id="@+id/layout_matriz_llaveinv"
                 android:layout_width="match_parent"
@@ -335,10 +339,225 @@
 
             </RelativeLayout>
 
+            <!-- Llave Video-->
+            <RelativeLayout
+                android:id="@+id/layout_matrizVideo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/layout_matriz_llaveinv"
+                android:layout_marginTop="12dp">
+
+
+
+                <EditText
+                    android:id="@+id/edt_keyvid00"
+                    android:layout_toLeftOf="@+id/edt_keyvid01"
+                    android:inputType="number"
+                    android:text="@string/key_example1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys"/>
+
+                <EditText
+                    android:id="@+id/edt_keyvid01"
+                    android:inputType="number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentTop="true"
+                    android:text="@string/key_example1"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+
+                <EditText
+                    android:id="@+id/edt_keyvid02"
+                    android:inputType="number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/edt_keyvid01"
+                    android:layout_alignParentTop="true"
+                    android:text="@string/key_example1"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <!--renglon 2-->
+                <EditText
+                    android:id="@+id/edt_keyvid10"
+                    android:inputType="number"
+                    android:text="@string/key_example4"
+                    android:layout_below="@+id/edt_keyvid00"
+                    android:layout_toLeftOf="@+id/edt_keyvid11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid11"
+                    android:inputType="number"
+                    android:layout_below="@+id/edt_keyvid01"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/key_example5"
+                    android:textSize="@dimen/edt_fragment_keys"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid12"
+                    android:inputType="number"
+                    android:text="@string/key_example6"
+                    android:layout_below="@+id/edt_keyvid02"
+                    android:layout_toRightOf="@+id/edt_keyvid01"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <!--Renglon 3-->
+                <EditText
+                    android:id="@+id/edt_keyvid20"
+                    android:layout_centerHorizontal="true"
+                    android:layout_toLeftOf="@+id/edt_keyvid21"
+                    android:layout_below="@+id/edt_keyvid10"
+                    android:text="@string/key_example7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid21"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/edt_keyvid11"
+                    android:inputType="number"
+                    android:text="@string/key_example8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid22"
+                    android:layout_toRightOf="@+id/edt_keyvid21"
+                    android:layout_below="@+id/edt_keyvid12"
+                    android:text="@string/key_example9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyvid20"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/msg_key_3" />
+            </RelativeLayout>
+
+            <!-- Llave Inversa Video -->
+            <RelativeLayout
+                android:id="@+id/layout_matrizVideo_inv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/layout_matrizVideo"
+                android:layout_marginTop="12dp">
+
+
+
+                <EditText
+                    android:id="@+id/edt_keyvid00_inv"
+                    android:layout_toLeftOf="@+id/edt_keyvid01_inv"
+                    android:inputType="number"
+                    android:text="@string/key_example1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys"/>
+
+                <EditText
+                    android:id="@+id/edt_keyvid01_inv"
+                    android:inputType="number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_alignParentTop="true"
+                    android:text="@string/key_example1"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+
+                <EditText
+                    android:id="@+id/edt_keyvid02_inv"
+                    android:inputType="number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/edt_keyvid01_inv"
+                    android:layout_alignParentTop="true"
+                    android:text="@string/key_example1"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/edt_fragment_keys" />
+
+                <!--renglon 2-->
+                <EditText
+                    android:id="@+id/edt_keyvid10_inv"
+                    android:inputType="number"
+                    android:text="@string/key_example4"
+                    android:layout_below="@+id/edt_keyvid00_inv"
+                    android:layout_toLeftOf="@+id/edt_keyvid11_inv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid11_inv"
+                    android:inputType="number"
+                    android:layout_below="@+id/edt_keyvid01_inv"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/key_example5"
+                    android:textSize="@dimen/edt_fragment_keys"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid12_inv"
+                    android:inputType="number"
+                    android:text="@string/key_example6"
+                    android:layout_below="@+id/edt_keyvid02_inv"
+                    android:layout_toRightOf="@+id/edt_keyvid01_inv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <!--Renglon 3-->
+                <EditText
+                    android:id="@+id/edt_keyvid20_inv"
+                    android:layout_centerHorizontal="true"
+                    android:inputType="number"
+                    android:layout_toLeftOf="@+id/edt_keyvid21_inv"
+                    android:layout_below="@+id/edt_keyvid10_inv"
+                    android:text="@string/key_example7"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid21_inv"
+                    android:layout_centerHorizontal="true"
+                    android:layout_below="@+id/edt_keyvid11_inv"
+                    android:inputType="number"
+                    android:text="@string/key_example8"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:id="@+id/edt_keyvid22_inv"
+                    android:inputType="number"
+                    android:layout_toRightOf="@+id/edt_keyvid21_inv"
+                    android:layout_below="@+id/edt_keyvid12_inv"
+                    android:text="@string/key_example9"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/edt_keyvid20_inv"
+                    android:layout_centerHorizontal="true"
+                    android:text="@string/msg_key_4" />
+            </RelativeLayout>
+
+
 
         </RelativeLayout>
 
 
 
     </RelativeLayout>
+
+    </ScrollView>
 </FrameLayout>

@@ -85,7 +85,7 @@ public class FragmentVideo extends Fragment {
      * @param param2 Parameter 2.
      * @return A new instance of fragment FragmentVideo.
      */
-    // TODO: Rename and change types and number of parameters
+
     public static FragmentVideo newInstance(String param1, String param2) {
         FragmentVideo fragment = new FragmentVideo();
         Bundle args = new Bundle();
@@ -169,7 +169,7 @@ public class FragmentVideo extends Fragment {
         });
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
+
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
