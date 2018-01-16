@@ -10,8 +10,10 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -37,6 +39,9 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 
 
@@ -72,6 +77,15 @@ public class FragmentVideo extends Fragment {
     private WaveformView waveformView;
     private TextView info;
     private MarkerView startMarker, endMarker;
+    private DialogLlaves dialogLlaves;
+    private DialogProgress progressDialog;
+    private Handler handler;
+    private Long tiempoAntes, tiempoDespues;
+    private static String RECORD_DIRECTORY = "ENC";
+    private static String TMP_RECORD_DIRECTORY = "ENC/tmp";
+    public static String directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
+    private boolean directorioCreado = false;
+    private File encriptedFile;
 
     public FragmentVideo() {
         // Required empty public constructor
@@ -163,10 +177,29 @@ public class FragmentVideo extends Fragment {
         btnEncripttar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogProgress dp = new DialogProgress(context);
-                dp.show();
+                dialogLlaves = new DialogLlaves(context, 1);
+                dialogLlaves.show();
+                dialogLlaves.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        if(!dialogLlaves.getCancelled()){
+                            DatosEncriptar datos = DatosEncriptar.getInstance();
+                            if(datos.getLlaveAudio() != null){
+                                encriptar(dialogLlaves.getEncrypt());
+                            }
+                        }
+                    }
+                });
             }
         });
+
+        handler = new Handler();
+        progressDialog = null;
+        directorioCreado = new File(directorio, RECORD_DIRECTORY).exists();
+        if(!directorioCreado) directorioCreado = new File(directorio, RECORD_DIRECTORY).mkdir();
+        directorioCreado = new File(directorio, TMP_RECORD_DIRECTORY).exists();
+        if(!directorioCreado) directorioCreado = new File(directorio, TMP_RECORD_DIRECTORY).mkdir();
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -290,6 +323,253 @@ public class FragmentVideo extends Fragment {
             graficaOriginal.setmFile(file);
             graficaOriginal.generarGrafica();
         }
+    }
+
+    private void encriptar(final boolean encrypt){
+        progressDialog = new DialogProgress(context);
+
+        /*if(encrypt){
+            progressDialog.setTitle("Encriptando");
+        }
+        else
+        {
+            progressDialog.setTitle("Desencriptando");
+        }
+*/
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        new Thread(){
+            @Override
+            public void run(){
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        progressDialog.setProgress(0);
+                    }
+                });
+                int offset = 0;
+                tiempoAntes = System.currentTimeMillis();
+                DatosEncriptar datos = DatosEncriptar.getInstance();
+                int[][] llave;
+                if(dialogLlaves.getEncrypt()){
+                    llave = datos.getLlaveAudio();
+                }
+                else{
+                    llave = datos.getLlaveDesAudio();
+                    offset = 2;
+                }
+                int[] arreglo = new int[3];
+                int[] arregloSignos = new int[3];
+                int[] arregloEnc = new int[3];
+                /*Debug*/
+                /*Log.i("ISOUND", "Samples " + graficaOriginal.getSoundFile().getNumSamples());
+                Log.i("ISOUND", "Frames " + graficaOriginal.getSoundFile().getNumFrames());
+                Log.i("ISOUND", "SampleRate " + graficaOriginal.getSoundFile().getSampleRate() + "\nSamplesPerFrame " + graficaOriginal.getSoundFile().getSamplesPerFrame());*/
+
+                /*
+                Creamos los buffers, uno con los datos del sonido original y el segundo donde se alojaran los datos encriptados
+                 */
+                ByteBuffer bufferSonidoOriginal = graficaOriginal.getSoundFile().getDecodedBytes();
+                ByteBuffer otroBuffer = ByteBuffer.allocate(bufferSonidoOriginal.limit());
+                int lastProgress = 0;
+                for(int i = offset; i < bufferSonidoOriginal.limit(); i+=3)
+                {
+                    /*if(i%100 == 0 && i < 10000)Log.i("DATOSB", i + "--" + bufferSonidoOriginal.get(i) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", bufferSonidoOriginal.get(i + 1) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSB", bufferSonidoOriginal.get(i + 2) + "");*/
+                    //Asignamos los valores del Buffer al arrelo a encriptar
+                    arreglo[0] = bufferSonidoOriginal.get(i);
+                    if((i + 1) < bufferSonidoOriginal.limit()) arreglo[1] = bufferSonidoOriginal.get(i + 1);
+                    if((i + 2) < bufferSonidoOriginal.limit()) arreglo[2] = bufferSonidoOriginal.get(i + 2);
+                    /*if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[0] + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[1] + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSA", arreglo[2] + "");*/
+
+                    //Verificamos valor de signos
+                    for(int j = 0; j < 3; j++){
+                        if(arreglo[j] < 0){
+                            arreglo[j] = arreglo[j] * -1;
+                            arregloSignos[j] = -1;
+                        }
+                        else{
+                            arregloSignos[j] = 1;
+                        }
+                    }
+                    //Log.i("NENC", "[" + arreglo[0] + ", " + arreglo[1] + ", " + arreglo[2] + "]");
+
+                    //Encriptamos
+                    for(int j = 0; j < 3; j++)
+                    {
+                        arregloEnc[j] = 0;
+                        for(int k = 0; k < 3; k++)
+                        {
+                            arregloEnc[j] += llave[j][k] * arreglo[k];
+                        }
+                        //Modulo 128
+                        //if(i%100 == 0 && i < 10000)Log.i("DATOSENM", arregloEnc[j] + "");
+                        arregloEnc[j] = arregloEnc[j]%128;
+                        //if(i%100 == 0 && i < 10000)Log.i("DATOSE", arregloEnc[j] + "");
+                    }
+
+                    //Insertamos los datos encriptados en el buffer
+                    otroBuffer.put(i, ((byte) (arregloEnc[0] * arregloSignos[0])));
+                    if((i + 1) < bufferSonidoOriginal.limit())otroBuffer.put(i + 1, ((byte) (arregloEnc[1] * arregloSignos[1])));
+                    if((i + 2) < bufferSonidoOriginal.limit())otroBuffer.put(i + 2, ((byte) (arregloEnc[2] * arregloSignos[2])));
+                    /*otroBuffer.put(i, bufferSonidoOriginal.get(i));
+                    if((i + 1) < bufferSonidoOriginal.limit())otroBuffer.put(i + 1, bufferSonidoOriginal.get(i+1));
+                    if((i + 2) < bufferSonidoOriginal.limit())otroBuffer.put(i + 2, bufferSonidoOriginal.get(i+2));*/
+
+
+                    /*if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 1) + "");
+                    if(i%100 == 0 && i < 10000)Log.i("DATOSDes", otroBuffer.get(i + 2) + "");*/
+
+                    final int progresoEncriptacion = (i * 100) / bufferSonidoOriginal.limit();
+
+                    if(progresoEncriptacion > lastProgress){
+                        lastProgress = progresoEncriptacion;
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                progressDialog.setProgress(progresoEncriptacion);
+                            }
+                        });
+                    }
+
+                }
+                tiempoDespues = System.currentTimeMillis();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.setTitle("Creando Archivo");
+                    }
+                });
+
+                if(directorioCreado){
+                    String recordName = "";
+                    if(encrypt){
+                        recordName = "ENC_" + (graficaOriginal.mFile.getName().substring(0, (graficaOriginal.mFile.getName().length() - 4))) + ".wav";
+                    }
+                    else
+                    {
+
+                        recordName = "DES_" + (graficaOriginal.mFile.getName().substring(0, (graficaOriginal.mFile.getName().length() - 4))) + ".wav";
+                    }
+                    directorio = Environment.getExternalStorageDirectory().getAbsolutePath();
+                    directorio = directorio + File.separator + TMP_RECORD_DIRECTORY + File.separator + recordName;
+                    encriptedFile = new File(directorio);
+                    try{
+                        WriteWAVFile(encriptedFile, Float.parseFloat(startText.getText().toString()),
+                                Float.parseFloat(graficaOriginal.getMaxTime()),
+                                graficaOriginal.getSoundFile().getChannels(),
+                                graficaOriginal.getSoundFile().getSampleRate(),
+                                otroBuffer);
+                        MediaScannerConnection.scanFile (context, new String[] {encriptedFile.toString()}, null, null);
+                    }
+                    catch(IOException ioe){
+                        Log.e("CFILE", ioe.getMessage());
+                    }
+
+                }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        tiempoDespues = tiempoDespues - tiempoAntes;
+                        //editTituloEnc.setText("Tiempo encriptado: " + TimeUnit.MILLISECONDS.toSeconds(tiempoDespues) + " seg");
+                    }
+                });
+            }
+        }.start();
+    }
+
+    private void swapLeftRightChannels(byte[] buffer) {
+        byte left[] = new byte[2];
+        byte right[] = new byte[2];
+        if (buffer.length % 4 != 0) {  // 2 channels, 2 bytes per sample (for one channel).
+            // Invalid buffer size.
+            return;
+        }
+        for (int offset = 0; offset < buffer.length; offset += 4) {
+            left[0] = buffer[offset];
+            left[1] = buffer[offset + 1];
+            right[0] = buffer[offset + 2];
+            right[1] = buffer[offset + 3];
+            buffer[offset] = right[0];
+            buffer[offset + 1] = right[1];
+            buffer[offset + 2] = left[0];
+            buffer[offset + 3] = left[1];
+        }
+    }
+
+    public void WriteWAVFile(File outputFile, float startTime, float endTime, int mChannels, int mSampleRate, ByteBuffer mDecodedBytes)
+            throws java.io.IOException {
+        int startOffset = (int)(startTime * mSampleRate) * 2 * mChannels;
+        int numSamples = (int)((endTime - startTime) * mSampleRate);
+
+        // Start by writing the RIFF header.
+        FileOutputStream outputStream = new FileOutputStream(outputFile);
+        outputStream.write(WAVHeader.getWAVHeader(mSampleRate, mChannels, numSamples));
+
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.setProgress(0);
+            }
+        });
+
+        // Write the samples to the file, 1024 at a time.
+        byte buffer[] = new byte[1024 * mChannels * 2];  // Each sample is coded with a short.
+        mDecodedBytes.position(startOffset);
+        int numBytesLeft = numSamples * mChannels * 2;
+        int lastProgress = 0, contador = 0;
+        Log.i("FILE", "" + numBytesLeft);
+        while (numBytesLeft >= buffer.length) {
+            if (mDecodedBytes.remaining() < buffer.length) {
+                // This should not happen.
+                for (int i = mDecodedBytes.remaining(); i < buffer.length; i++) {
+                    buffer[i] = 0;  // pad with extra 0s to make a full frame.
+                }
+                mDecodedBytes.get(buffer, 0, mDecodedBytes.remaining());
+            } else {
+                mDecodedBytes.get(buffer);
+            }
+            if (mChannels == 2) {
+                swapLeftRightChannels(buffer);
+            }
+            final int progress = (100*contador)/numBytesLeft;
+            if(progress > lastProgress){
+                lastProgress = progress;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.setProgress(progress);
+                    }
+                });
+
+            }
+            outputStream.write(buffer);
+            numBytesLeft -= buffer.length;
+            contador++;
+        }
+        if (numBytesLeft > 0) {
+            if (mDecodedBytes.remaining() < numBytesLeft) {
+                // This should not happen.
+                for (int i = mDecodedBytes.remaining(); i < numBytesLeft; i++) {
+                    buffer[i] = 0;  // pad with extra 0s to make a full frame.
+                }
+                mDecodedBytes.get(buffer, 0, mDecodedBytes.remaining());
+            } else {
+                mDecodedBytes.get(buffer, 0, numBytesLeft);
+            }
+            if (mChannels == 2) {
+                swapLeftRightChannels(buffer);
+            }
+            outputStream.write(buffer, 0, numBytesLeft);
+        }
+        outputStream.close();
     }
 
     private class GraficaSonido implements com.turing.encripturing.MarkerView.MarkerListener, WaveformView.WaveformListener, VideoView.OnTouchListener{
