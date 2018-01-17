@@ -748,7 +748,7 @@ public class FragmentImagenes extends Fragment {
             // to execute "ffmpeg -version" command you just need to pass "-version"
             //NOTA: Hay que tener cuidado que los strings no tengan espacios innecesarios
             //      de lo contrario no se ejecutará correctamente
-            String[] cmd = new String[15];
+            String[] cmd = new String[18];
             cmd[0] = "-framerate";
             cmd[1] = "3";
             cmd[2] = "-f";
@@ -757,15 +757,16 @@ public class FragmentImagenes extends Fragment {
             cmd[5] = "storage/emulated/0/ENC/tmp/img%d.jpg";
             cmd[6] = "-i";
             cmd[7] = "storage/emulated/0/ENC/tmp/audio.mp3";
-            cmd[6] = "-c:v";
-            cmd[7] = "libx264";
-            cmd[8] = "-qp";
-            cmd[9] = "0";
-            cmd[10] = "-preset";
-            cmd[11] = "veryslow";
-            cmd[12] = "-b:a";
-            cmd[13] = "320k";
-            cmd[14] = "storage/emulated/0/ENC/tmp/a.mp4";
+            cmd[8] = "-c:v";
+            cmd[9] = "libx264";
+            cmd[10] = "-qp";
+            cmd[11] = "0";
+            cmd[12] = "-preset";
+            cmd[13] = "veryslow";
+            cmd[14] = "-b:a";
+            cmd[15] = "320k";
+            cmd[16] = "-shortest";
+            cmd[17] = "storage/emulated/0/ENC/tmp/a.mp4";
             ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
 
                 @Override
