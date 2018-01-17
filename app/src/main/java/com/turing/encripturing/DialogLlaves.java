@@ -247,7 +247,7 @@ public class DialogLlaves extends Dialog{
                     mat.print_matrix(llaveVideo);
                     llaveDesVideo = mat.get_inverse();
                     mat.print_matrix(llaveDesVideo);
-                    mat.print_matrix(mat.multiply(llaveDesAudio));
+                    mat.print_matrix(mat.multiply(llaveDesVideo));
                     llenarUIVideo();
                     btnAceptar.setEnabled(true);
                     btnCancelar.setEnabled(true);
@@ -304,7 +304,7 @@ public class DialogLlaves extends Dialog{
                     mat.print_matrix(llaveVideo);
                     llaveDesVideo = mat.get_inverse();
                     mat.print_matrix(llaveDesVideo);
-                    mat.print_matrix(mat.multiply(llaveDesAudio));
+                    mat.print_matrix(mat.multiply(llaveDesVideo));
                     llenarUIVideo();
                     btnAceptar.setEnabled(true);
                     btnCancelar.setEnabled(true);
@@ -326,16 +326,16 @@ public class DialogLlaves extends Dialog{
                 }
                 else if(type == 2) {
                     if(keygenerated){
-                        datosEncriptar.setLlaveAudio(llaveVideo);
-                        datosEncriptar.setLlaveDesAudio(llaveDesVideo);
+                        datosEncriptar.setLlaveVideo(llaveVideo);
+                        datosEncriptar.setLlaveDesVideo(llaveDesVideo);
                     }
                 }
                 else if(type == 3){
                     if(keygenerated){
                         datosEncriptar.setLlaveAudio(llaveAudio);
                         datosEncriptar.setLlaveDesAudio(llaveDesAudio);
-                        datosEncriptar.setLlaveAudio(llaveVideo);
-                        datosEncriptar.setLlaveDesAudio(llaveDesVideo);
+                        datosEncriptar.setLlaveVideo(llaveVideo);
+                        datosEncriptar.setLlaveDesVideo(llaveDesVideo);
                     }
                 }
                 dismiss();

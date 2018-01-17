@@ -37,6 +37,10 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
+
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.api.SequenceEncoder;
@@ -63,6 +67,8 @@ import org.opencv.imgproc.Imgproc;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Console;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -94,7 +100,7 @@ public class FragmentImagenes extends Fragment {
     private MediaController mc;
     private RelativeLayout.LayoutParams paramsNotFullScreen;
     private FloatingActionButton btn_SeleccionarVideo;
-    private Context context;
+    private static Context context;
     private final int SELECT_VIDEO = 201;
     private final int GRABAR_VIDEO = 202;
     private Uri pathVideo;
@@ -636,7 +642,7 @@ public class FragmentImagenes extends Fragment {
     }
 
     /**
-     * Funcion para extraer los frames de un video
+     * Funcion para extraer los frames de un video a partir de la clase HilosPorFrame
      */
     public void getFramesOfVideo(){
         progressDialog = new ProgressDialog(getActivity());
@@ -700,6 +706,9 @@ public class FragmentImagenes extends Fragment {
         }.start();
     }
 
+    /**
+     * Método para actualizar el Progress Dialog de la obteneción de frames
+     */
     public static void reportProgressFrames(){
         numberOfFramesExtracted++;
         progressDialog.setProgress((numberOfFramesExtracted * 100)/FragmentImagenes.frames.length);
@@ -718,6 +727,10 @@ public class FragmentImagenes extends Fragment {
         }
     }
 
+    /**
+     * Método estátitco para obtener la fecha y hora actual en el formato necesario para nombrar el video
+     * @return String con la fecha y hora actual
+     */
     public static String getFechaActual(){
         Date ahora = new Date();
         SimpleDateFormat formateador = new SimpleDateFormat("yyyyMMDDhhmmss");
@@ -725,10 +738,61 @@ public class FragmentImagenes extends Fragment {
     }
 
     public static void generatVideo(){
+        FFmpeg ffmpeg = FFmpeg.getInstance(FragmentImagenes.context);
+        File file = new File("storage/emulated/0/ENC/tmp/a.mp4");
+        if(file.exists()){
+            file.delete();
+        }
+        try {
+            Log.i("GENERARVIDEO", "Entró a la función para ganerar video");
+            // to execute "ffmpeg -version" command you just need to pass "-version"
+            //NOTA: Hay que tener cuidado que los strings no tengan espacios innecesarios
+            //      de lo contrario no se ejecutará correctamente
+            String[] cmd = new String[15];
+            cmd[0] = "-framerate";
+            cmd[1] = "3";
+            cmd[2] = "-f";
+            cmd[3] = "image2";
+            cmd[4] = "-i";
+            cmd[5] = "storage/emulated/0/ENC/tmp/img%d.jpg";
+            cmd[6] = "-i";
+            cmd[7] = "storage/emulated/0/ENC/tmp/audio.mp3";
+            cmd[6] = "-c:v";
+            cmd[7] = "libx264";
+            cmd[8] = "-qp";
+            cmd[9] = "0";
+            cmd[10] = "-preset";
+            cmd[11] = "veryslow";
+            cmd[12] = "-b:a";
+            cmd[13] = "320k";
+            cmd[14] = "storage/emulated/0/ENC/tmp/a.mp4";
+            ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
+
+                @Override
+                public void onStart() {}
+
+                @Override
+                public void onProgress(String message) {}
+
+                @Override
+                public void onFailure(String message) {}
+
+                @Override
+                public void onSuccess(String message) {}
+
+                @Override
+                public void onFinish() {}
+            });
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            // Handle if FFmpeg is already running
+        }
     }
 
+    /**
+     * Método estátitco para actualizar el Progress Dialog de la encriptación de imágenes
+     */
     public static void reportProgressFramesEncriptados(){
-        Log.i("PROGRESO", Integer.toString(numberOfFramesEncriptados) + "=" + Integer.toString((numberOfFramesEncriptados * 100)/FragmentImagenes.frames.length));
+        //Log.i("PROGRESO", Integer.toString(numberOfFramesEncriptados) + "=" + Integer.toString((numberOfFramesEncriptados * 100)/FragmentImagenes.frames.length));
         numberOfFramesEncriptados++;
         progressDialog.setProgress((numberOfFramesEncriptados * 100)/FragmentImagenes.frames.length);
         if(numberOfFramesEncriptados == frames.length){
@@ -738,6 +802,7 @@ public class FragmentImagenes extends Fragment {
                 public void run() {
                     imgFrames.setImageBitmap(frames[0]);
                     crearDirectorio();
+                    generatVideo();
                     numberOfFramesEncriptados = 0;
                 }
             });
@@ -745,10 +810,13 @@ public class FragmentImagenes extends Fragment {
         }
     }
 
+    /**
+     * Método estático para crear un directorio con las imagenes después de encriptarlas
+     */
     public static void crearDirectorio(){
         FileOutputStream fos = null;
         for(int i=0; i<frames.length; i++){
-            File file = new File("storage/emulated/0/ENC/tmp/img00"+ (i+1) + ".jpeg");
+            File file = new File("storage/emulated/0/ENC/tmp/img"+ (i+1) + ".jpg");
             Bitmap bmTMP = frames[i];
             try{
                 if(file.exists()){
@@ -767,7 +835,8 @@ public class FragmentImagenes extends Fragment {
 
     /**
      * Función para encriptar un frame individualmente
-     * @param encrypt
+     * @param encrypt booleano que nos indica que se va a encriptar si es true
+     *                o que se va a desencriptar si es false
      */
     private void encriptar(final boolean encrypt){
         progressDialog = new ProgressDialog(getActivity());
@@ -850,6 +919,15 @@ public class FragmentImagenes extends Fragment {
         }.start();
     }
 
+    /**
+     * Clase estátitca que se instancia desde el método getFramesOfVideo al crearse un Thread
+     * Su método buscarSegundo() extrae los frames de un video a partir de las siguientes entradas y los convierte en Bitmap
+     * Su constructor recibe
+     *  -initialPosition : las posición inicial dentro de un arreglo de Bitmap
+     *  -finalPosition   : las posición final dentro de un arreglo de Bitmap
+     *  -initialTime     : la posición inicial del video desde la cual se empezarán a extraer los frames
+     *  -frameGrab       : objeto de la librería Jcodec que permite leer el stream de datos del video para extrar el frame
+     */
     public static class HilosPorFrame implements Runnable{
         double initialTime;
         int initialPosition, finalPoisition;
@@ -887,6 +965,9 @@ public class FragmentImagenes extends Fragment {
         }
     }
 
+    /**
+     * Método estático que permite encriptar los Bitmap de un arreglo a partir de la clase EncriptarFrames
+     */
     public void encriptarFramesThread(){
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -914,14 +995,14 @@ public class FragmentImagenes extends Fragment {
                                 dialogLlaves
                         ));
                     } else {//Ultimo fragmento de frames
-                        Log.i("PROGRESO", "Inicia ultimo segmento de frames");
+                        //Log.i("PROGRESO", "Inicia ultimo segmento de frames");
                         DefaultExecutorSupplier.getInstance().forBackgroundTasks().execute(new EncriptarFrames(
                                 initialPosition,
                                 frames.length - 1,
                                 Arrays.copyOfRange(frames, initialPosition, frames.length),
                                 dialogLlaves
                         ));
-                        Log.i("PROGRESO", "Terminó ultimo segmento de frames");
+                        //Log.i("PROGRESO", "Terminó ultimo segmento de frames");
                     }
                     initialPosition = initialPosition + framesThread;
                 }
@@ -930,6 +1011,14 @@ public class FragmentImagenes extends Fragment {
         }.start();
     }
 
+    /**
+     * Clase estátitca que se instancia desde el método encriptarFrames al crearse un Thread
+     * Su método encriptarFrames se encarga de encriptar un arreglo de Bitmap a partir de las siguientes entradas
+     *  -initialPosition : La posición inicial del arreglo de Bitmap
+     *  -finalPosition   : La posición final del arreglo de Bitmap
+     *  -framesAEncriptar: Arreglo de bitmap que recibe una copia de una cantidad de Bitmaps del arreglo original
+     *  -dialogLlaves    : Recibe los datos de las matrices de encriptación
+     */
     public static class EncriptarFrames implements Runnable{
         int initialPosition;
         int finalPosition;
@@ -973,9 +1062,9 @@ public class FragmentImagenes extends Fragment {
                 }
                 FragmentImagenes.reportProgressFramesEncriptados();
                 bitmapsEncriptados[o] = frameEncriptado;
-                Log.i("SUBENCRIPTADO", Integer.toString(o) +"/"+ Integer.toString(framesAEncriptar.length-1));
+                //Log.i("SUBENCRIPTADO", Integer.toString(o) +"/"+ Integer.toString(framesAEncriptar.length-1));
             }
-            Log.i("ENCRIPTADO", Integer.toString(initialPosition) + ", " + Integer.toString(finalPosition));
+            //Log.i("ENCRIPTADO", Integer.toString(initialPosition) + ", " + Integer.toString(finalPosition));
             for(int p = 0; p < framesAEncriptar.length; p ++){
                 frames[initialPosition+p]=bitmapsEncriptados[p];
             }
