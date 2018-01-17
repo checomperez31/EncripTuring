@@ -749,24 +749,24 @@ public class FragmentImagenes extends Fragment {
             //NOTA: Hay que tener cuidado que los strings no tengan espacios innecesarios
             //      de lo contrario no se ejecutará correctamente
             String[] cmd = new String[18];
-            cmd[0] = "-framerate";
+            cmd[0] = "-framerate"; //Prepara el comando para establecer un framerate específico
             cmd[1] = "3";
-            cmd[2] = "-f";
+            cmd[2] = "-f"; // Este comando junto con la siguiente línea le dice a ffmpeg que seleccione un grupo de imágenes
             cmd[3] = "image2";
-            cmd[4] = "-i";
-            cmd[5] = "storage/emulated/0/ENC/tmp/img%d.jpg";
-            cmd[6] = "-i";
-            cmd[7] = "storage/emulated/0/ENC/tmp/audio.mp3";
-            cmd[8] = "-c:v";
-            cmd[9] = "libx264";
-            cmd[10] = "-qp";
-            cmd[11] = "0";
-            cmd[12] = "-preset";
-            cmd[13] = "veryslow";
-            cmd[14] = "-b:a";
+            cmd[4] = "-i"; //Establece una entrada para el archivo de salida en este caso video
+            cmd[5] = "storage/emulated/0/ENC/tmp/img%d.jpg"; //Le adjuntamos la ruta junto con '%d' para que recorra toda las imágenes seriadas
+            cmd[6] = "-i"; //Establece una segunda entrada para el archivo de salida en este caso audio
+            cmd[7] = "storage/emulated/0/ENC/tmp/audio.wav"; //Le decimos la ruta del archivo de entrada
+            cmd[8] = "-c:v"; //Establecemos la librería que encodeará el video
+            cmd[9] = "libx264"; //Establecemos que sea la que encodea en h264
+            cmd[10] = "-qp"; //Establecemos la calidad de las ímagenes a encodear con ésta línea y el valor de la siguiente línea. Una alternativa es -crf
+            cmd[11] = "0"; //Un valor entre 0-51 siendo '0' el valor sin pérdida, '23' default visualmente sin perdida, '51' peor valor de calidad visual y de datos, pero más rápido
+            cmd[12] = "-preset";//Establecemos ajustes para que todos los demás comandos omitidos tiendan a la mejor calidad, para que no exista pérdida de datos
+            cmd[13] = "veryslow";//Este es el preset para mejor calidad
+            cmd[14] = "-b:a";//Le establecemos un bitrate al audio de 320k
             cmd[15] = "320k";
-            cmd[16] = "-shortest";
-            cmd[17] = "storage/emulated/0/ENC/tmp/a.mp4";
+            cmd[16] = "-shortest";//Agregamos este comando para que el archivo siempre dure lo mismo que el archivo de entrada de longitud más pequeña
+            cmd[17] = "storage/emulated/0/ENC/tmp/a.mp4";//Definimos la ruta del archivo de salida
             ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
 
                 @Override
