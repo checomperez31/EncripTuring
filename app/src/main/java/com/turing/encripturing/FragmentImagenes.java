@@ -748,7 +748,7 @@ public class FragmentImagenes extends Fragment {
             // to execute "ffmpeg -version" command you just need to pass "-version"
             //NOTA: Hay que tener cuidado que los strings no tengan espacios innecesarios
             //      de lo contrario no se ejecutará correctamente
-            String[] cmd = new String[18];
+            String[] cmd = new String[16];
             cmd[0] = "-framerate"; //Prepara el comando para establecer un framerate específico
             cmd[1] = "3";
             cmd[2] = "-f"; // Este comando junto con la siguiente línea le dice a ffmpeg que seleccione un grupo de imágenes
@@ -760,13 +760,14 @@ public class FragmentImagenes extends Fragment {
             cmd[8] = "-c:v"; //Establecemos la librería que encodeará el video
             cmd[9] = "libx264"; //Establecemos que sea la que encodea en h264
             cmd[10] = "-qp"; //Establecemos la calidad de las ímagenes a encodear con ésta línea y el valor de la siguiente línea. Una alternativa es -crf
-            cmd[11] = "0"; //Un valor entre 0-51 siendo '0' el valor sin pérdida, '23' default visualmente sin perdida, '51' peor valor de calidad visual y de datos, pero más rápido
+            cmd[11] = "17"; //Un valor entre 0-51 siendo '0' el valor sin pérdida, '23' default visualmente sin perdida, '51' peor valor de calidad visual y de datos, pero más rápido
             cmd[12] = "-preset";//Establecemos ajustes para que todos los demás comandos omitidos tiendan a la mejor calidad, para que no exista pérdida de datos
-            cmd[13] = "veryslow";//Este es el preset para mejor calidad
-            cmd[14] = "-b:a";//Le establecemos un bitrate al audio de 320k
-            cmd[15] = "320k";
-            cmd[16] = "-shortest";//Agregamos este comando para que el archivo siempre dure lo mismo que el archivo de entrada de longitud más pequeña
-            cmd[17] = "storage/emulated/0/ENC/tmp/a.mp4";//Definimos la ruta del archivo de salida
+            cmd[13] = "slow";//Este es segundo mejor (Siendo el mejor 'veryslow') el preset para mejor calidad
+            /*cmd[14] = "-b:a";//Le establecemos un bitrate al audio de 320k
+            cmd[15] = "320k";*/
+            cmd[14] = "-shortest";//Agregamos este comando para que el archivo siempre dure lo mismo que el archivo de entrada de longitud más pequeña
+            cmd[15] = "storage/emulated/0/ENC/tmp/a.mp4";//Definimos la ruta del archivo de salida
+            Log.i("FFMPEG", cmd[11]);
             ffmpeg.execute(cmd, new ExecuteBinaryResponseHandler() {
 
                 @Override
