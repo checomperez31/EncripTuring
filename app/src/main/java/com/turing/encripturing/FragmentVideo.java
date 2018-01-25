@@ -159,7 +159,8 @@ public class FragmentVideo extends Fragment {
      * @param savedInstanceState
      */
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState){DisplayMetrics metrics = new DisplayMetrics();
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
+        DisplayMetrics metrics = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
         density = metrics.density;
         btnSeleccionarVideo.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +172,7 @@ public class FragmentVideo extends Fragment {
         reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
+                mediaPlayer.setVolume(0f, 0f);
                 mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                     //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
                     @Override
