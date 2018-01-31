@@ -216,7 +216,7 @@ public class DialogLlaves extends Dialog{
                     while(generar);
 
                     mat.print_matrix(llaveAudio);
-                    llaveDesAudio = mat.get_inverse();
+                    //llaveDesAudio = mat.get_inverse();
                     mat.print_matrix(llaveDesAudio);
                     mat.print_matrix(mat.multiply(llaveDesAudio));
                     llenarUIAudio();
@@ -245,7 +245,7 @@ public class DialogLlaves extends Dialog{
                     while(generar);
 
                     mat.print_matrix(llaveVideo);
-                    llaveDesVideo = mat.get_inverse();
+                    //llaveDesVideo = mat.get_inverse();
                     mat.print_matrix(llaveDesVideo);
                     mat.print_matrix(mat.multiply(llaveDesVideo));
                     llenarUIVideo();
@@ -274,7 +274,7 @@ public class DialogLlaves extends Dialog{
                     while(generar);
 
                     mat.print_matrix(llaveAudio);
-                    llaveDesAudio = mat.get_inverse();
+                    //llaveDesAudio = mat.get_inverse();
                     mat.print_matrix(llaveDesAudio);
                     mat.print_matrix(mat.multiply(llaveDesAudio));
                     llenarUIAudio();
@@ -302,7 +302,7 @@ public class DialogLlaves extends Dialog{
                     while(generar);
 
                     mat.print_matrix(llaveVideo);
-                    llaveDesVideo = mat.get_inverse();
+                    //llaveDesVideo = mat.get_inverse();
                     mat.print_matrix(llaveDesVideo);
                     mat.print_matrix(mat.multiply(llaveDesVideo));
                     llenarUIVideo();
@@ -345,6 +345,26 @@ public class DialogLlaves extends Dialog{
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(type == 1){
+                    if(keygenerated){
+                        datosEncriptar.setLlaveAudio(llaveAudio);
+                        datosEncriptar.setLlaveDesAudio(llaveDesAudio);
+                    }
+                }
+                else if(type == 2) {
+                    if(keygenerated){
+                        datosEncriptar.setLlaveVideo(llaveVideo);
+                        datosEncriptar.setLlaveDesVideo(llaveDesVideo);
+                    }
+                }
+                else if(type == 3){
+                    if(keygenerated){
+                        datosEncriptar.setLlaveAudio(llaveAudio);
+                        datosEncriptar.setLlaveDesAudio(llaveDesAudio);
+                        datosEncriptar.setLlaveVideo(llaveVideo);
+                        datosEncriptar.setLlaveDesVideo(llaveDesVideo);
+                    }
+                }
                 canceled = true;
                 dismiss();
             }

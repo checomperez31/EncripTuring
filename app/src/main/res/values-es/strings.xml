@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">TuringPlayer</string>
     <string name="action_settings">Configuraciones</string>
 
+    <string name="navigation_drawer_open">Abrir ventana de navegación</string>
+    <string name="navigation_drawer_close">Cerrar ventana de navegación</string>
     <!-- Strings Fragmento Sonido -->
     <string name = "nombre_sonido">Nombre del Audio</string>
     <string name = "tam_sonido">Tamaño del audio</string>

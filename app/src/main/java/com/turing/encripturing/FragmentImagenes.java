@@ -47,6 +47,7 @@ import org.jcodec.api.SequenceEncoder;
 import org.jcodec.common.AndroidUtil;
 import org.jcodec.common.DemuxerTrack;
 import org.jcodec.common.DemuxerTrackMeta;
+import org.jcodec.common.io.FileChannelWrapper;
 import org.jcodec.common.io.NIOUtils;
 import org.jcodec.common.model.Frame;
 import org.jcodec.common.model.Picture;
@@ -143,9 +144,10 @@ public class FragmentImagenes extends Fragment {
     private static int numberOfFramesExtracted = 0;
     private static Handler handler;
     private int positionFrame = 0;
-    public static double timeforFrame = 0.33;//33 ms para cada frame da un aproximado de 3 frames por segundo
+    public static double timeforFrame;//33 ms para cada frame da un aproximado de 3 frames por segundo
     private static double time = 0;
     public static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
+    private static int fps;
 
     private OnFragmentInteractionListener mListener;
 
@@ -430,96 +432,121 @@ public class FragmentImagenes extends Fragment {
 
                 //Modifiqué la asignación del view para que éste pudiera establecerse correctamente
                 reproductor = getView().findViewById(R.id.reproductorVideo);
+                try {
+                    Log.i("DURACION", "DURACION= " + getDurationOfVideo(data));
+                    if(getDurationOfVideo(data) >= 3.00 && getDurationOfVideo(data) <= 7.00){
+                        reproductor.setVideoURI(Uri.parse(data));
+                        reproductor.setVisibility(View.VISIBLE);
+                        fileVideo = new File(data);
+                        Log.i("RUTA", data);
+                        mmdr.setDataSource(data);
 
-                reproductor.setVideoURI(Uri.parse(data));
-                fileVideo = new File(data);
-                Log.i("RUTA", data);
-                mmdr.setDataSource(data);
-
-
-                //el listener que detecta cuando el video esta en play o pause
-                reproductor.setPlayPauseListener(new CustomVideoView.PlayPauseListener() {
-                    @Override
-                    public void onPlay() {
-                        //mensaje que se muestra cuando está reproduciendo
-                        Toast.makeText(getActivity(),"Está reproduciendo",Toast.LENGTH_SHORT).show();
-                        histograma = getView().findViewById(R.id.histogramaImgView);
-                        imgViewBN = getView().findViewById(R.id.imgViewBN);
-                        histogramaLum = getView().findViewById(R.id.histogramaLumImgView);
-                        histograma.setVisibility(ImageView.GONE);
-                        imgViewBN.setVisibility(ImageView.GONE);
-                        histogramaLum.setVisibility(ImageView.GONE);
-                        imgViewEncriptado.setVisibility(ImageView.GONE);
-                    }
-                    @Override
-                    public void onPause() {
-                        /*
-                        Bloque de codigo de chequiño :v
-                         */
-
-                        //TERMINA
-                        //mensaje que se muestra cuando está pausado
-                        Toast.makeText(getActivity(),"Está pausado"
-                                +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
-                        //Extraemos el frame en el instante que se da pause
-                        bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
-                        SingletonBitmap.getInstance().setBm(bm);
-                        Log.i("SINGLETON", "Setea el BM desde el on Pause");
-                        Mat bmMat = new Mat();
-                        Utils.bitmapToMat(bm, bmMat);
-                        Mat bmGrayMat = new Mat();
-                        //Convertirmos la imagen a escala de grises
-                        Bitmap bmGray = createContrast(bm,bmMat,bmGrayMat);
-
-
-
-                        //Definimos el contenido de nuestro ImageView en el layout con los datos del histograma y los hacemos visibles
-                        histograma = getView().findViewById(R.id.histogramaImgView);
-                        histograma.setImageBitmap(getHistogramaColor(bm));
-                        histograma.setVisibility(ImageView.VISIBLE);
-                        imgViewBN = getView().findViewById(R.id.imgViewBN);
-                        imgViewBN.setImageBitmap(bmGray);
-                        imgViewBN.setVisibility(ImageView.VISIBLE);
-                        histogramaLum = getView().findViewById(R.id.histogramaLumImgView);
-                        histogramaLum.setImageBitmap(getHistogramaBN(bmGray));
-                        histogramaLum.setVisibility(ImageView.VISIBLE);
-                        Log.i("TESTEO", "Sale");
-                    }
-                });
-
-                //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
-                reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    @Override
-                    public void onPrepared(MediaPlayer mediaPlayer) {
-                        mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                            //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
+                        //el listener que detecta cuando el video esta en play o pause
+                        reproductor.setPlayPauseListener(new CustomVideoView.PlayPauseListener() {
                             @Override
-                            public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
-                                mc = new MediaController(getActivity());
-                                //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
-                                //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
-                                reproductor.setMediaController(mc);
-                                mc.setAnchorView(reproductor);
+                            public void onPlay() {
+                                //mensaje que se muestra cuando está reproduciendo
+                                Toast.makeText(getActivity(),"Está reproduciendo",Toast.LENGTH_SHORT).show();
+                                histograma = getView().findViewById(R.id.histogramaImgView);
+                                imgViewBN = getView().findViewById(R.id.imgViewBN);
+                                histogramaLum = getView().findViewById(R.id.histogramaLumImgView);
+                                histograma.setVisibility(ImageView.GONE);
+                                imgViewBN.setVisibility(ImageView.GONE);
+                                histogramaLum.setVisibility(ImageView.GONE);
+                                imgViewEncriptado.setVisibility(ImageView.GONE);
+                            }// Fin onPlay()
+                            @Override
+                            public void onPause() {
+                                /*
+                                Bloque de codigo de chequiño :v
+                                */
+
+                                //TERMINA
+                                //mensaje que se muestra cuando está pausado
+                                Toast.makeText(getActivity(),"Está pausado"
+                                        +reproductor.getCurrentPosition(),Toast.LENGTH_SHORT).show();
+                                //Extraemos el frame en el instante que se da pause
+                                bm = mmdr.getFrameAtTime(reproductor.getCurrentPosition()*1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                                SingletonBitmap.getInstance().setBm(bm);
+                                Log.i("SINGLETON", "Setea el BM desde el on Pause");
+                                Mat bmMat = new Mat();
+                                Utils.bitmapToMat(bm, bmMat);
+                                Mat bmGrayMat = new Mat();
+                                //Convertirmos la imagen a escala de grises
+                                Bitmap bmGray = createContrast(bm,bmMat,bmGrayMat);
+
+
+
+                                //Definimos el contenido de nuestro ImageView en el layout con los datos del histograma y los hacemos visibles
+                                histograma = getView().findViewById(R.id.histogramaImgView);
+                                histograma.setImageBitmap(getHistogramaColor(bm));
+                                histograma.setVisibility(ImageView.VISIBLE);
+                                imgViewBN = getView().findViewById(R.id.imgViewBN);
+                                imgViewBN.setImageBitmap(bmGray);
+                                imgViewBN.setVisibility(ImageView.VISIBLE);
+                                histogramaLum = getView().findViewById(R.id.histogramaLumImgView);
+                                histogramaLum.setImageBitmap(getHistogramaBN(bmGray));
+                                histogramaLum.setVisibility(ImageView.VISIBLE);
+                                Log.i("TESTEO", "Sale");
+                            }// Fin onPause
+                        });//Fin pauseListener
+
+                        //Listener para aplicar el media controller al tamaño del video una vez que esté cargado
+                        reproductor.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                            @Override
+                            public void onPrepared(MediaPlayer mediaPlayer) {
+                                mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                                    //Listener en caso de que el video se redimensione y posicionar de nuevo el media controller
+                                    @Override
+                                    public void onVideoSizeChanged(MediaPlayer mediaPlayer, int i, int i1) {
+                                        mc = new MediaController(getActivity());
+                                        //IMPORTANTE asignar el media controller al videoView antes de posicionarlo
+                                        //de lo contrario se colocará en la parte de abajo de la pantalla sobreponiendose
+                                        reproductor.setMediaController(mc);
+                                        mc.setAnchorView(reproductor);
+                                    }
+                                });
                             }
                         });
+
+                        reproductor.start();
+                        reproductor.requestFocus();
+                    }// Fin if(duracion > 3 && duracion<7)
+                    else{
+                        Toast.makeText(getActivity(), "El video debe tener una duración entre 3 y 7 segundos",Toast.LENGTH_LONG).show();
+                        reproductor.setVisibility(View.INVISIBLE);
                     }
-                });
-
-                reproductor.start();
-                reproductor.requestFocus();
-
-
-            }
+                }catch (IOException ioe){
+                    ioe.printStackTrace();
+                }//Fin catch
+            }//Fin if(cursor!=null && cursor.moveToFirst)
         } finally {
-
             if (cursor != null) {
                 cursor.close();
-            }
-        }
-    }
+            }//Fin cursor != null
+        }//Fin finally
+    }// obtenerVideo()
 
     public VideoView getReproductor(){
         return reproductor;
+    }
+
+    public double getDurationOfVideo(String path) throws IOException {
+        double duracion;
+        FileChannelWrapper ch = NIOUtils.readableFileChannel(path);
+        MP4Demuxer demuxer = MP4Demuxer.createMP4Demuxer(ch);
+        DemuxerTrack video_track = demuxer.getVideoTrack();
+        duracion = video_track.getMeta().getTotalDuration();
+        return duracion;
+    }
+
+    public int getNoFramesOfVideo(String path) throws IOException {
+        int noFrames;
+        FileChannelWrapper ch = NIOUtils.readableFileChannel(path);
+        MP4Demuxer demuxer = MP4Demuxer.createMP4Demuxer(ch);
+        DemuxerTrack video_track = demuxer.getVideoTrack();
+        noFrames = video_track.getMeta().getTotalFrames();
+        return noFrames;
     }
 
     public static Bitmap createContrast(Bitmap img, Mat src, Mat fin){
@@ -662,9 +689,14 @@ public class FragmentImagenes extends Fragment {
 
                 try {
                     grab = FrameGrab.createFrameGrab(NIOUtils.readableChannel(fileVideo));
-                    int durationOfVideo = reproductor.getDuration();
-                    frames = new Bitmap[(durationOfVideo/330) + 1];//calculamos el numero total de frames
+
+                    double durationOfVideo = getDurationOfVideo(fileVideo.toString());
+                    frames = new Bitmap[getNoFramesOfVideo(fileVideo.toString())];
+                    fps = (int) (frames.length/durationOfVideo);
+                    timeforFrame = 1/(double)fps;
                     Log.i("Debug", "NumberOfFrames: " + frames.length);
+                    Log.i("Debug", "NumberOfFramesPerSecond: " + fps);
+                    Log.i("Debug", "TimeForFrame: " + timeforFrame);
                     int framesThread = frames.length/NUMBER_OF_CORES;//calculamos el numero de hilos por nucleo
                     int initialPosition = 0;
                     double initialTime = 0;
@@ -738,6 +770,7 @@ public class FragmentImagenes extends Fragment {
     }
 
     public static void generatVideo(){
+        String framerate = Integer.toString(fps);
         FFmpeg ffmpeg = FFmpeg.getInstance(FragmentImagenes.context);
         File file = new File("storage/emulated/0/ENC/tmp/a.mp4");
         if(file.exists()){
@@ -750,7 +783,7 @@ public class FragmentImagenes extends Fragment {
             //      de lo contrario no se ejecutará correctamente
             String[] cmd = new String[16];
             cmd[0] = "-framerate"; //Prepara el comando para establecer un framerate específico
-            cmd[1] = "3";
+            cmd[1] = framerate;
             cmd[2] = "-f"; // Este comando junto con la siguiente línea le dice a ffmpeg que seleccione un grupo de imágenes
             cmd[3] = "image2";
             cmd[4] = "-i"; //Establece una entrada para el archivo de salida en este caso video
